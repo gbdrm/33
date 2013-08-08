@@ -1,0 +1,43 @@
+﻿@model _33.Models.HomeModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>HomeModel</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.BuildServerName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.BuildServerName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.BuildServerAddress)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.BuildServerAddress)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.IssueTrackerName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IssueTrackerName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.IssueTrackerAddress)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IssueTrackerAddress)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.HomeModelId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

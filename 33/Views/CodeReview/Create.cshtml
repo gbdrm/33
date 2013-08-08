@@ -1,0 +1,59 @@
+﻿@model _33.Models.CodeReview
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>CodeReview</legend>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Changeset)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Changeset)
+            @Html.ValidationMessageFor(model => model.Changeset)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.File)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.File)
+            @Html.ValidationMessageFor(model => model.File)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Lines)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Lines)
+            @Html.ValidationMessageFor(model => model.Lines)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Comment)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Comment)
+            @Html.ValidationMessageFor(model => model.Comment)
+        </div>
+
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

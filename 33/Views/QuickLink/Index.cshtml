@@ -1,0 +1,51 @@
+﻿@model IEnumerable<_33.Models.QuickLink>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.HomeModel.BuildServerName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LinkText)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ActionName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ContollerName)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.HomeModel.BuildServerName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.LinkText)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ActionName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ContollerName)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.QuickLinkId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.QuickLinkId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.QuickLinkId })
+        </td>
+    </tr>
+}
+
+</table>

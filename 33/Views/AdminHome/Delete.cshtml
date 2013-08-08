@@ -1,0 +1,46 @@
+﻿@model _33.Models.HomeModel
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>HomeModel</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.BuildServerName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.BuildServerName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.BuildServerAddress)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.BuildServerAddress)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.IssueTrackerName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IssueTrackerName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.IssueTrackerAddress)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IssueTrackerAddress)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

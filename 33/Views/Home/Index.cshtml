@@ -1,0 +1,40 @@
+﻿@model _33.Models.HomeModel
+@{
+    ViewBag.Title = "Home Page";
+}
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <hgroup class="title">
+                <h1>@ViewBag.Title.</h1>
+                <h2>@ViewBag.Message</h2>
+            </hgroup>
+            
+        </div>
+    </section>
+}
+@if (@Model != null)
+{
+    <h3>
+        Qucik links:</h3>
+    <ol class="round">
+        <li class="one">
+            <h5>
+                Bulid Server</h5>
+            <a href=@Model.BuildServerAddress>@Model.BuildServerName</a> </li>
+        <li class="two">
+            <h5>
+                Issue Tracker</h5>
+            <a href=@Model.IssueTrackerAddress>@Model.IssueTrackerName</a>
+            <li class="three">
+                <h5>
+                    Other</h5>
+                <ul>
+                    @foreach (_33.Models.QuickLink item in Model.QuickLinks)
+                    {
+                        <li>@Html.ActionLink(item.LinkText, item.ActionName, item.ContollerName)</li>
+                    }
+                </ul>
+            </li>
+    </ol>
+}

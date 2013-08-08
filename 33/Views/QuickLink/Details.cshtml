@@ -1,0 +1,43 @@
+﻿@model _33.Models.QuickLink
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>QuickLink</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.HomeModel.BuildServerName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.HomeModel.BuildServerName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.LinkText)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.LinkText)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.ActionName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ActionName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.ContollerName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ContollerName)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.QuickLinkId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

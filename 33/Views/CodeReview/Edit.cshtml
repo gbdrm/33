@@ -1,0 +1,71 @@
+﻿@model _33.Models.CodeReview
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>CodeReview</legend>
+
+        @Html.HiddenFor(model => model.CodeReviewId)
+        @Html.HiddenFor(model => model.DateAdded)
+        @Html.HiddenFor(model => model.DateComplete)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Changeset)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Changeset)
+            @Html.ValidationMessageFor(model => model.Changeset)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.File)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.File)
+            @Html.ValidationMessageFor(model => model.File)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Lines)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Lines)
+            @Html.ValidationMessageFor(model => model.Lines)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Comment)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Comment)
+            @Html.ValidationMessageFor(model => model.Comment)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ActionDone)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ActionDone)
+            @Html.ValidationMessageFor(model => model.ActionDone)
+        </div>
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

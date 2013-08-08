@@ -1,0 +1,51 @@
+﻿@model IEnumerable<_33.Models.HomeModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.BuildServerName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BuildServerAddress)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IssueTrackerName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IssueTrackerAddress)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.BuildServerName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.BuildServerAddress)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IssueTrackerName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IssueTrackerAddress)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.HomeModelId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.HomeModelId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.HomeModelId })
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,108 @@
+﻿@model IEnumerable<_33.Models.CodeReview>
+@{
+    ViewBag.Title = "Code reviews";
+}
+
+<style>
+th.header { 
+    background-image: url(../../Images/bg.gif);     
+    cursor: pointer; 
+    font-weight: bold; 
+    background-repeat: no-repeat; 
+    background-position: center left; 
+    padding-left: 20px; 
+    border-right: 1px solid #dad9c7; 
+    margin-left: -1px; 
+} 
+
+th.headerSortUp {
+	background-image: url(../../Images/asc.gif);
+	background-color: #3399FF;
+}
+
+th.headerSortDown { 
+    background-image: url(../../Images/desc.gif); 
+    background-color: #3399FF; 
+} 
+</style>
+
+<h2>
+    Code reviews</h2>
+<p>
+    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Shown not done only", "NotDone")
+</p>
+<table class="tablesorter" id="reviews" width="100%">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Changeset)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.File)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lines)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ActionDone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateAdded)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateComplete)
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Changeset)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.File)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Lines)
+                </td>
+                <td>
+                    @Html.Raw(item.Comment == null ? "" : item.Comment.Replace("\n", "<br/>"))
+                </td>
+                <td>
+                    @Html.Raw(item.ActionDone == null ? "" : item.ActionDone.Replace("\n", "<br/>"))
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateAdded)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateComplete)
+                </td>
+                <td>
+                    @Html.ActionLink("Fix", "Fix", new { id = item.CodeReviewId }) |
+                    @Html.ActionLink("Edit", "Edit", new { id = item.CodeReviewId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.CodeReviewId })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#reviews").tablesorter();
+    }
+
+
+); 
+</script>
+<p>
+    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Shown not done only", "NotDone")
+</p>

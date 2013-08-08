@@ -1,0 +1,64 @@
+﻿@model _33.Models.CodeReview
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>CodeReview</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Changeset)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Changeset)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.File)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.File)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Lines)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Lines)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Comment)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Comment)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.ActionDone)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ActionDone)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.DateAdded)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.DateAdded)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.DateComplete)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.DateComplete)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.CodeReviewId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

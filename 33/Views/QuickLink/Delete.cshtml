@@ -1,0 +1,46 @@
+﻿@model _33.Models.QuickLink
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>QuickLink</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.HomeModel.BuildServerName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.HomeModel.BuildServerName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.LinkText)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.LinkText)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.ActionName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ActionName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.ContollerName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ContollerName)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

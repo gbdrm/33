@@ -1,0 +1,61 @@
+﻿@model _33.Models.HomeModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>HomeModel</legend>
+
+        @Html.HiddenFor(model => model.HomeModelId)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.BuildServerName)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.BuildServerName)
+            @Html.ValidationMessageFor(model => model.BuildServerName)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.BuildServerAddress)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.BuildServerAddress)
+            @Html.ValidationMessageFor(model => model.BuildServerAddress)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.IssueTrackerName)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.IssueTrackerName)
+            @Html.ValidationMessageFor(model => model.IssueTrackerName)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.IssueTrackerAddress)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.IssueTrackerAddress)
+            @Html.ValidationMessageFor(model => model.IssueTrackerAddress)
+        </div>
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

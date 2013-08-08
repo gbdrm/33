@@ -1,0 +1,49 @@
+﻿@model IEnumerable<_33.Models.Question>
+
+@{
+    ViewBag.Title = "Questions";
+}
+
+<h2>Questions</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Show questions without answer", "NotAnswered")
+</p>
+<table class="tablesorter" width="100%">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Content)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Answer)
+        </th>
+        <th style="display:none">
+            @Html.DisplayNameFor(model => model.DateAnswered)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.Raw(item.Content == null ? "" : item.Content.Replace("\n", "<br/>"))
+        </td>
+        <td>
+            @Html.Raw(item.Answer == null ? "" : item.Answer.Replace("\n", "<br/>"))
+        </td>
+        <td style="display:none">
+            @Html.DisplayFor(modelItem => item.DateAnswered)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.QuestionId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.QuestionId })
+        </td>
+    </tr>
+}
+
+</table>
+<p>
+    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Show questions without answer", "NotAnswered")
+</p>
