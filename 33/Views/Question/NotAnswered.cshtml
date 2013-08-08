@@ -12,27 +12,33 @@
 </p>
 <table class="tablesorter" width="100%">
     <tr>
-        <th>
+        <th width="2%">
+           @Html.DisplayNameFor(model => model.QuestionId)
+        </th>
+        <th width="40%">
             @Html.DisplayNameFor(model => model.Content)
         </th>
-        <th>
+        <th width="40%">
             @Html.DisplayNameFor(model => model.Answer)
         </th>
-        <th style="display:none">
+        <th width="8%">
             @Html.DisplayNameFor(model => model.DateAnswered)
         </th>
-        <th></th>
+        <th width="10%"></th>
     </tr>
 
 @foreach (var item in Model) {
     <tr>
+        <td class="centered">
+            @Html.ActionLink(item.QuestionId.ToString(), "Edit", new { id = item.QuestionId })
+        </td>
         <td>
             @Html.Raw(item.Content == null ? "" : item.Content.Replace("\n", "<br/>"))
         </td>
         <td>
              @Html.Raw(item.Answer == null ? "" : item.Answer.Replace("\n", "<br/>"))
         </td>
-        <td style="display:none">
+        <td>
             @Html.DisplayFor(modelItem => item.DateAnswered)
         </td>
         <td>
