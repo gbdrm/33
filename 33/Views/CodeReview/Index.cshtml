@@ -36,6 +36,9 @@ th.headerSortDown {
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.CodeReviewId)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Changeset)
             </th>
             <th>
@@ -64,6 +67,9 @@ th.headerSortDown {
         @foreach (var item in Model)
         {
             <tr>
+                <td class="centered">
+                    @Html.DisplayFor(modelItem => item.CodeReviewId)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Changeset)
                 </td>
