@@ -3,7 +3,7 @@
 
   if (!window.THREE) {
     document.body.innerHTML =
-      "<p style='padding:2rem;font-family:sans-serif'>Could not load 3D engine. Check your internet connection and refresh.</p>";
+      "<p style='padding:2rem;font-family:sans-serif;max-width:28rem;line-height:1.45'>Could not load the 3D engine. Open the newest <strong>v7</strong> link (Three.js is built into that file), or play from <code>pretty-mall/index.html</code> with the local vendor folder.</p>";
     return;
   }
 
