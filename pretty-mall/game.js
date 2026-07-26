@@ -54,20 +54,35 @@
   const locationBadge = document.getElementById("locationBadge");
   const lookHint = document.getElementById("lookHint");
 
-  // Three.js setup
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+  // Three.js setup — keep this simple for iPad / HTML preview WebGL
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "default" });
+  } catch (err) {
+    viewport.innerHTML =
+      "<p style='padding:2rem;color:#fff;font-family:sans-serif'>WebGL is blocked in this browser preview. Try Safari settings → allow 3D / WebGL, or open the file outside the preview site.</p>";
+    return;
+  }
+  renderer.setClearColor("#f5d0e8", 1);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.shadowMap.enabled = true;
+  if ("outputColorSpace" in renderer && THREE.SRGBColorSpace) {
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+  }
+  renderer.shadowMap.enabled = false;
   viewport.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#b9dfff");
-  scene.fog = new THREE.Fog("#cfe9ff", 18, 55);
+  scene.background = new THREE.Color("#f7d6ea");
+  scene.fog = new THREE.Fog("#f7d6ea", 35, 70);
 
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.08, 80);
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.set(player.x, player.y, player.z);
+  // Look down the hall immediately (human eye view)
+  state.yaw = Math.PI;
+  camera.rotation.order = "YXZ";
+  camera.rotation.y = state.yaw;
+  camera.rotation.x = 0;
 
   const clock = new THREE.Clock();
   const raycaster = new THREE.Raycaster();
@@ -110,23 +125,25 @@
     if (state.textureCache.has(url)) return state.textureCache.get(url);
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin("anonymous");
-    const tex = loader.load(url);
-    tex.colorSpace = THREE.SRGBColorSpace;
+    const tex = loader.load(
+      url,
+      undefined,
+      undefined,
+      () => {
+        /* photo failed — solid color fallback stays visible */
+      }
+    );
+    if (THREE.SRGBColorSpace && "colorSpace" in tex) tex.colorSpace = THREE.SRGBColorSpace;
     state.textureCache.set(url, tex);
     return tex;
   }
 
   function box(w, h, d, color, x, y, z, opts = {}) {
     const geo = new THREE.BoxGeometry(w, h, d);
-    const mat = new THREE.MeshStandardMaterial({
-      color,
-      roughness: opts.roughness ?? 0.85,
-      metalness: opts.metalness ?? 0.05,
-    });
+    // MeshBasicMaterial = always visible on iPad (no lighting required)
+    const mat = new THREE.MeshBasicMaterial({ color });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(x, y, z);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
     worldGroup.add(mesh);
     if (opts.collide) {
       colliders.push({
@@ -143,24 +160,18 @@
     const url = art.photoUrlForItem(item);
     const tex = getTexture(url);
     const geo = new THREE.PlaneGeometry(w, h);
-    const mat = new THREE.MeshStandardMaterial({
+    const mat = new THREE.MeshBasicMaterial({
       map: tex,
-      roughness: 0.55,
-      metalness: 0.05,
+      color: item.swatch || "#ffffff",
       side: THREE.DoubleSide,
     });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(x, y, z);
     mesh.rotation.y = rotY;
-    mesh.castShadow = true;
     // thin backing for 3D depth
-    const back = box(w * 0.98, h * 0.98, 0.04, item.swatch || "#ddd", x, y, z, { roughness: 0.7 });
+    const back = box(w * 0.98, h * 0.98, 0.06, item.swatch || "#ddd", x, y, z);
     back.rotation.y = rotY;
-    back.position.set(
-      x - Math.sin(rotY) * 0.03,
-      y,
-      z - Math.cos(rotY) * 0.03
-    );
+    back.position.set(x - Math.sin(rotY) * 0.04, y, z - Math.cos(rotY) * 0.04);
     mesh.userData = {
       type: "item",
       itemId: item.id,
@@ -208,108 +219,112 @@
     state.interactables = [];
   }
 
-  function addLights(tint = "#ffffff") {
-    const hemi = new THREE.HemisphereLight("#fff1f7", "#7a8b6a", 1.05);
-    worldGroup.add(hemi);
-    const sun = new THREE.DirectionalLight(tint, 1.15);
-    sun.position.set(8, 14, 6);
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(1024, 1024);
-    worldGroup.add(sun);
-    const fill = new THREE.PointLight("#ffd0ea", 0.55, 28);
-    fill.position.set(0, 2.4, 0);
-    worldGroup.add(fill);
+  function addLights() {
+    // Basic materials don't need lights, but keep a tiny ambient for future use
+    const ambient = new THREE.AmbientLight(0xffffff, 1);
+    worldGroup.add(ambient);
   }
 
   function buildHallway(floor) {
     clearWorld();
-    scene.background = new THREE.Color("#a9d8ff");
-    scene.fog = new THREE.Fog("#cfe9ff", 20, 60);
-    addLights("#fff6ea");
+    scene.background = new THREE.Color("#f3c9e0");
+    scene.fog = new THREE.Fog("#f3c9e0", 40, 75);
+    addLights();
 
     const stores = data.stores.filter((s) => s.floor === floor);
     const hallLen = Math.max(28, stores.length * 5.2 + 8);
 
-    // floor / ceiling / walls
-    box(12, 0.2, hallLen, "#e9e0e8", 0, 0, -hallLen / 2 + 4, { roughness: 0.95 });
-    box(12, 0.2, hallLen, "#fff7fb", 0, 3.4, -hallLen / 2 + 4, { roughness: 1 });
-    box(0.35, 3.4, hallLen, "#ffe3f0", -6, 1.7, -hallLen / 2 + 4, { collide: true });
-    box(0.35, 3.4, hallLen, "#ffe3f0", 6, 1.7, -hallLen / 2 + 4, { collide: true });
+    // Big visible floor / ceiling / walls (bright so they never look like "only blue")
+    box(14, 0.25, hallLen + 10, "#f2b8d4", 0, -0.12, -hallLen / 2 + 2);
+    box(14, 0.25, hallLen + 10, "#ffe9f4", 0, 3.5, -hallLen / 2 + 2);
+    box(0.5, 3.6, hallLen + 10, "#ff8fb7", -6.5, 1.7, -hallLen / 2 + 2, { collide: true });
+    box(0.5, 3.6, hallLen + 10, "#ff8fb7", 6.5, 1.7, -hallLen / 2 + 2, { collide: true });
 
-    // outdoor glass front feeling + skylight strips
-    for (let i = 0; i < 10; i += 1) {
-      box(1.4, 0.05, 1.4, "#9fd9ff", -2 + (i % 3) * 2, 3.35, -3 - i * 4);
-    }
+    // Guide carpet down the middle
+    box(2.2, 0.03, hallLen, "#ff4f9a", 0, 0.02, -hallLen / 2 + 2);
+
+    // Welcome billboard right in front of spawn
+    box(4.5, 1.4, 0.12, "#ffffff", 0, 1.8, 3.2);
+    box(4.2, 1.1, 0.08, "#ff4f9a", 0, 1.8, 3.14);
 
     // elevator booth
-    box(2.2, 2.6, 2.2, "#ffd36b", -4.2, 1.3, 6, { collide: true });
-    box(1.4, 2.1, 0.08, "#ffffff", -4.2, 1.2, 7.15);
-    const elev = box(1.5, 0.9, 0.2, "#fff4c2", -4.2, 1.3, 7.3);
-    elev.userData = { type: "elevator", label: `Elevator to Level ${floor === 3 ? 1 : floor + 1}`, nextFloor: floor === 3 ? 1 : floor + 1 };
+    box(2.2, 2.6, 2.2, "#ffd36b", -4.2, 1.3, 5.5, { collide: true });
+    box(1.4, 2.1, 0.08, "#ffffff", -4.2, 1.2, 6.65);
+    const elev = box(1.5, 0.9, 0.2, "#fff4c2", -4.2, 1.3, 6.8);
+    elev.userData = {
+      type: "elevator",
+      label: `Elevator to Level ${floor === 3 ? 1 : floor + 1}`,
+      nextFloor: floor === 3 ? 1 : floor + 1,
+    };
     state.interactables.push(elev);
     floorZones.push({
       type: "elevator",
       nextFloor: floor === 3 ? 1 : floor + 1,
       minX: -5.2,
       maxX: -3.2,
-      minZ: 5.2,
-      maxZ: 7.8,
+      minZ: 4.8,
+      maxZ: 7.2,
       label: `Elevator to Level ${floor === 3 ? 1 : floor + 1}`,
     });
 
-    // fountain center
-    box(1.8, 0.25, 1.8, "#8fd3ff", 0, 0.2, 2);
-    box(0.25, 1.1, 0.25, "#ffffff", 0, 0.8, 2);
+    // fountain
+    box(1.8, 0.25, 1.8, "#8fd3ff", 0, 0.2, 1.2);
+    box(0.25, 1.1, 0.25, "#ffffff", 0, 0.8, 1.2);
 
     stores.forEach((store, i) => {
-      const z = -2 - i * 5.2;
+      const z = -1.5 - i * 5.2;
       const side = i % 2 === 0 ? -1 : 1;
       const wallX = side * 4.35;
       // storefront building block
-      box(2.6, 2.8, 4.2, "#fffafc", wallX, 1.4, z, { collide: true });
-      box(2.8, 0.25, 4.4, store.fancy ? "#ff8fb7" : "#b8e0ff", wallX, 2.9, z);
+      box(2.8, 2.9, 4.2, "#fffafc", wallX, 1.45, z, { collide: true });
+      box(3.0, 0.3, 4.4, store.fancy ? "#ff8fb7" : "#9ad0ff", wallX, 3.0, z);
       // sign
-      const sign = box(2.0, 0.4, 0.08, store.color || "#333", wallX + side * -1.35, 2.35, z);
-      // glass door
-      const door = box(1.1, 2.1, 0.08, "#7ec8ff", wallX + side * -1.35, 1.1, z + 0.9);
+      box(2.1, 0.45, 0.1, store.color || "#333", wallX + side * -1.45, 2.4, z);
+      // glass door facing the hallway
+      const door = box(1.2, 2.2, 0.1, "#5ec2ff", wallX + side * -1.45, 1.15, z + 1.0);
       door.userData = { type: "door", storeId: store.id, label: `Enter ${store.name}` };
       state.interactables.push(door);
-      // window product tease
+      // window product tease facing hallway
       const tease = store.items[0];
       if (tease) {
         photoPlane(
           itemsById[tease.id],
-          0.7,
-          0.7,
-          wallX + side * -1.36,
-          1.5,
-          z - 0.6,
+          0.85,
+          0.85,
+          wallX + side * -1.48,
+          1.55,
+          z - 0.3,
           side > 0 ? Math.PI / 2 : -Math.PI / 2
         );
       }
       doorZones.push({
         storeId: store.id,
         label: `Enter ${store.name}`,
-        minX: wallX + side * -1.9,
-        maxX: wallX + side * -0.7,
+        minX: Math.min(wallX + side * -2.0, wallX + side * -0.7),
+        maxX: Math.max(wallX + side * -2.0, wallX + side * -0.7),
         minZ: z + 0.3,
-        maxZ: z + 1.5,
+        maxZ: z + 1.7,
       });
     });
 
+    // Spawn in the hall looking at stores (not the empty sky)
     player.x = 0;
-    player.z = 8;
+    player.z = 6.5;
     state.yaw = Math.PI;
     state.pitch = 0;
+    camera.position.set(player.x, player.y, player.z);
+    camera.rotation.order = "YXZ";
+    camera.rotation.y = state.yaw;
+    camera.rotation.x = state.pitch;
     updateLocationBadge();
   }
 
   function buildStore(storeId) {
     const store = storesById[storeId];
     clearWorld();
-    scene.background = new THREE.Color(store.floorColor || "#fff0f5");
-    scene.fog = new THREE.Fog(store.floorColor || "#fff0f5", 12, 28);
-    addLights("#ffffff");
+    scene.background = new THREE.Color("#ffe6f2");
+    scene.fog = new THREE.Fog("#ffe6f2", 20, 40);
+    addLights();
     state.storeId = storeId;
 
     // room shell
