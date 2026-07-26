@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-    <title>Rose Quartz Mall — First Person 3D v8</title>
+    <title>Rose Quartz Mall — Fancy VIP v10</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,25 +15,43 @@
   <body class="fp-body">
     <div id="viewport" class="viewport"></div>
     <div class="crosshair" aria-hidden="true"></div>
+    <div id="fxLayer" class="fx-layer" aria-hidden="true"></div>
 
     <header class="topbar topbar--fp">
       <div class="brand">
         <p class="brand__name">Rose Quartz Mall</p>
-        <p class="brand__tag">First-person 3D · human view</p>
+        <p class="brand__tag">Party mode · missions · runway</p>
       </div>
       <div class="wallet"><span>Wallet</span><strong>$∞</strong></div>
-      <div class="progress-chip"><span>Stores bagged</span><strong id="progressText">0 / 21</strong></div>
+      <div class="progress-chip"><span>Style</span><strong id="stylePoints">0</strong></div>
+      <div class="progress-chip"><span>Combo</span><strong id="comboText">x0</strong></div>
+      <div class="progress-chip"><span>Fancy stores</span><strong id="progressText">0 / 17</strong></div>
       <button type="button" id="btnInventory" class="pill-btn pill-btn--inventory">Inventory</button>
+      <button type="button" id="btnMission" class="pill-btn pill-btn--soft">Mission</button>
+      <button type="button" id="btnRunway" class="pill-btn pill-btn--gold">Runway</button>
       <button type="button" id="btnBags" class="pill-btn pill-btn--soft">Bags</button>
     </header>
 
     <div id="locationBadge" class="location-badge">Mall Hallway · Level 1</div>
+    <div id="missionHud" class="mission-hud">
+      <p class="mission-hud__label">Mission</p>
+      <p id="missionTitle" class="mission-hud__title">Loading...</p>
+      <p id="missionDetail" class="mission-hud__detail"></p>
+      <div class="mission-bar"><span id="missionBar"></span></div>
+      <p id="missionProgress" class="mission-hud__progress">0 / 0</p>
+    </div>
+    <div id="friendChat" class="friend-chat" hidden>
+      <strong>Bestie</strong>
+      <p class="friend-chat__text"></p>
+    </div>
     <div id="prompt" class="prompt" hidden></div>
-    <p id="prizeBanner" class="prize-banner" hidden>Mall Princess Prize unlocked!</p>
+    <p id="prizeBanner" class="prize-banner" hidden>VIP Prize Set unlocked — full glam outfit!</p>
 
     <div id="lookHint" class="look-hint">
-      You should see a pink mall hallway.<br />Drag to look · stick to walk · Do to enter stores
-      <button type="button" id="btnStartLook" class="pill-btn">Start shopping</button>
+      <h2>Mall Party Mode</h2>
+      <p>Missions · style points · chatty besties · RUNWAY</p>
+      <p>Drag to look · stick to walk · hold Sprint · Do to grab</p>
+      <button type="button" id="btnStartLook" class="pill-btn">Let’s gooo</button>
     </div>
 
     <aside class="side-panel side-panel--fp">
@@ -44,14 +62,18 @@
 
     <div class="touch-controls" id="touchControls">
       <div class="stick" id="stick"><div class="stick__knob" id="stickKnob"></div></div>
-      <button type="button" id="btnInteract" class="interact-btn">Do</button>
+      <div class="touch-right">
+        <button type="button" id="btnSprint" class="sprint-btn">Sprint</button>
+        <button type="button" id="btnDance" class="dance-btn">Dance</button>
+        <button type="button" id="btnInteract" class="interact-btn">Do</button>
+      </div>
     </div>
 
     <div id="inventoryModal" class="modal" hidden>
       <div class="modal__card modal__card--wide">
         <button type="button" class="modal__close" data-close="inventoryModal">×</button>
         <h2>Inventory</h2>
-        <p class="tip">80 slots. Walk into a dressing room to try things on.</p>
+        <p class="tip">80 slots. Dressing room to try on. Runway to show off.</p>
         <div id="inventoryGrid" class="inventory-grid"></div>
       </div>
     </div>
@@ -61,12 +83,13 @@
         <button type="button" class="modal__close" data-close="fittingModal">×</button>
         <div>
           <h2>Dressing Room</h2>
-          <p class="tip">Tap an item photo to try it on your avatar.</p>
+          <p class="tip">Tap items to try on. Build a look, then hit Runway!</p>
           <div id="fittingInventory" class="inventory-grid inventory-grid--compact"></div>
         </div>
         <div class="fitting-avatar-wrap">
           <div id="fittingAvatar" class="avatar-stage avatar-stage--large"></div>
           <button type="button" id="btnClearOutfit" class="pill-btn pill-btn--soft">Clear try-on</button>
+          <button type="button" id="btnRunwayFromFit" class="pill-btn pill-btn--gold">Hit the runway</button>
         </div>
       </div>
     </div>
@@ -101,17 +124,36 @@
     <div id="prizeModal" class="modal" hidden>
       <div class="modal__card prize-card">
         <button type="button" class="modal__close" data-close="prizeModal">×</button>
-        <p class="eyebrow">Mall complete</p>
-        <h2>Little Prize Unlocked</h2>
-        <p>You bought something in every store! Claim your Mall Princess Crown.</p>
+        <p class="eyebrow">Fancy mall complete</p>
+        <h2>VIP Prize Set</h2>
+        <p>You shopped every fancy store! Unlock the full glam set: Crystal Crown, Diamond Pink Gala Gown, Sparkle Tulle Skirt, Glass Slipper Heels, and VIP Rose Quartz Clutch.</p>
         <div id="prizeAvatar" class="avatar-stage"></div>
-        <button type="button" id="btnClaimPrize" class="pill-btn pill-btn--gold">Wear my crown</button>
+        <button type="button" id="btnClaimPrize" class="pill-btn pill-btn--gold">Wear the full VIP look</button>
+      </div>
+    </div>
+
+    <div id="runwayModal" class="modal" hidden>
+      <div class="modal__card runway-card">
+        <button type="button" class="modal__close" data-close="runwayModal">×</button>
+        <p class="eyebrow">Mall Runway</p>
+        <h2>Walk it. Own it.</h2>
+        <p class="tip">Tap the pulsing hearts in time — don’t miss!</p>
+        <div id="runwayStage" class="runway-stage">
+          <div id="runwayAvatar" class="avatar-stage avatar-stage--large"></div>
+          <div id="runwayBeat" class="runway-beat">TAP</div>
+        </div>
+        <p id="runwayScoreText" class="runway-score">Score 0</p>
+        <div class="cashier-actions">
+          <button type="button" id="btnRunwayTap" class="pill-btn pill-btn--gold">TAP THE BEAT</button>
+          <button type="button" id="btnRunwayFinish" class="pill-btn">Finish walk</button>
+        </div>
       </div>
     </div>
 
     <script src="vendor/three.min.js"></script>
     <script src="data.js"></script>
     <script src="art.js"></script>
+    <script src="fun.js"></script>
     <script src="game.js"></script>
   </body>
 </html>

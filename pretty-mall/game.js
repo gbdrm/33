@@ -10,6 +10,10 @@
   const THREE = window.THREE;
   const data = window.MALL_DATA;
   const art = window.MALL_ART;
+  const fun = window.MALL_FUN;
+
+  // Fancy boutiques only — delete non-fancy stores
+  data.stores = data.stores.filter((s) => s.fancy);
 
   const storesById = Object.fromEntries(data.stores.map((s) => [s.id, s]));
   const itemsById = {};
@@ -18,7 +22,9 @@
       itemsById[item.id] = { ...item, storeId: store.id, storeName: store.name };
     });
   });
-  itemsById[data.prize.id] = { ...data.prize, storeId: "prize", storeName: "Prize" };
+  (data.prizeSet || [data.prize]).forEach((p) => {
+    itemsById[p.id] = { ...p, storeId: "prize", storeName: "VIP Prize" };
+  });
 
   const state = {
     floor: 1,
@@ -38,15 +44,85 @@
     nearby: null,
     interactables: [],
     textureCache: new Map(),
+    stylePoints: 0,
+    combo: 0,
+    comboTimer: 0,
+    sprint: false,
+    danceT: 0,
+    tryOns: 0,
+    purchases: 0,
+    runwayPlays: 0,
+    storesEntered: new Set(),
+    mission: null,
+    npcs: [],
+    chatTimer: 4,
+    runwayLive: false,
+    runwayTaps: 0,
+    runwayGood: 0,
+    runwayBeatT: 0,
   };
 
   const player = {
     x: 0,
     y: 1.6,
     z: 8,
-    speed: 4.2,
+    speed: 5.4,
     radius: 0.35,
   };
+
+  function missionCtx() {
+    return {
+      inventory: state.inventory,
+      items: itemsById,
+      tryOns: state.tryOns,
+      purchases: state.purchases,
+      runwayPlays: state.runwayPlays,
+      storesEntered: state.storesEntered,
+    };
+  }
+
+  function setMission(mission) {
+    state.mission = mission || fun.pickMission();
+    renderMissionHud();
+  }
+
+  function renderMissionHud() {
+    if (!state.mission) return;
+    const m = state.mission;
+    const val = Math.min(m.goal, m.check(missionCtx()));
+    document.getElementById("missionTitle").textContent = m.title;
+    document.getElementById("missionDetail").textContent = m.detail;
+    document.getElementById("missionProgress").textContent = `${val} / ${m.goal}`;
+    document.getElementById("missionBar").style.width = `${(val / m.goal) * 100}%`;
+  }
+
+  function checkMissionComplete() {
+    if (!state.mission) return;
+    const m = state.mission;
+    const val = m.check(missionCtx());
+    renderMissionHud();
+    if (val >= m.goal) {
+      state.stylePoints += m.reward;
+      document.getElementById("stylePoints").textContent = String(state.stylePoints);
+      fun.confetti(55);
+      fun.floatText(`Mission clear! +${m.reward} style`);
+      fun.sfxMission();
+      fun.showChat("Yesss mission complete, you ate that!!");
+      setMission(fun.pickMission(m.id));
+    }
+  }
+
+  function bumpCombo() {
+    state.combo += 1;
+    state.comboTimer = 2.5;
+    document.getElementById("comboText").textContent = `x${state.combo}`;
+    if (state.combo >= 3) {
+      const bonus = state.combo * 5;
+      state.stylePoints += bonus;
+      document.getElementById("stylePoints").textContent = String(state.stylePoints);
+      fun.floatText(`Combo x${state.combo}! +${bonus}`);
+    }
+  }
 
   // DOM
   const viewport = document.getElementById("viewport");
@@ -271,6 +347,39 @@
     box(1.8, 0.25, 1.8, "#8fd3ff", 0, 0.2, 1.2);
     box(0.25, 1.1, 0.25, "#ffffff", 0, 0.8, 1.2);
 
+    // Runway club entrance
+    box(3.2, 2.6, 2.4, "#2a1030", 4.2, 1.3, 4.8, { collide: true });
+    box(2.6, 0.35, 0.2, "#ffd36b", 4.2, 2.5, 3.7);
+    const runwayDoor = box(1.4, 2.2, 0.12, "#ff4f9a", 4.2, 1.2, 3.55);
+    runwayDoor.userData = { type: "runway", label: "Enter the RUNWAY show" };
+    state.interactables.push(runwayDoor);
+    doorZones.push({
+      type: "runway",
+      label: "Enter the RUNWAY show",
+      minX: 3.2,
+      maxX: 5.2,
+      minZ: 3.0,
+      maxZ: 4.4,
+    });
+
+    // NPCs (bestie shoppers) bouncing around
+    state.npcs = [];
+    const npcColors = ["#ff9ec8", "#b388ff", "#7ec8ff", "#ffd36b", "#ffa0c0"];
+    for (let i = 0; i < 5; i += 1) {
+      const x = -3 + i * 1.5;
+      const z = 2 - i * 0.4;
+      const body = box(0.35, 0.7, 0.25, npcColors[i % npcColors.length], x, 1.05, z);
+      const head = box(0.28, 0.28, 0.28, "#ffd7bf", x, 1.6, z);
+      state.npcs.push({
+        body,
+        head,
+        baseX: x,
+        baseZ: z,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.8 + Math.random() * 0.8,
+      });
+    }
+
     stores.forEach((store, i) => {
       const z = -1.5 - i * 5.2;
       const side = i % 2 === 0 ? -1 : 1;
@@ -326,6 +435,11 @@
     scene.fog = new THREE.Fog("#ffe6f2", 20, 40);
     addLights();
     state.storeId = storeId;
+    state.storesEntered.add(storeId);
+    state.stylePoints += 8;
+    document.getElementById("stylePoints").textContent = String(state.stylePoints);
+    fun.showChat(`Okay we’re in ${store.name}. Grab the cutest thing.`);
+    checkMissionComplete();
 
     // room shell
     box(12, 0.2, 12, store.floorColor || "#f4ebe3", 0, 0, 0, { roughness: 1 });
@@ -412,7 +526,21 @@
     else locationBadge.textContent = `${storesById[state.storeId].name} · Level ${state.floor}`;
   }
 
+  function accessoryStyle(acc) {
+    if (!acc) return { kind: "none" };
+    const n = `${acc.name} ${acc.material || ""}`.toLowerCase();
+    if (acc.id === "prize-crown" || /crown/.test(n)) return { kind: "crown", color: acc.swatch };
+    if (/necklace|pendant|choker/.test(n)) return { kind: "necklace", color: acc.swatch };
+    if (/earring|stud|hoop/.test(n)) return { kind: "earrings", color: acc.swatch };
+    if (/bracelet|watch|ring|clic|love bracelet|juste/.test(n)) return { kind: "bracelet", color: acc.swatch };
+    if (/lipstick|rouge|lip /.test(n)) return { kind: "lips", color: acc.swatch };
+    if (/blush|highlighter|glow|bronzer/.test(n)) return { kind: "blush", color: acc.swatch };
+    // perfume / mascara / skincare / wallets — no weird body blob
+    return { kind: "aura", color: acc.swatch };
+  }
+
   function renderAvatar(target, equipped = state.equipped) {
+    if (!target) return;
     const top = equipped.top ? itemsById[equipped.top] : null;
     const bottom = equipped.bottom ? itemsById[equipped.bottom] : null;
     const shoes = equipped.shoes ? itemsById[equipped.shoes] : null;
@@ -422,16 +550,36 @@
     const legs = bottom ? bottom.swatch : "#f7c1d8";
     const shoe = shoes ? shoes.swatch : "#ffffff";
     const bagColor = bag ? bag.swatch : "#d4a017";
-    const accColor = acc ? acc.swatch : "#ffd700";
-    const showCrown = acc && acc.id === "prize-crown";
+    const a = accessoryStyle(acc);
+    const crown = a.kind === "crown" ? `<div class="roblox__acc is-on" style="background:${a.color}"></div>` : "";
+    const necklace =
+      a.kind === "necklace"
+        ? `<div class="roblox__necklace" style="border-color:${a.color}"></div>`
+        : "";
+    const earrings =
+      a.kind === "earrings"
+        ? `<div class="roblox__ear roblox__ear--l" style="background:${a.color}"></div><div class="roblox__ear roblox__ear--r" style="background:${a.color}"></div>`
+        : "";
+    const bracelet =
+      a.kind === "bracelet" ? `<div class="roblox__bracelet" style="background:${a.color}"></div>` : "";
+    const lips = a.kind === "lips" ? a.color : "#4a2b3b";
+    const cheeks =
+      a.kind === "blush" || a.kind === "aura"
+        ? `<div class="roblox__cheek roblox__cheek--l" style="background:${a.color}"></div><div class="roblox__cheek roblox__cheek--r" style="background:${a.color}"></div>`
+        : "";
     target.innerHTML = `
       <div class="roblox" aria-hidden="true"><div class="roblox__body">
         <div class="roblox__hair"></div>
-        <div class="roblox__acc ${acc ? "is-on" : ""}" style="background:${accColor}; ${
-          showCrown ? "" : "clip-path:none;border-radius:10px;height:12px;top:44px;width:20px;left:45px;"
-        }"></div>
-        <div class="roblox__head"><div class="roblox__face"><div class="roblox__smile"></div></div></div>
-        <div class="roblox__arm roblox__arm--l"><div class="roblox__sleeve" style="background:${torso}"></div></div>
+        ${crown}
+        <div class="roblox__head">
+          <div class="roblox__face">
+            ${earrings}
+            ${cheeks}
+            <div class="roblox__smile" style="border-bottom-color:${lips}"></div>
+          </div>
+          ${necklace}
+        </div>
+        <div class="roblox__arm roblox__arm--l"><div class="roblox__sleeve" style="background:${torso}"></div>${bracelet}</div>
         <div class="roblox__arm roblox__arm--r"><div class="roblox__sleeve" style="background:${torso}"></div></div>
         <div class="roblox__torso" style="background:${torso}"></div>
         <div class="roblox__leg roblox__leg--l" style="background:${legs}"></div>
@@ -493,17 +641,30 @@
     if (state.inventory.includes(itemId)) return toast("Already in Inventory");
     if (state.inventory.length >= data.inventorySlots) return toast("Inventory full");
     state.inventory.push(itemId);
+    state.stylePoints += 15;
+    document.getElementById("stylePoints").textContent = String(state.stylePoints);
+    bumpCombo();
+    fun.sfxGrab();
+    fun.confetti(18);
+    fun.floatText("Cute find!");
     toast(`Took ${itemsById[itemId].name}`);
+    if (Math.random() < 0.45) fun.showChat();
+    checkMissionComplete();
   }
 
   function tryOn(itemId) {
     const item = itemsById[itemId];
     if (!item) return;
     state.equipped[item.slot] = itemId;
+    state.tryOns += 1;
+    state.stylePoints += 10;
+    document.getElementById("stylePoints").textContent = String(state.stylePoints);
     renderAvatar(document.getElementById("avatarStage"));
     renderAvatar(document.getElementById("fittingAvatar"));
     renderEquippedList();
+    fun.floatText("Glow up!");
     toast(`Tried on ${item.name}`);
+    checkMissionComplete();
   }
 
   function openDressingRoom() {
@@ -548,10 +709,18 @@
     if (!checked.length) return toast("Select at least one item");
     checked.forEach((id) => state.owned.add(id));
     state.purchasedStores.add(store.id);
+    state.purchases += 1;
     state.bags.push({ storeId: store.id, storeName: store.name, itemIds: [...checked], color: store.color });
+    state.stylePoints += 40 + checked.length * 20;
+    document.getElementById("stylePoints").textContent = String(state.stylePoints);
     closeModal("cashierModal");
+    fun.sfxBuy();
+    fun.confetti(70);
+    fun.floatText("Shopping bag secured!");
+    fun.showChat("The bag is everything. Post that fit.");
     toast(`${store.name} cashier: here’s your shopping bag`);
     updateProgress();
+    checkMissionComplete();
   }
 
   function renderBags() {
@@ -573,14 +742,28 @@
   }
 
   function claimPrize() {
-    if (!state.inventory.includes(data.prize.id)) state.inventory.unshift(data.prize.id);
-    state.owned.add(data.prize.id);
-    state.equipped.accessory = data.prize.id;
+    const set = data.prizeSet || [data.prize];
+    set.forEach((p) => {
+      itemsById[p.id] = { ...p, storeId: "prize", storeName: "VIP Prize" };
+      if (!state.inventory.includes(p.id)) state.inventory.unshift(p.id);
+      state.owned.add(p.id);
+      state.equipped[p.slot] = p.id;
+    });
     state.prizeClaimed = true;
+    state.stylePoints += 500;
+    const styleEl = document.getElementById("stylePoints");
+    if (styleEl) styleEl.textContent = String(state.stylePoints);
     renderAvatar(document.getElementById("avatarStage"));
+    renderAvatar(document.getElementById("prizeAvatar"));
     renderEquippedList();
+    if (window.MALL_FUN) {
+      fun.confetti(90);
+      fun.floatText("VIP LOOK UNLOCKED");
+      fun.sfxMission();
+      fun.showChat("FULL VIP SET?? You’re the mall now.");
+    }
     closeModal("prizeModal");
-    toast("Crown added to Inventory");
+    toast("VIP prize set unlocked — gown, heels, clutch, skirt + crown!");
   }
 
   function blocked(nx, nz) {
