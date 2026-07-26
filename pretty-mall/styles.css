@@ -331,9 +331,22 @@ body {
 .swatch {
   width: 100%; aspect-ratio: 1; border-radius: 12px; margin-bottom: 0.35rem;
   border: 1px solid rgba(0,0,0,0.05);
+  object-fit: cover;
+  background: #f6f1f4;
+  display: block;
 }
-.swatch.diamond { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); border-radius: 0; }
-.swatch.circle { border-radius: 50%; }
+.swatch.diamond { clip-path: none; border-radius: 12px; }
+.swatch.circle { border-radius: 12px; }
+.product-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  margin-bottom: 0.35rem;
+  object-fit: cover;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #fff;
+  display: block;
+}
 .inv-slot strong { display: block; font-size: 0.75rem; line-height: 1.2; }
 .inv-slot span { display: block; font-size: 0.68rem; color: var(--mute); margin-top: 0.15rem; }
 

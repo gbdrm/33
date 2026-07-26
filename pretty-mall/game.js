@@ -2,6 +2,7 @@
   "use strict";
 
   const data = window.MALL_DATA;
+  const art = window.MALL_ART;
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
 
@@ -296,9 +297,10 @@
       }
       const item = itemsById[itemId];
       const owned = state.owned.has(itemId);
+      const photo = art.photoUrlForItem(item);
       slots.push(`
         <button type="button" class="inv-slot ${owned ? "is-owned" : ""}" data-item="${itemId}">
-          <div class="swatch ${item.shape || "square"}" style="background:${item.swatch}"></div>
+          <img class="product-thumb" src="${photo}" alt="${item.name}" loading="lazy" />
           <strong>${item.name}</strong>
           <span>${item.material || item.slot}${owned ? " · owned" : ""}</span>
         </button>`);
@@ -359,9 +361,10 @@
       list.innerHTML = pending
         .map((id) => {
           const item = itemsById[id];
+          const photo = art.photoUrlForItem(item);
           return `<label class="checkout-row">
             <input type="checkbox" name="buy" value="${id}" checked />
-            <div class="swatch ${item.shape}" style="background:${item.swatch};width:36px;aspect-ratio:1;margin:0;flex:0 0 36px;"></div>
+            <img src="${photo}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:10px;flex:0 0 44px;" />
             <div><strong>${item.name}</strong>
             <span style="display:block;color:var(--mute);font-size:.75rem;">$${Number(item.price).toLocaleString()} · ${item.material || ""} · $∞ wallet</span></div>
           </label>`;
@@ -627,25 +630,20 @@
     const taken = state.inventory.includes(item.id) || state.owned.has(item.id);
     ctx.save();
     ctx.globalAlpha = taken ? 0.35 : 1;
-    // rod
     ctx.strokeStyle = "#c9a27c";
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(obj.x, obj.y);
     ctx.lineTo(obj.x + obj.w, obj.y);
     ctx.stroke();
-    // hook
     ctx.beginPath();
     ctx.arc(obj.x + obj.w / 2, obj.y - 6, 6, Math.PI, 0);
     ctx.stroke();
-    // garment
-    ctx.fillStyle = item.swatch;
-    ctx.fillRect(obj.x + 8, obj.y + 8, obj.w - 16, 50);
-    ctx.fillStyle = "rgba(255,255,255,0.25)";
-    ctx.fillRect(obj.x + 12, obj.y + 12, 10, 40);
+    // real-looking product photo on the hanger
+    art.drawProductPhoto(ctx, item, obj.x + 6, obj.y + 8, obj.w - 12, 58, item.swatch);
     ctx.fillStyle = "#4a2b3b";
-    ctx.font = "600 9px Nunito, sans-serif";
-    ctx.fillText("HANGER", obj.x + 4, obj.y + obj.h - 4);
+    ctx.font = "700 9px Nunito, sans-serif";
+    ctx.fillText("HANGER", obj.x + 6, obj.y + obj.h - 2);
     ctx.restore();
   }
 
@@ -654,24 +652,19 @@
     ctx.save();
     ctx.globalAlpha = taken ? 0.35 : 1;
     const cx = obj.x + obj.w / 2;
-    // stand
-    ctx.fillStyle = "#d9c4b0";
-    ctx.fillRect(cx - 8, obj.y + obj.h - 12, 16, 12);
-    ctx.fillRect(cx - 2, obj.y + 70, 4, 30);
-    // body
+    // Brookhaven-ish blocky mannequin stand
+    ctx.fillStyle = "#e8d5c4";
+    ctx.fillRect(cx - 10, obj.y + obj.h - 10, 20, 10);
     ctx.fillStyle = "#f0d2c0";
-    ctx.beginPath();
-    ctx.arc(cx, obj.y + 14, 10, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = item.swatch;
-    ctx.fillRect(cx - 14, obj.y + 26, 28, 36);
-    if (item.slot === "bottom" || item.slot === "shoes") {
-      ctx.fillRect(cx - 12, obj.y + 60, 10, 22);
-      ctx.fillRect(cx + 2, obj.y + 60, 10, 22);
-    }
+    ctx.fillRect(cx - 9, obj.y + 4, 18, 16);
+    ctx.fillRect(cx - 14, obj.y + 22, 28, 34);
+    ctx.fillRect(cx - 12, obj.y + 56, 10, 24);
+    ctx.fillRect(cx + 2, obj.y + 56, 10, 24);
+    // product photo plaque in front
+    art.drawProductPhoto(ctx, item, obj.x + 4, obj.y + 28, obj.w - 8, obj.w - 8, item.swatch);
     ctx.fillStyle = "#4a2b3b";
-    ctx.font = "700 9px Nunito, sans-serif";
-    ctx.fillText("MANNEQUIN", obj.x - 4, obj.y + obj.h + 10);
+    ctx.font = "700 8px Nunito, sans-serif";
+    ctx.fillText("MANNEQUIN", obj.x - 2, obj.y + obj.h + 10);
     ctx.restore();
   }
 
@@ -679,111 +672,95 @@
     const taken = state.inventory.includes(item.id) || state.owned.has(item.id);
     ctx.save();
     ctx.globalAlpha = taken ? 0.35 : 1;
-    ctx.fillStyle = "#e8d5c4";
-    ctx.fillRect(obj.x, obj.y + 40, obj.w, 10);
-    ctx.fillStyle = item.swatch;
-    ctx.beginPath();
-    if (item.shape === "circle") {
-      ctx.arc(obj.x + obj.w / 2, obj.y + 22, 16, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.fillRect(obj.x + 10, obj.y + 6, obj.w - 20, 32);
-    }
+    ctx.fillStyle = "#d9b896";
+    ctx.fillRect(obj.x - 4, obj.y + obj.h - 12, obj.w + 8, 10);
+    ctx.fillStyle = "#b08968";
+    ctx.fillRect(obj.x - 2, obj.y + obj.h - 2, 4, 8);
+    ctx.fillRect(obj.x + obj.w - 2, obj.y + obj.h - 2, 4, 8);
+    art.drawProductPhoto(ctx, item, obj.x + 4, obj.y, obj.w - 8, obj.h - 16, item.swatch);
     ctx.restore();
   }
 
   function drawMall() {
     const cam = state.camX;
-    // floor
-    const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    g.addColorStop(0, "#ffd6e8");
-    g.addColorStop(0.35, "#ffeaf3");
-    g.addColorStop(1, "#f7d0e2");
-    ctx.fillStyle = g;
+    // Brookhaven-like sky
+    const sky = ctx.createLinearGradient(0, 0, 0, 220);
+    sky.addColorStop(0, "#9ad9ff");
+    sky.addColorStop(1, "#ffe6f2");
+    ctx.fillStyle = sky;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.save();
     ctx.translate(-cam, 0);
 
-    // ceiling lights
-    for (let i = 0; i < 12; i += 1) {
-      ctx.fillStyle = "rgba(255,255,255,0.55)";
-      ctx.beginPath();
-      ctx.ellipse(150 + i * 180, 30, 40, 10, 0, 0, Math.PI * 2);
-      ctx.fill();
+    // clouds
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    for (let i = 0; i < 10; i += 1) {
+      const cx = 80 + i * 210;
+      ctx.fillRect(cx, 36 + (i % 3) * 10, 70, 22);
+      ctx.fillRect(cx + 20, 24 + (i % 3) * 10, 50, 20);
     }
 
-    // corridor tiles
-    ctx.strokeStyle = "rgba(255,143,183,0.2)";
-    for (let x = 0; x < MALL_W; x += 40) {
+    // grass plaza strip
+    ctx.fillStyle = "#7dce6f";
+    ctx.fillRect(0, 210, MALL_W, 50);
+    // sidewalk
+    ctx.fillStyle = "#ece7ef";
+    ctx.fillRect(0, 255, MALL_W, 40);
+    ctx.strokeStyle = "rgba(0,0,0,0.06)";
+    for (let x = 0; x < MALL_W; x += 36) {
       ctx.beginPath();
-      ctx.moveTo(x, 240);
-      ctx.lineTo(x, MALL_H);
+      ctx.moveTo(x, 255);
+      ctx.lineTo(x, 295);
       ctx.stroke();
     }
-
-    // elevator
-    ctx.fillStyle = "#f0c75e";
-    ctx.fillRect(30, 280, 60, 100);
+    // road / walkway
+    ctx.fillStyle = "#d5c6d0";
+    ctx.fillRect(0, 295, MALL_W, MALL_H - 295);
     ctx.fillStyle = "#fff";
-    ctx.fillRect(40, 295, 40, 70);
-    ctx.fillStyle = "#4a2b3b";
-    ctx.font = "800 11px Nunito, sans-serif";
-    ctx.fillText("ELEV", 40, 275);
-    ctx.fillText(`L${state.floor}`, 48, 335);
-
-    // stores
-    for (const r of mallStoreRects(state.floor)) {
-      const store = r.store;
-      ctx.fillStyle = "#fff";
-      ctx.strokeStyle = store.color;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.roundRect(r.x, r.y, r.w, r.h, 16);
-      ctx.fill();
-      ctx.stroke();
-
-      // awning
-      ctx.fillStyle = store.fancy ? "#ff8fb7" : "#ffd0ea";
-      ctx.fillRect(r.x + 8, r.y + 8, r.w - 16, 28);
-      ctx.fillStyle = "#fff";
-      ctx.font = "800 13px Nunito, sans-serif";
-      ctx.fillText(store.name.slice(0, 14), r.x + 14, r.y + 28);
-
-      if (store.fancy) {
-        ctx.fillStyle = "#d4a017";
-        ctx.font = "700 9px Nunito, sans-serif";
-        ctx.fillText("FANCY", r.x + r.w - 48, r.y + 50);
-      }
-
-      // window mannequin silhouette
-      ctx.fillStyle = store.color + "33";
-      ctx.fillRect(r.x + 30, r.y + 60, 40, 55);
-      ctx.fillStyle = "#f0d2c0";
-      ctx.beginPath();
-      ctx.arc(r.x + 50, r.y + 55, 10, 0, Math.PI * 2);
-      ctx.fill();
-
-      // door
-      ctx.fillStyle = state.purchasedStores.has(store.id) ? "#ffb3d4" : "#4a2b3b";
-      ctx.fillRect(r.door.x, r.door.y, r.door.w, r.door.h);
-      ctx.fillStyle = "#fff";
-      ctx.font = "700 9px Nunito, sans-serif";
-      ctx.fillText("ENTER", r.door.x + 2, r.door.y + 13);
-
-      if (state.purchasedStores.has(store.id)) {
-        ctx.fillStyle = "#ff4f9a";
-        ctx.font = "800 10px Nunito, sans-serif";
-        ctx.fillText("BAGGED", r.x + 50, r.y + r.h - 20);
-      }
+    for (let x = 0; x < MALL_W; x += 60) {
+      ctx.fillRect(x, 420, 28, 6);
     }
 
-    // floor label + how-to
-    ctx.fillStyle = "rgba(74,43,59,0.55)";
+    // fountain plaza (Berry Ave vibes)
+    ctx.fillStyle = "#8fd3ff";
+    ctx.beginPath();
+    ctx.arc(980, 470, 40, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(972, 430, 16, 40);
+    ctx.fillStyle = "#bde7ff";
+    ctx.beginPath();
+    ctx.arc(980, 430, 12, 0, Math.PI * 2);
+    ctx.fill();
+
+    // elevators as blocky booth
+    ctx.fillStyle = "#ffd36b";
+    ctx.fillRect(24, 250, 70, 120);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(34, 270, 50, 80);
+    ctx.fillStyle = "#5a3b00";
+    ctx.font = "800 12px Nunito, sans-serif";
+    ctx.fillText("ELEV", 40, 245);
+    ctx.fillText(`L${state.floor}`, 50, 315);
+
+    // trees + lamps + benches
+    for (let i = 0; i < 14; i += 1) {
+      art.drawBlockyTree(ctx, 160 + i * 150, 250);
+      if (i % 2 === 0) art.drawStreetLamp(ctx, 230 + i * 150, 300);
+      if (i % 3 === 0) art.drawBench(ctx, 300 + i * 150, 310);
+    }
+
+    // stores as Brookhaven buildings
+    for (const r of mallStoreRects(state.floor)) {
+      art.drawBrookhavenStore(ctx, r, r.store, state.purchasedStores.has(r.store.id));
+    }
+
+    ctx.fillStyle = "rgba(74,43,59,0.7)";
     ctx.font = "800 20px Playfair Display, serif";
     ctx.fillText(`Rose Quartz Mall · Level ${state.floor}`, 120, 580);
-    ctx.font = "700 14px Nunito, sans-serif";
-    ctx.fillText("This pink hallway IS the mall — walk to a store door and tap ENTER", 120, 608);
+    ctx.font = "700 13px Nunito, sans-serif";
+    ctx.fillText("Brookhaven-style street — walk to a store ENTER door", 120, 608);
 
     drawRobloxPlayer(player.x, player.y);
     ctx.restore();
@@ -791,28 +768,37 @@
 
   function drawStore() {
     const store = storeWorld.store;
-    ctx.fillStyle = store.floorColor || "#fff0f5";
+    // interior walls like a Roblox shop
+    ctx.fillStyle = "#f2d6e4";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = store.floorColor || "#f7efe8";
+    ctx.fillRect(storeWorld.room.x, storeWorld.room.y + 80, storeWorld.room.w, storeWorld.room.h - 80);
+    // tile grid
+    ctx.strokeStyle = "rgba(0,0,0,0.04)";
+    for (let x = storeWorld.room.x; x < storeWorld.room.x + storeWorld.room.w; x += 28) {
+      ctx.beginPath();
+      ctx.moveTo(x, storeWorld.room.y + 80);
+      ctx.lineTo(x, storeWorld.room.y + storeWorld.room.h);
+      ctx.stroke();
+    }
 
-    // room
-    ctx.fillStyle = "#fff";
+    // blocky room walls
+    ctx.fillStyle = "#fffafc";
+    ctx.fillRect(storeWorld.room.x, storeWorld.room.y, storeWorld.room.w, 80);
     ctx.strokeStyle = store.color;
     ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.roundRect(storeWorld.room.x, storeWorld.room.y, storeWorld.room.w, storeWorld.room.h, 18);
-    ctx.fill();
-    ctx.stroke();
+    ctx.strokeRect(storeWorld.room.x, storeWorld.room.y, storeWorld.room.w, storeWorld.room.h);
 
-    // signage
+    // signage board
     ctx.fillStyle = store.color;
-    ctx.fillRect(60, 50, 280, 40);
+    ctx.fillRect(60, 50, 300, 44);
     ctx.fillStyle = "#fff";
-    ctx.font = "800 20px Nunito, sans-serif";
-    ctx.fillText(store.name, 75, 78);
+    ctx.font = "800 22px Nunito, sans-serif";
+    ctx.fillText(store.name, 75, 80);
 
     ctx.fillStyle = "#9a6b80";
-    ctx.font = "600 12px Nunito, sans-serif";
-    ctx.fillText("Click hangers & mannequins · walk to Dressing Room & Cashier", 360, 75);
+    ctx.font = "700 12px Nunito, sans-serif";
+    ctx.fillText("Tap real-looking items on hangers & mannequins", 380, 75);
 
     for (const obj of state.interactables) {
       if (obj.type === "item") {
@@ -995,6 +981,7 @@
   stick.addEventListener("pointercancel", clearStick);
 
   // Boot
+  art.preloadAll(Object.values(itemsById));
   renderAvatar(document.getElementById("avatarStage"));
   renderEquippedList();
   updateProgress();
