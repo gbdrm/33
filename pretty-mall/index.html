@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Rose Quartz Mall — Brookhaven Walk v4</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Rose Quartz Mall — First Person 3D v6</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -12,13 +12,14 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
-    <div class="sparkle-layer" aria-hidden="true"></div>
+  <body class="fp-body">
+    <div id="viewport" class="viewport"></div>
+    <div class="crosshair" aria-hidden="true"></div>
 
-    <header class="topbar">
+    <header class="topbar topbar--fp">
       <div class="brand">
         <p class="brand__name">Rose Quartz Mall</p>
-        <p class="brand__tag">Brookhaven-style mall · real-looking items</p>
+        <p class="brand__tag">First-person 3D · human view</p>
       </div>
       <div class="wallet"><span>Wallet</span><strong>$∞</strong></div>
       <div class="progress-chip"><span>Stores bagged</span><strong id="progressText">0 / 21</strong></div>
@@ -26,32 +27,23 @@
       <button type="button" id="btnBags" class="pill-btn pill-btn--soft">Bags</button>
     </header>
 
-    <main class="play-shell">
-      <div class="canvas-wrap">
-        <canvas id="game" width="1100" height="640" aria-label="Walkable mall"></canvas>
-        <div id="locationBadge" class="location-badge">Mall Corridor · Level 1</div>
-        <div id="prompt" class="prompt" hidden></div>
-        <p id="prizeBanner" class="prize-banner" hidden>Mall Princess Prize unlocked — every store bagged!</p>
-      </div>
+    <div id="locationBadge" class="location-badge">Mall Hallway · Level 1</div>
+    <div id="prompt" class="prompt" hidden></div>
+    <p id="prizeBanner" class="prize-banner" hidden>Mall Princess Prize unlocked!</p>
 
-      <aside class="side-panel">
-        <h2>You</h2>
-        <div id="avatarStage" class="avatar-stage"></div>
-        <div id="equippedList" class="equipped-list"></div>
-        <div class="help">
-          <p><strong>Move:</strong> WASD / arrows · drag the stick on iPad</p>
-          <p><strong>Take item:</strong> walk to a hanger or mannequin, tap it (or press E)</p>
-          <p><strong>Try on:</strong> walk into the Dressing Room</p>
-          <p><strong>Buy:</strong> walk up to the Cashier</p>
-          <p><strong>Leave store:</strong> walk to the EXIT mat</p>
-        </div>
-      </aside>
-    </main>
+    <div id="lookHint" class="look-hint">
+      Drag to look around · use the stick to walk · tap items in front of you
+      <button type="button" id="btnStartLook" class="pill-btn">Start shopping</button>
+    </div>
+
+    <aside class="side-panel side-panel--fp">
+      <h2>You</h2>
+      <div id="avatarStage" class="avatar-stage"></div>
+      <div id="equippedList" class="equipped-list"></div>
+    </aside>
 
     <div class="touch-controls" id="touchControls">
-      <div class="stick" id="stick">
-        <div class="stick__knob" id="stickKnob"></div>
-      </div>
+      <div class="stick" id="stick"><div class="stick__knob" id="stickKnob"></div></div>
       <button type="button" id="btnInteract" class="interact-btn">Do</button>
     </div>
 
@@ -59,7 +51,7 @@
       <div class="modal__card modal__card--wide">
         <button type="button" class="modal__close" data-close="inventoryModal">×</button>
         <h2>Inventory</h2>
-        <p class="tip">80 slots. Walk to a dressing room to try things on.</p>
+        <p class="tip">80 slots. Walk into a dressing room to try things on.</p>
         <div id="inventoryGrid" class="inventory-grid"></div>
       </div>
     </div>
@@ -69,7 +61,7 @@
         <button type="button" class="modal__close" data-close="fittingModal">×</button>
         <div>
           <h2>Dressing Room</h2>
-          <p class="tip">Tap an item to try it on your Roblox-style avatar. Keep what you love, then walk to the cashier.</p>
+          <p class="tip">Tap an item photo to try it on your avatar.</p>
           <div id="fittingInventory" class="inventory-grid inventory-grid--compact"></div>
         </div>
         <div class="fitting-avatar-wrap">
@@ -83,7 +75,7 @@
       <div class="modal__card">
         <button type="button" class="modal__close" data-close="cashierModal">×</button>
         <div class="cashier-scene">
-          <div class="cashier-avatar" aria-hidden="true"><span class="cashier-face"></span></div>
+          <div class="cashier-avatar"><span class="cashier-face"></span></div>
           <div>
             <p class="eyebrow" id="cashierStore"></p>
             <h2>Cashier</h2>
@@ -117,8 +109,7 @@
       </div>
     </div>
 
-    <div id="itemPeek" class="item-peek" hidden></div>
-
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script src="data.js"></script>
     <script src="art.js"></script>
     <script src="game.js"></script>

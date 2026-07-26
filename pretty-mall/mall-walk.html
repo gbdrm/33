@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Rose Quartz Mall — Brookhaven Walk v5 Fresh</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Rose Quartz Mall — First Person 3D v6</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,13 +15,11 @@
   --blush: #ffd6e8;
   --blush-deep: #ff8fb7;
   --rose: #ff4f9a;
-  --pearl: #fff7fb;
-  --lilac: #f1d4ff;
   --gold: #f0c75e;
   --gold-deep: #d4a017;
   --ink: #4a2b3b;
   --mute: #9a6b80;
-  --card: rgba(255, 255, 255, 0.82);
+  --card: rgba(255, 255, 255, 0.88);
   --line: rgba(255, 143, 183, 0.35);
   --shadow: 0 18px 50px rgba(255, 105, 180, 0.18);
   --font-display: "Playfair Display", Georgia, serif;
@@ -29,294 +27,214 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; min-height: 100%; }
-body {
-  min-height: 100vh;
+html, body { margin: 0; height: 100%; overflow: hidden; }
+.fp-body {
   font-family: var(--font-body);
   color: var(--ink);
-  background:
-    radial-gradient(900px 500px at 10% -10%, #ffd0ea, transparent 55%),
-    radial-gradient(800px 480px at 90% 0%, #f3d4ff, transparent 50%),
-    linear-gradient(180deg, #fff0f7 0%, #ffe8f2 45%, #fff7fb 100%);
+  background: #1a1020;
 }
 
-.sparkle-layer {
-  pointer-events: none;
+.viewport {
   position: fixed;
   inset: 0;
   z-index: 0;
-  opacity: 0.5;
-  background-image:
-    radial-gradient(circle at 12% 22%, rgba(255,255,255,.9) 0 1px, transparent 2px),
-    radial-gradient(circle at 78% 18%, rgba(255,215,120,.9) 0 1px, transparent 2px),
-    radial-gradient(circle at 40% 70%, rgba(255,255,255,.75) 0 1px, transparent 2px);
-  animation: twinkle 5s ease-in-out infinite alternate;
 }
-@keyframes twinkle {
-  from { opacity: 0.3; }
-  to { opacity: 0.65; }
+.viewport canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
 }
 
-.topbar, .play-shell, .modal, .touch-controls { position: relative; z-index: 1; }
+.crosshair {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid rgba(255,255,255,0.85);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
+  z-index: 5;
+  pointer-events: none;
+}
 
-.topbar {
+.topbar--fp {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem;
+  gap: 0.55rem;
   align-items: center;
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid var(--line);
-  background: rgba(255, 247, 251, 0.82);
-  backdrop-filter: blur(10px);
+  padding: 0.65rem 0.8rem;
+  background: linear-gradient(180deg, rgba(20,10,24,0.72), transparent);
+  color: #fff;
 }
-
 .brand__name {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 4vw, 1.9rem);
-  color: var(--rose);
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+  color: #ffb7d5;
 }
-.brand__tag { margin: 0.1rem 0 0; font-size: 0.75rem; color: var(--mute); }
+.brand__tag { margin: 0.1rem 0 0; font-size: 0.72rem; color: rgba(255,255,255,0.75); }
 
 .wallet, .progress-chip {
-  display: flex;
-  flex-direction: column;
-  padding: 0.4rem 0.7rem;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--card);
-  min-width: 100px;
+  display: flex; flex-direction: column;
+  padding: 0.35rem 0.65rem;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.18);
+  min-width: 90px;
+  color: #fff;
 }
 .wallet span, .progress-chip span {
-  font-size: 0.68rem;
-  color: var(--mute);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.8;
 }
-.wallet strong { color: var(--gold-deep); font-size: 1.1rem; }
+.wallet strong { color: var(--gold); }
 
 .pill-btn {
-  appearance: none;
-  border: 0;
-  border-radius: 999px;
-  padding: 0.7rem 1.05rem;
+  appearance: none; border: 0; border-radius: 999px;
+  padding: 0.65rem 1rem;
   background: linear-gradient(135deg, var(--rose), #ff7eb3);
-  color: #fff;
-  font-family: var(--font-body);
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(255, 79, 154, 0.28);
+  color: #fff; font-family: var(--font-body); font-weight: 800; cursor: pointer;
 }
 .pill-btn--soft {
-  background: #fff;
-  color: var(--rose);
-  border: 1px solid var(--line);
-  box-shadow: none;
+  background: rgba(255,255,255,0.92); color: var(--rose);
 }
 .pill-btn--gold {
-  background: linear-gradient(135deg, var(--gold), #f6b73c);
-  color: #5a3b00;
+  background: linear-gradient(135deg, var(--gold), #f6b73c); color: #5a3b00;
 }
 .pill-btn--inventory {
-  font-size: 1rem;
-  padding: 0.8rem 1.25rem;
-  outline: 2px solid #fff;
+  outline: 2px solid rgba(255,255,255,0.7);
   outline-offset: 2px;
 }
 .pill-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.play-shell {
-  display: grid;
-  grid-template-columns: 1fr 260px;
-  gap: 0.85rem;
-  padding: 0.85rem;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.canvas-wrap {
-  position: relative;
-  border-radius: 24px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-  background: #fff;
-}
-#game {
-  display: block;
-  width: 100%;
-  height: auto;
-  touch-action: none;
-  background: #f7d6e6;
-}
-
 .location-badge {
-  position: absolute;
-  top: 0.7rem;
-  left: 0.7rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.9);
-  border: 1px solid var(--line);
-  font-weight: 800;
-  font-size: 0.82rem;
+  position: fixed; top: 4.6rem; left: 0.8rem; z-index: 10;
+  padding: 0.4rem 0.75rem; border-radius: 999px;
+  background: rgba(0,0,0,0.45); color: #fff; font-weight: 800; font-size: 0.8rem;
 }
 .prompt {
-  position: absolute;
-  left: 50%;
-  bottom: 0.85rem;
-  transform: translateX(-50%);
-  padding: 0.55rem 0.9rem;
-  border-radius: 999px;
-  background: rgba(74, 43, 59, 0.88);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.85rem;
-  max-width: 90%;
-  text-align: center;
+  position: fixed; left: 50%; bottom: 7.5rem; transform: translateX(-50%);
+  z-index: 10; padding: 0.55rem 0.9rem; border-radius: 999px;
+  background: rgba(0,0,0,0.72); color: #fff; font-weight: 700; font-size: 0.85rem;
+  max-width: 90%; text-align: center;
 }
 .prize-banner {
-  position: absolute;
-  top: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0.55rem 0.9rem;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #fff4c2, #ffe0f0);
-  font-weight: 800;
-  white-space: nowrap;
+  position: fixed; top: 5.2rem; left: 50%; transform: translateX(-50%);
+  z-index: 10; padding: 0.5rem 0.85rem; border-radius: 14px;
+  background: linear-gradient(135deg, #fff4c2, #ffe0f0); font-weight: 800;
 }
 
-.side-panel {
-  background: var(--card);
+.look-hint {
+  position: fixed; inset: 0; z-index: 20;
+  display: grid; place-items: center; gap: 0.8rem;
+  padding: 1.5rem; text-align: center;
+  background: rgba(20, 10, 28, 0.55);
+  color: #fff; font-weight: 700;
+  backdrop-filter: blur(3px);
+}
+.look-hint[hidden] { display: none; }
+
+.side-panel--fp {
+  position: fixed; right: 0.7rem; top: 4.8rem; z-index: 10;
+  width: min(200px, 34vw);
+  background: rgba(255,255,255,0.88);
   border: 1px solid var(--line);
-  border-radius: 24px;
-  padding: 0.9rem;
+  border-radius: 20px;
+  padding: 0.7rem;
   box-shadow: var(--shadow);
 }
-.side-panel h2 {
-  margin: 0;
-  font-family: var(--font-display);
-}
-.help { margin-top: 0.7rem; color: var(--mute); font-size: 0.78rem; }
-.help p { margin: 0.35rem 0; }
+.side-panel--fp h2 { margin: 0; font-family: var(--font-display); font-size: 1.1rem; }
 
 .avatar-stage {
-  width: 160px;
-  height: 230px;
-  margin: 0.7rem auto;
-  position: relative;
-  border-radius: 24px;
+  width: 120px; height: 175px; margin: 0.5rem auto; position: relative;
+  border-radius: 18px; overflow: hidden;
   background: linear-gradient(180deg, #ffe1ef, #ffd0ea);
   border: 1px solid var(--line);
-  overflow: hidden;
 }
 .avatar-stage--large { width: 210px; height: 300px; }
 
 .roblox { position: absolute; inset: 0; display: grid; place-items: center; }
-.roblox__body { position: relative; width: 120px; height: 210px; }
+.roblox__body { position: relative; width: 110px; height: 190px; }
 .roblox__head, .roblox__torso, .roblox__arm, .roblox__leg, .roblox__shoe, .roblox__bag, .roblox__acc, .roblox__hair {
   position: absolute; border-radius: 8px;
 }
-.roblox__head { width: 44px; height: 44px; left: 38px; top: 10px; background: #ffd7bf; }
+.roblox__head { width: 40px; height: 40px; left: 35px; top: 10px; background: #ffd7bf; }
 .roblox__face { position: absolute; inset: 0; }
 .roblox__face::before, .roblox__face::after {
-  content: ""; position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #4a2b3b; top: 16px;
+  content: ""; position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #4a2b3b; top: 14px;
 }
-.roblox__face::before { left: 11px; }
-.roblox__face::after { right: 11px; }
+.roblox__face::before { left: 10px; }
+.roblox__face::after { right: 10px; }
 .roblox__smile {
-  position: absolute; width: 14px; height: 7px; border-bottom: 2px solid #4a2b3b;
-  border-radius: 0 0 12px 12px; left: 15px; top: 26px;
+  position: absolute; width: 12px; height: 6px; border-bottom: 2px solid #4a2b3b;
+  border-radius: 0 0 12px 12px; left: 14px; top: 24px;
 }
-.roblox__hair {
-  width: 52px; height: 22px; left: 34px; top: 4px; border-radius: 18px 18px 8px 8px;
-  background: #6b3a2c; z-index: 2;
-}
-.roblox__torso { width: 50px; height: 58px; left: 35px; top: 56px; background: #ff9ec8; }
-.roblox__arm { width: 18px; height: 54px; top: 58px; background: #ffd7bf; }
+.roblox__hair { width: 48px; height: 20px; left: 31px; top: 4px; border-radius: 16px 16px 8px 8px; background: #6b3a2c; z-index: 2; }
+.roblox__torso { width: 46px; height: 52px; left: 32px; top: 52px; background: #ff9ec8; }
+.roblox__arm { width: 16px; height: 48px; top: 54px; background: #ffd7bf; }
 .roblox__arm--l { left: 14px; }
 .roblox__arm--r { right: 14px; left: auto; }
-.roblox__sleeve { position: absolute; width: 18px; height: 20px; top: 0; left: 0; border-radius: 8px; background: #ff9ec8; }
-.roblox__leg { width: 20px; height: 56px; top: 116px; background: #f7c1d8; }
-.roblox__leg--l { left: 38px; }
-.roblox__leg--r { left: 62px; }
-.roblox__shoe { width: 24px; height: 12px; top: 168px; background: #fff; border: 1px solid #f0c1d4; }
-.roblox__shoe--l { left: 36px; }
-.roblox__shoe--r { left: 60px; }
-.roblox__bag {
-  width: 28px; height: 34px; right: 4px; top: 88px; background: #d4a017;
-  border-radius: 8px 8px 10px 10px; display: none;
-}
+.roblox__sleeve { position: absolute; width: 16px; height: 18px; top: 0; left: 0; border-radius: 8px; background: #ff9ec8; }
+.roblox__leg { width: 18px; height: 50px; top: 106px; background: #f7c1d8; }
+.roblox__leg--l { left: 35px; }
+.roblox__leg--r { left: 57px; }
+.roblox__shoe { width: 22px; height: 11px; top: 154px; background: #fff; border: 1px solid #f0c1d4; }
+.roblox__shoe--l { left: 33px; }
+.roblox__shoe--r { left: 55px; }
+.roblox__bag { width: 24px; height: 30px; right: 6px; top: 80px; background: #d4a017; display: none; }
 .roblox__bag.is-on { display: block; }
 .roblox__acc {
-  width: 34px; height: 16px; left: 43px; top: 2px; background: #ffd700;
+  width: 30px; height: 14px; left: 40px; top: 2px; background: #ffd700; display: none; z-index: 3;
   clip-path: polygon(0 70%, 20% 0, 40% 70%, 60% 0, 80% 70%, 100% 0, 100% 100%, 0 100%);
-  display: none; z-index: 3;
 }
 .roblox__acc.is-on { display: block; }
 
-.equipped-list { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
+.equipped-list { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center; }
 .chip {
-  font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 999px;
+  font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.45rem; border-radius: 999px;
   background: #fff; border: 1px solid var(--line);
 }
 
 .touch-controls {
-  display: none;
-  position: fixed;
-  left: 0; right: 0; bottom: 0.8rem;
-  z-index: 15;
-  padding: 0 1rem;
-  justify-content: space-between;
-  align-items: flex-end;
-  pointer-events: none;
+  position: fixed; left: 0; right: 0; bottom: 0.7rem; z-index: 12;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 1rem; pointer-events: none;
 }
 .stick {
-  pointer-events: auto;
-  width: 110px; height: 110px; border-radius: 50%;
-  background: rgba(255,255,255,0.55);
-  border: 2px solid rgba(255,143,183,0.5);
-  position: relative;
+  pointer-events: auto; width: 118px; height: 118px; border-radius: 50%;
+  background: rgba(255,255,255,0.28); border: 2px solid rgba(255,255,255,0.45); position: relative;
 }
 .stick__knob {
-  width: 46px; height: 46px; border-radius: 50%;
+  width: 48px; height: 48px; border-radius: 50%;
   background: linear-gradient(135deg, var(--rose), #ff7eb3);
-  position: absolute; left: 32px; top: 32px;
+  position: absolute; left: 35px; top: 35px;
 }
 .interact-btn {
-  pointer-events: auto;
-  width: 78px; height: 78px; border-radius: 50%;
-  border: 0; font-weight: 800; font-family: var(--font-body);
-  background: linear-gradient(135deg, var(--gold), #f6b73c);
-  color: #5a3b00;
-  box-shadow: 0 8px 20px rgba(240, 199, 94, 0.4);
+  pointer-events: auto; width: 78px; height: 78px; border-radius: 50%; border: 0;
+  font-weight: 800; font-family: var(--font-body);
+  background: linear-gradient(135deg, var(--gold), #f6b73c); color: #5a3b00;
 }
 
 .modal[hidden] { display: none; }
 .modal {
-  position: fixed; inset: 0; z-index: 30;
-  display: grid; place-items: center;
-  padding: 1rem;
-  background: rgba(74, 43, 59, 0.35);
-  backdrop-filter: blur(4px);
+  position: fixed; inset: 0; z-index: 30; display: grid; place-items: center;
+  padding: 1rem; background: rgba(20,10,28,0.45); backdrop-filter: blur(4px);
 }
 .modal__card {
-  width: min(100%, 560px);
-  max-height: min(90vh, 820px);
-  overflow: auto;
+  width: min(100%, 560px); max-height: min(90vh, 820px); overflow: auto;
   background: linear-gradient(180deg, #fff9fc, #ffeaf4);
-  border: 1px solid var(--line);
-  border-radius: 28px;
-  box-shadow: var(--shadow);
-  padding: 1.1rem;
-  position: relative;
+  border: 1px solid var(--line); border-radius: 28px; box-shadow: var(--shadow);
+  padding: 1.1rem; position: relative;
 }
 .modal__card--wide { width: min(100%, 860px); }
 .modal__close {
-  position: absolute; top: 0.55rem; right: 0.7rem;
-  border: 0; background: #fff; width: 36px; height: 36px;
-  border-radius: 50%; font-size: 1.3rem; cursor: pointer; color: var(--mute);
+  position: absolute; top: 0.55rem; right: 0.7rem; border: 0; background: #fff;
+  width: 36px; height: 36px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; color: var(--mute);
 }
 .modal h2 { margin: 0; font-family: var(--font-display); }
 .tip, .eyebrow { color: var(--mute); }
@@ -326,42 +244,26 @@ body {
 }
 
 .inventory-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-  gap: 0.55rem;
-  margin-top: 0.7rem;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 0.55rem; margin-top: 0.7rem;
 }
 .inventory-grid--compact { max-height: 360px; overflow: auto; }
-.inv-slot, .item-card {
+.inv-slot {
   border: 1px solid var(--line); border-radius: 16px; background: #fff;
-  padding: 0.55rem; cursor: pointer; text-align: left; font-family: var(--font-body);
+  padding: 0.5rem; cursor: pointer; text-align: left; font-family: var(--font-body);
 }
 .inv-slot.empty {
-  min-height: 90px; background: rgba(255,255,255,0.45);
-  border-style: dashed; cursor: default;
+  min-height: 96px; background: rgba(255,255,255,0.45); border-style: dashed; cursor: default;
 }
 .inv-slot.is-owned { opacity: 0.55; }
-.swatch {
-  width: 100%; aspect-ratio: 1; border-radius: 12px; margin-bottom: 0.35rem;
-  border: 1px solid rgba(0,0,0,0.05);
-  object-fit: cover;
-  background: #f6f1f4;
-  display: block;
-}
-.swatch.diamond { clip-path: none; border-radius: 12px; }
-.swatch.circle { border-radius: 12px; }
 .product-thumb {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 12px;
-  margin-bottom: 0.35rem;
-  object-fit: cover;
-  border: 1px solid rgba(0,0,0,0.08);
-  background: #fff;
-  display: block;
+  width: 100%; aspect-ratio: 1; border-radius: 12px; margin-bottom: 0.35rem;
+  object-fit: cover; border: 1px solid rgba(0,0,0,0.08); background: #fff; display: block;
+  transform: perspective(220px) rotateY(-8deg) rotateX(4deg);
+  box-shadow: 8px 10px 18px rgba(74, 43, 59, 0.18);
 }
-.inv-slot strong { display: block; font-size: 0.75rem; line-height: 1.2; }
-.inv-slot span { display: block; font-size: 0.68rem; color: var(--mute); margin-top: 0.15rem; }
+.inv-slot strong { display: block; font-size: 0.72rem; line-height: 1.2; }
+.inv-slot span { display: block; font-size: 0.66rem; color: var(--mute); margin-top: 0.15rem; }
 
 .fitting-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem; }
 .fitting-avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.65rem; }
@@ -376,8 +278,7 @@ body {
   position: relative; box-shadow: 0 14px 0 10px #ff9ec8;
 }
 .cashier-face::before, .cashier-face::after {
-  content: ""; position: absolute; width: 4px; height: 4px; border-radius: 50%;
-  background: #4a2b3b; top: 10px;
+  content: ""; position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #4a2b3b; top: 10px;
 }
 .cashier-face::before { left: 6px; }
 .cashier-face::after { right: 6px; }
@@ -386,6 +287,11 @@ body {
 .checkout-row {
   display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.65rem;
   border-radius: 14px; background: #fff; border: 1px solid var(--line);
+}
+.checkout-row img {
+  width: 52px; height: 52px; object-fit: cover; border-radius: 10px;
+  transform: perspective(180px) rotateY(-10deg);
+  box-shadow: 6px 8px 14px rgba(0,0,0,0.15);
 }
 .checkout-row input { width: 18px; height: 18px; accent-color: var(--rose); }
 .cashier-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -399,38 +305,23 @@ body {
   width: 48px; height: 56px; border-radius: 10px 10px 14px 14px;
   background: linear-gradient(180deg, #ff9ec8, #ff4f9a); position: relative;
 }
-.bag-icon::before {
-  content: ""; position: absolute; left: 12px; right: 12px; top: -8px; height: 12px;
-  border: 3px solid #ff4f9a; border-bottom: 0; border-radius: 12px 12px 0 0;
-}
 .prize-card { text-align: center; }
 
-.item-peek {
-  position: fixed; z-index: 25; pointer-events: none;
-  padding: 0.45rem 0.65rem; border-radius: 12px;
-  background: rgba(255,255,255,0.95); border: 1px solid var(--line);
-  font-size: 0.78rem; font-weight: 700; max-width: 220px;
-  box-shadow: var(--shadow);
-}
-
-@media (max-width: 960px) {
-  .play-shell { grid-template-columns: 1fr; }
-  .side-panel { order: -1; }
-  .touch-controls { display: flex; }
-}
-@media (max-width: 700px) {
+@media (max-width: 800px) {
+  .side-panel--fp { display: none; }
   .fitting-layout { grid-template-columns: 1fr; }
 }
 
 </style>
   </head>
-  <body>
-    <div class="sparkle-layer" aria-hidden="true"></div>
+  <body class="fp-body">
+    <div id="viewport" class="viewport"></div>
+    <div class="crosshair" aria-hidden="true"></div>
 
-    <header class="topbar">
+    <header class="topbar topbar--fp">
       <div class="brand">
         <p class="brand__name">Rose Quartz Mall</p>
-        <p class="brand__tag">Brookhaven-style mall · real-looking items</p>
+        <p class="brand__tag">First-person 3D · human view</p>
       </div>
       <div class="wallet"><span>Wallet</span><strong>$∞</strong></div>
       <div class="progress-chip"><span>Stores bagged</span><strong id="progressText">0 / 21</strong></div>
@@ -438,32 +329,23 @@ body {
       <button type="button" id="btnBags" class="pill-btn pill-btn--soft">Bags</button>
     </header>
 
-    <main class="play-shell">
-      <div class="canvas-wrap">
-        <canvas id="game" width="1100" height="640" aria-label="Walkable mall"></canvas>
-        <div id="locationBadge" class="location-badge">Mall Corridor · Level 1</div>
-        <div id="prompt" class="prompt" hidden></div>
-        <p id="prizeBanner" class="prize-banner" hidden>Mall Princess Prize unlocked — every store bagged!</p>
-      </div>
+    <div id="locationBadge" class="location-badge">Mall Hallway · Level 1</div>
+    <div id="prompt" class="prompt" hidden></div>
+    <p id="prizeBanner" class="prize-banner" hidden>Mall Princess Prize unlocked!</p>
 
-      <aside class="side-panel">
-        <h2>You</h2>
-        <div id="avatarStage" class="avatar-stage"></div>
-        <div id="equippedList" class="equipped-list"></div>
-        <div class="help">
-          <p><strong>Move:</strong> WASD / arrows · drag the stick on iPad</p>
-          <p><strong>Take item:</strong> walk to a hanger or mannequin, tap it (or press E)</p>
-          <p><strong>Try on:</strong> walk into the Dressing Room</p>
-          <p><strong>Buy:</strong> walk up to the Cashier</p>
-          <p><strong>Leave store:</strong> walk to the EXIT mat</p>
-        </div>
-      </aside>
-    </main>
+    <div id="lookHint" class="look-hint">
+      Drag to look around · use the stick to walk · tap items in front of you
+      <button type="button" id="btnStartLook" class="pill-btn">Start shopping</button>
+    </div>
+
+    <aside class="side-panel side-panel--fp">
+      <h2>You</h2>
+      <div id="avatarStage" class="avatar-stage"></div>
+      <div id="equippedList" class="equipped-list"></div>
+    </aside>
 
     <div class="touch-controls" id="touchControls">
-      <div class="stick" id="stick">
-        <div class="stick__knob" id="stickKnob"></div>
-      </div>
+      <div class="stick" id="stick"><div class="stick__knob" id="stickKnob"></div></div>
       <button type="button" id="btnInteract" class="interact-btn">Do</button>
     </div>
 
@@ -471,7 +353,7 @@ body {
       <div class="modal__card modal__card--wide">
         <button type="button" class="modal__close" data-close="inventoryModal">×</button>
         <h2>Inventory</h2>
-        <p class="tip">80 slots. Walk to a dressing room to try things on.</p>
+        <p class="tip">80 slots. Walk into a dressing room to try things on.</p>
         <div id="inventoryGrid" class="inventory-grid"></div>
       </div>
     </div>
@@ -481,7 +363,7 @@ body {
         <button type="button" class="modal__close" data-close="fittingModal">×</button>
         <div>
           <h2>Dressing Room</h2>
-          <p class="tip">Tap an item to try it on your Roblox-style avatar. Keep what you love, then walk to the cashier.</p>
+          <p class="tip">Tap an item photo to try it on your avatar.</p>
           <div id="fittingInventory" class="inventory-grid inventory-grid--compact"></div>
         </div>
         <div class="fitting-avatar-wrap">
@@ -495,7 +377,7 @@ body {
       <div class="modal__card">
         <button type="button" class="modal__close" data-close="cashierModal">×</button>
         <div class="cashier-scene">
-          <div class="cashier-avatar" aria-hidden="true"><span class="cashier-face"></span></div>
+          <div class="cashier-avatar"><span class="cashier-face"></span></div>
           <div>
             <p class="eyebrow" id="cashierStore"></p>
             <h2>Cashier</h2>
@@ -529,8 +411,7 @@ body {
       </div>
     </div>
 
-    <div id="itemPeek" class="item-peek" hidden></div>
-
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script>
 window.MALL_DATA = {
   inventorySlots: 80,
@@ -1304,24 +1185,15 @@ window.MALL_ART = (() => {
 (() => {
   "use strict";
 
+  if (!window.THREE) {
+    document.body.innerHTML =
+      "<p style='padding:2rem;font-family:sans-serif'>Could not load 3D engine. Check your internet connection and refresh.</p>";
+    return;
+  }
+
+  const THREE = window.THREE;
   const data = window.MALL_DATA;
   const art = window.MALL_ART;
-  const canvas = document.getElementById("game");
-  const ctx = canvas.getContext("2d");
-
-  // iPad / older Safari may not have roundRect
-  if (!ctx.roundRect) {
-    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-      const radius = typeof r === "number" ? r : 10;
-      this.moveTo(x + radius, y);
-      this.arcTo(x + w, y, x + w, y + h, radius);
-      this.arcTo(x + w, y + h, x, y + h, radius);
-      this.arcTo(x, y + h, x, y, radius);
-      this.arcTo(x, y, x + w, y, radius);
-      this.closePath();
-      return this;
-    };
-  }
 
   const storesById = Object.fromEntries(data.stores.map((s) => [s.id, s]));
   const itemsById = {};
@@ -1333,9 +1205,8 @@ window.MALL_ART = (() => {
   itemsById[data.prize.id] = { ...data.prize, storeId: "prize", storeName: "Prize" };
 
   const state = {
-    scene: "mall", // mall | store
     floor: 1,
-    storeId: null,
+    storeId: null, // null = hallway
     inventory: [],
     owned: new Set(),
     equipped: { top: null, bottom: null, shoes: null, bag: null, accessory: null },
@@ -1343,172 +1214,54 @@ window.MALL_ART = (() => {
     purchasedStores: new Set(),
     prizeClaimed: false,
     toastTimer: null,
-    interactables: [],
     keys: new Set(),
     stick: { active: false, x: 0, y: 0 },
+    looking: false,
+    yaw: 0,
+    pitch: 0,
     nearby: null,
-    camX: 0,
+    interactables: [],
+    textureCache: new Map(),
   };
 
   const player = {
-    x: 180,
-    y: 360,
-    w: 28,
-    h: 44,
-    speed: 210,
-    facing: 1,
+    x: 0,
+    y: 1.6,
+    z: 8,
+    speed: 4.2,
+    radius: 0.35,
   };
 
-  // Mall corridor geometry
-  const MALL_W = 2200;
-  const MALL_H = 640;
-  const STORE_W = 160;
-  const STORE_H = 150;
+  // DOM
+  const viewport = document.getElementById("viewport");
+  const promptEl = document.getElementById("prompt");
+  const locationBadge = document.getElementById("locationBadge");
+  const lookHint = document.getElementById("lookHint");
 
-  function floorStores(floor) {
-    return data.stores.filter((s) => s.floor === floor);
-  }
+  // Three.js setup
+  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.shadowMap.enabled = true;
+  viewport.appendChild(renderer.domElement);
 
-  function mallStoreRects(floor) {
-    const list = floorStores(floor);
-    return list.map((store, i) => {
-      const x = 120 + i * (STORE_W + 48);
-      const y = 55;
-      const h = 200;
-      return {
-        store,
-        x,
-        y,
-        w: STORE_W,
-        h,
-        door: { x: x + STORE_W / 2 - 18, y: y + h - 16, w: 36, h: 18 },
-      };
-    });
-  }
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color("#b9dfff");
+  scene.fog = new THREE.Fog("#cfe9ff", 18, 55);
 
-  function buildStoreInterior(storeId) {
-    const store = storesById[storeId];
-    const interactables = [];
-    const room = { x: 40, y: 40, w: 1020, h: 560 };
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.08, 80);
+  camera.position.set(player.x, player.y, player.z);
 
-    // Place items on hangers / mannequins / shelves
-    let hx = 80;
-    let mx = 80;
-    let sx = 80;
-    store.items.forEach((item, idx) => {
-      const full = itemsById[item.id];
-      if (item.display === "hanger") {
-        interactables.push({
-          type: "item",
-          kind: "hanger",
-          itemId: item.id,
-          x: hx,
-          y: 120 + (idx % 2) * 20,
-          w: 54,
-          h: 90,
-          label: full.name,
-        });
-        hx += 70;
-        if (hx > 520) hx = 80;
-      } else if (item.display === "mannequin") {
-        interactables.push({
-          type: "item",
-          kind: "mannequin",
-          itemId: item.id,
-          x: 560 + (mx % 280),
-          y: 150 + Math.floor((mx - 80) / 280) * 130,
-          w: 50,
-          h: 110,
-          label: full.name,
-        });
-        mx += 90;
-      } else {
-        interactables.push({
-          type: "item",
-          kind: "shelf",
-          itemId: item.id,
-          x: 70 + (sx % 8) * 70,
-          y: 380 + Math.floor((sx - 80) / (70 * 8)) * 70,
-          w: 56,
-          h: 56,
-          label: full.name,
-        });
-        sx += 70;
-      }
-    });
+  const clock = new THREE.Clock();
+  const raycaster = new THREE.Raycaster();
+  const centerNDC = new THREE.Vector2(0, 0);
+  const worldGroup = new THREE.Group();
+  scene.add(worldGroup);
 
-    interactables.push({
-      type: "dressing",
-      x: 820,
-      y: 80,
-      w: 200,
-      h: 130,
-      label: "Dressing Room",
-    });
-    interactables.push({
-      type: "cashier",
-      x: 820,
-      y: 280,
-      w: 200,
-      h: 120,
-      label: "Cashier",
-    });
-    interactables.push({
-      type: "exit",
-      x: 460,
-      y: 540,
-      w: 180,
-      h: 40,
-      label: "EXIT to Mall",
-    });
-
-    return { store, room, interactables };
-  }
-
-  let storeWorld = null;
-
-  function enterStore(storeId) {
-    state.scene = "store";
-    state.storeId = storeId;
-    storeWorld = buildStoreInterior(storeId);
-    state.interactables = storeWorld.interactables;
-    player.x = 520;
-    player.y = 500;
-    updateLocationBadge();
-    toast(`Welcome to ${storesById[storeId].name}`);
-  }
-
-  function exitStore() {
-    const storeId = state.storeId;
-    state.scene = "mall";
-    state.storeId = null;
-    storeWorld = null;
-    state.interactables = [];
-    const rects = mallStoreRects(state.floor);
-    const rect = rects.find((r) => r.store.id === storeId);
-    if (rect) {
-      player.x = rect.door.x + 10;
-      player.y = rect.door.y + 30;
-    }
-    updateLocationBadge();
-  }
-
-  function changeFloor(floor) {
-    state.floor = floor;
-    player.x = 180;
-    player.y = 360;
-    updateLocationBadge();
-    toast(`Elevator → Level ${floor}`);
-  }
-
-  function updateLocationBadge() {
-    const el = document.getElementById("locationBadge");
-    if (state.scene === "mall") {
-      el.textContent = `Mall Corridor · Level ${state.floor}`;
-    } else {
-      el.textContent = `${storesById[state.storeId].name} · Floor ${state.floor}`;
-    }
-  }
+  const colliders = []; // {minX,maxX,minZ,maxZ}
+  let doorZones = []; // {storeId, minX,maxX,minZ,maxZ, label}
+  let floorZones = [];
 
   function toast(message) {
     let node = document.getElementById("toast");
@@ -1516,7 +1269,7 @@ window.MALL_ART = (() => {
       node = document.createElement("div");
       node.id = "toast";
       node.style.cssText =
-        "position:fixed;left:50%;bottom:6.5rem;transform:translateX(-50%);z-index:40;background:#fff;border:1px solid rgba(255,143,183,.45);padding:.7rem 1rem;border-radius:999px;font-weight:800;box-shadow:0 10px 30px rgba(255,105,180,.25);max-width:90vw;text-align:center;";
+        "position:fixed;left:50%;bottom:9rem;transform:translateX(-50%);z-index:40;background:#fff;border:1px solid rgba(255,143,183,.45);padding:.7rem 1rem;border-radius:999px;font-weight:800;box-shadow:0 10px 30px rgba(255,105,180,.25);max-width:90vw;text-align:center;";
       document.body.appendChild(node);
     }
     node.textContent = message;
@@ -1533,10 +1286,299 @@ window.MALL_ART = (() => {
   function closeModal(id) {
     document.getElementById(id).hidden = true;
   }
+  function modalOpen() {
+    return [...document.querySelectorAll(".modal")].some((m) => !m.hidden) || !lookHint.hidden;
+  }
 
-  function openInventory() {
-    renderInventoryGrid(document.getElementById("inventoryGrid"));
-    openModal("inventoryModal");
+  function getTexture(url) {
+    if (state.textureCache.has(url)) return state.textureCache.get(url);
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin("anonymous");
+    const tex = loader.load(url);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    state.textureCache.set(url, tex);
+    return tex;
+  }
+
+  function box(w, h, d, color, x, y, z, opts = {}) {
+    const geo = new THREE.BoxGeometry(w, h, d);
+    const mat = new THREE.MeshStandardMaterial({
+      color,
+      roughness: opts.roughness ?? 0.85,
+      metalness: opts.metalness ?? 0.05,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    worldGroup.add(mesh);
+    if (opts.collide) {
+      colliders.push({
+        minX: x - w / 2 - 0.05,
+        maxX: x + w / 2 + 0.05,
+        minZ: z - d / 2 - 0.05,
+        maxZ: z + d / 2 + 0.05,
+      });
+    }
+    return mesh;
+  }
+
+  function photoPlane(item, w, h, x, y, z, rotY = 0, meta = {}) {
+    const url = art.photoUrlForItem(item);
+    const tex = getTexture(url);
+    const geo = new THREE.PlaneGeometry(w, h);
+    const mat = new THREE.MeshStandardMaterial({
+      map: tex,
+      roughness: 0.55,
+      metalness: 0.05,
+      side: THREE.DoubleSide,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, y, z);
+    mesh.rotation.y = rotY;
+    mesh.castShadow = true;
+    // thin backing for 3D depth
+    const back = box(w * 0.98, h * 0.98, 0.04, item.swatch || "#ddd", x, y, z, { roughness: 0.7 });
+    back.rotation.y = rotY;
+    back.position.set(
+      x - Math.sin(rotY) * 0.03,
+      y,
+      z - Math.cos(rotY) * 0.03
+    );
+    mesh.userData = {
+      type: "item",
+      itemId: item.id,
+      label: item.name,
+      ...meta,
+    };
+    worldGroup.add(mesh);
+    state.interactables.push(mesh);
+    return mesh;
+  }
+
+  function makeMannequin(x, z, item) {
+    // blocky mannequin body
+    box(0.28, 0.35, 0.2, "#f0d2c0", x, 1.25, z, { collide: true });
+    box(0.18, 0.18, 0.18, "#f0d2c0", x, 1.55, z);
+    box(0.08, 0.55, 0.08, "#e5c3ad", x - 0.08, 0.55, z);
+    box(0.08, 0.55, 0.08, "#e5c3ad", x + 0.08, 0.55, z);
+    box(0.25, 0.04, 0.25, "#d9c4b0", x, 0.25, z);
+    photoPlane(item, 0.55, 0.55, x, 1.15, z + 0.22, 0, { kind: "mannequin" });
+  }
+
+  function makeHanger(x, z, item, rotY = 0) {
+    box(0.7, 0.03, 0.03, "#c9a27c", x, 1.7, z);
+    box(0.04, 0.2, 0.04, "#b08968", x, 1.8, z);
+    photoPlane(item, 0.48, 0.62, x, 1.25, z + 0.05, rotY, { kind: "hanger" });
+  }
+
+  function makeShelfItem(x, y, z, item, rotY = 0) {
+    box(0.55, 0.04, 0.35, "#d9b896", x, y - 0.28, z, { collide: true });
+    photoPlane(item, 0.42, 0.42, x, y, z + 0.02, rotY, { kind: "shelf" });
+  }
+
+  function clearWorld() {
+    while (worldGroup.children.length) {
+      const obj = worldGroup.children.pop();
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) {
+        if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
+        else obj.material.dispose();
+      }
+    }
+    colliders.length = 0;
+    doorZones = [];
+    floorZones = [];
+    state.interactables = [];
+  }
+
+  function addLights(tint = "#ffffff") {
+    const hemi = new THREE.HemisphereLight("#fff1f7", "#7a8b6a", 1.05);
+    worldGroup.add(hemi);
+    const sun = new THREE.DirectionalLight(tint, 1.15);
+    sun.position.set(8, 14, 6);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(1024, 1024);
+    worldGroup.add(sun);
+    const fill = new THREE.PointLight("#ffd0ea", 0.55, 28);
+    fill.position.set(0, 2.4, 0);
+    worldGroup.add(fill);
+  }
+
+  function buildHallway(floor) {
+    clearWorld();
+    scene.background = new THREE.Color("#a9d8ff");
+    scene.fog = new THREE.Fog("#cfe9ff", 20, 60);
+    addLights("#fff6ea");
+
+    const stores = data.stores.filter((s) => s.floor === floor);
+    const hallLen = Math.max(28, stores.length * 5.2 + 8);
+
+    // floor / ceiling / walls
+    box(12, 0.2, hallLen, "#e9e0e8", 0, 0, -hallLen / 2 + 4, { roughness: 0.95 });
+    box(12, 0.2, hallLen, "#fff7fb", 0, 3.4, -hallLen / 2 + 4, { roughness: 1 });
+    box(0.35, 3.4, hallLen, "#ffe3f0", -6, 1.7, -hallLen / 2 + 4, { collide: true });
+    box(0.35, 3.4, hallLen, "#ffe3f0", 6, 1.7, -hallLen / 2 + 4, { collide: true });
+
+    // outdoor glass front feeling + skylight strips
+    for (let i = 0; i < 10; i += 1) {
+      box(1.4, 0.05, 1.4, "#9fd9ff", -2 + (i % 3) * 2, 3.35, -3 - i * 4);
+    }
+
+    // elevator booth
+    box(2.2, 2.6, 2.2, "#ffd36b", -4.2, 1.3, 6, { collide: true });
+    box(1.4, 2.1, 0.08, "#ffffff", -4.2, 1.2, 7.15);
+    const elev = box(1.5, 0.9, 0.2, "#fff4c2", -4.2, 1.3, 7.3);
+    elev.userData = { type: "elevator", label: `Elevator to Level ${floor === 3 ? 1 : floor + 1}`, nextFloor: floor === 3 ? 1 : floor + 1 };
+    state.interactables.push(elev);
+    floorZones.push({
+      type: "elevator",
+      nextFloor: floor === 3 ? 1 : floor + 1,
+      minX: -5.2,
+      maxX: -3.2,
+      minZ: 5.2,
+      maxZ: 7.8,
+      label: `Elevator to Level ${floor === 3 ? 1 : floor + 1}`,
+    });
+
+    // fountain center
+    box(1.8, 0.25, 1.8, "#8fd3ff", 0, 0.2, 2);
+    box(0.25, 1.1, 0.25, "#ffffff", 0, 0.8, 2);
+
+    stores.forEach((store, i) => {
+      const z = -2 - i * 5.2;
+      const side = i % 2 === 0 ? -1 : 1;
+      const wallX = side * 4.35;
+      // storefront building block
+      box(2.6, 2.8, 4.2, "#fffafc", wallX, 1.4, z, { collide: true });
+      box(2.8, 0.25, 4.4, store.fancy ? "#ff8fb7" : "#b8e0ff", wallX, 2.9, z);
+      // sign
+      const sign = box(2.0, 0.4, 0.08, store.color || "#333", wallX + side * -1.35, 2.35, z);
+      // glass door
+      const door = box(1.1, 2.1, 0.08, "#7ec8ff", wallX + side * -1.35, 1.1, z + 0.9);
+      door.userData = { type: "door", storeId: store.id, label: `Enter ${store.name}` };
+      state.interactables.push(door);
+      // window product tease
+      const tease = store.items[0];
+      if (tease) {
+        photoPlane(
+          itemsById[tease.id],
+          0.7,
+          0.7,
+          wallX + side * -1.36,
+          1.5,
+          z - 0.6,
+          side > 0 ? Math.PI / 2 : -Math.PI / 2
+        );
+      }
+      doorZones.push({
+        storeId: store.id,
+        label: `Enter ${store.name}`,
+        minX: wallX + side * -1.9,
+        maxX: wallX + side * -0.7,
+        minZ: z + 0.3,
+        maxZ: z + 1.5,
+      });
+    });
+
+    player.x = 0;
+    player.z = 8;
+    state.yaw = Math.PI;
+    state.pitch = 0;
+    updateLocationBadge();
+  }
+
+  function buildStore(storeId) {
+    const store = storesById[storeId];
+    clearWorld();
+    scene.background = new THREE.Color(store.floorColor || "#fff0f5");
+    scene.fog = new THREE.Fog(store.floorColor || "#fff0f5", 12, 28);
+    addLights("#ffffff");
+    state.storeId = storeId;
+
+    // room shell
+    box(12, 0.2, 12, store.floorColor || "#f4ebe3", 0, 0, 0, { roughness: 1 });
+    box(12, 0.2, 12, "#ffffff", 0, 3.2, 0);
+    box(0.3, 3.2, 12, "#fff7fb", -6, 1.6, 0, { collide: true });
+    box(0.3, 3.2, 12, "#fff7fb", 6, 1.6, 0, { collide: true });
+    box(12, 3.2, 0.3, store.color || "#333", 0, 1.6, -6, { collide: true });
+    box(12, 3.2, 0.3, "#ffeaf3", 0, 1.6, 6, { collide: true });
+
+    // brand sign
+    box(4.5, 0.7, 0.12, store.color || "#222", 0, 2.6, -5.7);
+
+    // exit
+    const exit = box(1.8, 0.08, 1.0, "#4a2b3b", 0, 0.12, 5.1);
+    exit.userData = { type: "exit", label: "Exit to mall hallway" };
+    state.interactables.push(exit);
+    doorZones.push({ type: "exit", label: "Exit to mall hallway", minX: -1.1, maxX: 1.1, minZ: 4.4, maxZ: 5.7 });
+
+    // dressing room
+    box(2.6, 2.4, 2.2, "#f1d4ff", -4.2, 1.2, -3.8, { collide: true });
+    const dress = box(1.2, 2.0, 0.08, "#ff8fb7", -4.2, 1.1, -2.65);
+    dress.userData = { type: "dressing", label: "Dressing Room — try on inventory" };
+    state.interactables.push(dress);
+    doorZones.push({
+      type: "dressing",
+      label: "Dressing Room — try on inventory",
+      minX: -5.2,
+      maxX: -3.2,
+      minZ: -3.1,
+      maxZ: -1.9,
+    });
+
+    // cashier counter
+    box(2.8, 1.0, 1.1, "#e8d5a3", 4.0, 0.55, -3.6, { collide: true });
+    box(0.35, 0.8, 0.25, "#ffd7bf", 4.0, 1.35, -3.6); // cashier body
+    box(0.28, 0.28, 0.28, "#ffd7bf", 4.0, 1.85, -3.6); // head
+    const cashier = box(1.6, 0.5, 0.4, "#fff4c2", 4.0, 1.2, -2.9);
+    cashier.userData = { type: "cashier", label: `${store.name} Cashier` };
+    state.interactables.push(cashier);
+    doorZones.push({
+      type: "cashier",
+      label: `${store.name} Cashier`,
+      minX: 2.8,
+      maxX: 5.2,
+      minZ: -3.3,
+      maxZ: -1.8,
+    });
+
+    // place products in 3D
+    let hi = 0;
+    let mi = 0;
+    let si = 0;
+    store.items.forEach((raw) => {
+      const item = itemsById[raw.id];
+      if (raw.display === "hanger") {
+        const x = -3.5 + (hi % 5) * 0.85;
+        const z = 1.2 - Math.floor(hi / 5) * 1.1;
+        makeHanger(x, z, item);
+        hi += 1;
+      } else if (raw.display === "mannequin") {
+        const x = 0.2 + (mi % 3) * 1.3;
+        const z = 0.8 - Math.floor(mi / 3) * 1.5;
+        makeMannequin(x, z, item);
+        mi += 1;
+      } else {
+        const x = -2.5 + (si % 6) * 0.85;
+        const z = 3.2;
+        const y = 1.05 + Math.floor(si / 6) * 0.7;
+        makeShelfItem(x, y, z, item);
+        si += 1;
+      }
+    });
+
+    player.x = 0;
+    player.z = 4.2;
+    state.yaw = Math.PI;
+    state.pitch = 0;
+    updateLocationBadge();
+    toast(`You walked into ${store.name}`);
+  }
+
+  function updateLocationBadge() {
+    if (!state.storeId) locationBadge.textContent = `Mall Hallway · Level ${state.floor}`;
+    else locationBadge.textContent = `${storesById[state.storeId].name} · Level ${state.floor}`;
   }
 
   function renderAvatar(target, equipped = state.equipped) {
@@ -1552,23 +1594,21 @@ window.MALL_ART = (() => {
     const accColor = acc ? acc.swatch : "#ffd700";
     const showCrown = acc && acc.id === "prize-crown";
     target.innerHTML = `
-      <div class="roblox" aria-hidden="true">
-        <div class="roblox__body">
-          <div class="roblox__hair"></div>
-          <div class="roblox__acc ${acc ? "is-on" : ""}" style="background:${accColor}; ${
-            showCrown ? "" : "clip-path:none;border-radius:10px;height:12px;top:48px;width:22px;left:49px;"
-          }"></div>
-          <div class="roblox__head"><div class="roblox__face"><div class="roblox__smile"></div></div></div>
-          <div class="roblox__arm roblox__arm--l"><div class="roblox__sleeve" style="background:${torso}"></div></div>
-          <div class="roblox__arm roblox__arm--r"><div class="roblox__sleeve" style="background:${torso}"></div></div>
-          <div class="roblox__torso" style="background:${torso}"></div>
-          <div class="roblox__leg roblox__leg--l" style="background:${legs}"></div>
-          <div class="roblox__leg roblox__leg--r" style="background:${legs}"></div>
-          <div class="roblox__shoe roblox__shoe--l" style="background:${shoe}"></div>
-          <div class="roblox__shoe roblox__shoe--r" style="background:${shoe}"></div>
-          <div class="roblox__bag ${bag ? "is-on" : ""}" style="background:${bagColor}"></div>
-        </div>
-      </div>`;
+      <div class="roblox" aria-hidden="true"><div class="roblox__body">
+        <div class="roblox__hair"></div>
+        <div class="roblox__acc ${acc ? "is-on" : ""}" style="background:${accColor}; ${
+          showCrown ? "" : "clip-path:none;border-radius:10px;height:12px;top:44px;width:20px;left:45px;"
+        }"></div>
+        <div class="roblox__head"><div class="roblox__face"><div class="roblox__smile"></div></div></div>
+        <div class="roblox__arm roblox__arm--l"><div class="roblox__sleeve" style="background:${torso}"></div></div>
+        <div class="roblox__arm roblox__arm--r"><div class="roblox__sleeve" style="background:${torso}"></div></div>
+        <div class="roblox__torso" style="background:${torso}"></div>
+        <div class="roblox__leg roblox__leg--l" style="background:${legs}"></div>
+        <div class="roblox__leg roblox__leg--r" style="background:${legs}"></div>
+        <div class="roblox__shoe roblox__shoe--l" style="background:${shoe}"></div>
+        <div class="roblox__shoe roblox__shoe--r" style="background:${shoe}"></div>
+        <div class="roblox__bag ${bag ? "is-on" : ""}" style="background:${bagColor}"></div>
+      </div></div>`;
   }
 
   function renderEquippedList() {
@@ -1577,7 +1617,7 @@ window.MALL_ART = (() => {
       .map((id) => `<span class="chip">${itemsById[id].name.split("—")[0].trim()}</span>`);
     document.getElementById("equippedList").innerHTML = chips.length
       ? chips.join("")
-      : `<span class="chip">Base Roblox look</span>`;
+      : `<span class="chip">Base look</span>`;
   }
 
   function updateProgress() {
@@ -1602,10 +1642,9 @@ window.MALL_ART = (() => {
       }
       const item = itemsById[itemId];
       const owned = state.owned.has(itemId);
-      const photo = art.photoUrlForItem(item);
       slots.push(`
         <button type="button" class="inv-slot ${owned ? "is-owned" : ""}" data-item="${itemId}">
-          <img class="product-thumb" src="${photo}" alt="${item.name}" loading="lazy" />
+          <img class="product-thumb" src="${art.photoUrlForItem(item)}" alt="${item.name}" loading="lazy" />
           <strong>${item.name}</strong>
           <span>${item.material || item.slot}${owned ? " · owned" : ""}</span>
         </button>`);
@@ -1613,23 +1652,17 @@ window.MALL_ART = (() => {
     target.innerHTML = slots.join("");
   }
 
+  function openInventory() {
+    renderInventoryGrid(document.getElementById("inventoryGrid"));
+    openModal("inventoryModal");
+  }
+
   function addToInventory(itemId) {
-    if (state.owned.has(itemId)) {
-      toast("Already purchased");
-      return false;
-    }
-    if (state.inventory.includes(itemId)) {
-      toast("Already in inventory — open Inventory button to see it");
-      return false;
-    }
-    if (state.inventory.length >= data.inventorySlots) {
-      toast("Inventory full");
-      return false;
-    }
+    if (state.owned.has(itemId)) return toast("Already purchased");
+    if (state.inventory.includes(itemId)) return toast("Already in Inventory");
+    if (state.inventory.length >= data.inventorySlots) return toast("Inventory full");
     state.inventory.push(itemId);
-    const item = itemsById[itemId];
-    toast(`Took ${item.name} → Inventory`);
-    return true;
+    toast(`Took ${itemsById[itemId].name}`);
   }
 
   function tryOn(itemId) {
@@ -1659,19 +1692,18 @@ window.MALL_ART = (() => {
     const list = document.getElementById("checkoutList");
     const buyBtn = document.getElementById("btnBuyAll");
     if (!pending.length) {
-      list.innerHTML = `<p class="tip">No unpaid ${store.name} items yet. Click hangers or mannequins to take items, then come back.</p>`;
+      list.innerHTML = `<p class="tip">No unpaid items from ${store.name} yet. Look at hangers/mannequins and tap Do.</p>`;
       buyBtn.disabled = true;
     } else {
       buyBtn.disabled = false;
       list.innerHTML = pending
         .map((id) => {
           const item = itemsById[id];
-          const photo = art.photoUrlForItem(item);
           return `<label class="checkout-row">
             <input type="checkbox" name="buy" value="${id}" checked />
-            <img src="${photo}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:10px;flex:0 0 44px;" />
+            <img src="${art.photoUrlForItem(item)}" alt="" />
             <div><strong>${item.name}</strong>
-            <span style="display:block;color:var(--mute);font-size:.75rem;">$${Number(item.price).toLocaleString()} · ${item.material || ""} · $∞ wallet</span></div>
+            <span style="display:block;color:var(--mute);font-size:.75rem;">$${Number(item.price).toLocaleString()} · $∞</span></div>
           </label>`;
         })
         .join("");
@@ -1681,30 +1713,20 @@ window.MALL_ART = (() => {
 
   function buySelected() {
     const store = storesById[state.storeId];
-    const checked = [...document.querySelectorAll('#checkoutList input[name="buy"]:checked')].map(
-      (el) => el.value
-    );
-    if (!checked.length) {
-      toast("Select at least one item");
-      return;
-    }
+    const checked = [...document.querySelectorAll('#checkoutList input[name="buy"]:checked')].map((el) => el.value);
+    if (!checked.length) return toast("Select at least one item");
     checked.forEach((id) => state.owned.add(id));
     state.purchasedStores.add(store.id);
-    state.bags.push({
-      storeId: store.id,
-      storeName: store.name,
-      itemIds: [...checked],
-      color: store.color,
-    });
+    state.bags.push({ storeId: store.id, storeName: store.name, itemIds: [...checked], color: store.color });
     closeModal("cashierModal");
-    toast(`${store.name} cashier handed you a shopping bag`);
+    toast(`${store.name} cashier: here’s your shopping bag`);
     updateProgress();
   }
 
   function renderBags() {
     const el = document.getElementById("bagsList");
     if (!state.bags.length) {
-      el.innerHTML = `<p class="tip">No bags yet — walk to a cashier and buy something.</p>`;
+      el.innerHTML = `<p class="tip">No bags yet.</p>`;
       return;
     }
     el.innerHTML = state.bags
@@ -1712,11 +1734,9 @@ window.MALL_ART = (() => {
       .reverse()
       .map((bag) => {
         const names = bag.itemIds.map((id) => itemsById[id]?.name || "Item").join(", ");
-        return `<div class="bag-card">
-          <div class="bag-icon" style="background:linear-gradient(180deg, ${bag.color}aa, ${bag.color})"></div>
+        return `<div class="bag-card"><div class="bag-icon" style="background:linear-gradient(180deg, ${bag.color}aa, ${bag.color})"></div>
           <div><strong>${bag.storeName} Shopping Bag</strong>
-          <span style="display:block;color:var(--mute);font-size:.8rem;">${names}</span></div>
-        </div>`;
+          <span style="display:block;color:var(--mute);font-size:.8rem;">${names}</span></div></div>`;
       })
       .join("");
   }
@@ -1729,481 +1749,155 @@ window.MALL_ART = (() => {
     renderAvatar(document.getElementById("avatarStage"));
     renderEquippedList();
     closeModal("prizeModal");
-    toast("Mall Princess Crown added to Inventory");
+    toast("Crown added to Inventory");
   }
 
-  function overlaps(a, b) {
-    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-  }
-
-  function playerBox() {
-    return { x: player.x, y: player.y, w: player.w, h: player.h };
-  }
-
-  function findNearby() {
-    if (state.scene === "mall") {
-      const rects = mallStoreRects(state.floor);
-      for (const r of rects) {
-        if (overlaps(playerBox(), { x: r.door.x - 10, y: r.door.y - 10, w: r.door.w + 20, h: 40 })) {
-          return { type: "door", storeId: r.store.id, label: `Enter ${r.store.name}` };
-        }
-      }
-      // elevators
-      const elevators = [
-        { floor: 1, x: 40, y: 300, w: 50, h: 80 },
-        { floor: 2, x: 40, y: 300, w: 50, h: 80 },
-        { floor: 3, x: 40, y: 300, w: 50, h: 80 },
-      ];
-      // single elevator panel with floor buttons area
-      if (player.x < 100 && player.y > 260 && player.y < 420) {
-        const next = state.floor === 3 ? 1 : state.floor + 1;
-        return { type: "elevator", floor: next, label: `Elevator to Level ${next}` };
-      }
-      return null;
+  function blocked(nx, nz) {
+    for (const c of colliders) {
+      if (nx > c.minX && nx < c.maxX && nz > c.minZ && nz < c.maxZ) return true;
     }
+    return false;
+  }
 
-    let best = null;
-    let bestDist = 70;
-    for (const obj of state.interactables) {
-      const cx = obj.x + obj.w / 2;
-      const cy = obj.y + obj.h / 2;
-      const px = player.x + player.w / 2;
-      const py = player.y + player.h / 2;
-      const dist = Math.hypot(cx - px, cy - py);
-      const near = dist < bestDist || overlaps(playerBox(), obj);
-      if (near && dist < bestDist + 40) {
-        bestDist = dist;
-        if (obj.type === "item") {
-          const item = itemsById[obj.itemId];
-          const status = state.owned.has(obj.itemId)
-            ? " (owned)"
-            : state.inventory.includes(obj.itemId)
-              ? " (in inventory)"
-              : "";
-          best = {
-            type: "item",
-            itemId: obj.itemId,
-            label: `${obj.kind === "hanger" ? "Hanger" : obj.kind === "mannequin" ? "Mannequin" : "Display"}: ${item.name}${status}`,
-            obj,
-          };
-        } else {
-          best = { type: obj.type, label: obj.label, obj };
-        }
+  function findZone() {
+    for (const z of doorZones) {
+      if (player.x > z.minX && player.x < z.maxX && player.z > z.minZ && player.z < z.maxZ) return z;
+    }
+    for (const z of floorZones) {
+      if (player.x > z.minX && player.x < z.maxX && player.z > z.minZ && player.z < z.maxZ) return z;
+    }
+    return null;
+  }
+
+  function updateNearby() {
+    raycaster.setFromCamera(centerNDC, camera);
+    const hits = raycaster.intersectObjects(state.interactables, false);
+    let near = null;
+    if (hits.length && hits[0].distance < 3.2) {
+      const ud = hits[0].object.userData;
+      if (ud?.type === "item") {
+        const item = itemsById[ud.itemId];
+        const status = state.owned.has(ud.itemId)
+          ? " (owned)"
+          : state.inventory.includes(ud.itemId)
+            ? " (in inventory)"
+            : "";
+        near = {
+          type: "item",
+          itemId: ud.itemId,
+          label: `${ud.kind || "Item"}: ${item.name}${status}`,
+        };
+      } else if (ud) {
+        near = { ...ud };
       }
     }
-    return best;
+    if (!near) {
+      const zone = findZone();
+      if (zone) near = { ...zone, type: zone.type || "door" };
+    }
+    state.nearby = near;
+    if (near) {
+      promptEl.hidden = false;
+      promptEl.textContent = `${near.label} · tap / Do / E`;
+    } else {
+      promptEl.hidden = true;
+    }
   }
 
   function doInteract() {
     const n = state.nearby;
     if (!n) return;
-    if (n.type === "door") enterStore(n.storeId);
-    else if (n.type === "elevator") changeFloor(n.floor);
-    else if (n.type === "exit") exitStore();
-    else if (n.type === "dressing") openDressingRoom();
+    if (n.type === "door" && n.storeId) buildStore(n.storeId);
+    else if (n.type === "exit") {
+      state.storeId = null;
+      buildHallway(state.floor);
+      toast("Back in the mall hallway");
+    } else if (n.type === "elevator") {
+      state.floor = n.nextFloor;
+      state.storeId = null;
+      buildHallway(state.floor);
+      toast(`Elevator → Level ${state.floor}`);
+    } else if (n.type === "dressing") openDressingRoom();
     else if (n.type === "cashier") openCashier();
     else if (n.type === "item") addToInventory(n.itemId);
   }
 
-  function canvasToWorld(clientX, clientY) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    return {
-      x: (clientX - rect.left) * scaleX + (state.scene === "mall" ? state.camX : 0),
-      y: (clientY - rect.top) * scaleY,
-    };
-  }
-
-  function clickInteractable(clientX, clientY) {
-    const p = canvasToWorld(clientX, clientY);
-    if (state.scene === "mall") {
-      for (const r of mallStoreRects(state.floor)) {
-        if (p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h) {
-          // walk hint — if close enough enter
-          if (overlaps(playerBox(), { x: r.door.x - 20, y: r.door.y - 20, w: 60, h: 50 })) {
-            enterStore(r.store.id);
-          } else {
-            toast(`Walk to the ${r.store.name} door to go inside`);
-          }
-          return;
-        }
-      }
-      return;
-    }
-    for (const obj of state.interactables) {
-      if (p.x >= obj.x && p.x <= obj.x + obj.w && p.y >= obj.y && p.y <= obj.y + obj.h) {
-        const px = player.x + player.w / 2;
-        const py = player.y + player.h / 2;
-        const dist = Math.hypot(obj.x + obj.w / 2 - px, obj.y + obj.h / 2 - py);
-        if (dist > 120) {
-          toast("Walk closer, then click");
-          return;
-        }
-        if (obj.type === "item") addToInventory(obj.itemId);
-        else if (obj.type === "dressing") openDressingRoom();
-        else if (obj.type === "cashier") openCashier();
-        else if (obj.type === "exit") exitStore();
-        return;
-      }
-    }
-  }
-
-  function movePlayer(dt) {
+  function updateMovement(dt) {
     let mx = 0;
-    let my = 0;
+    let mz = 0;
+    if (state.keys.has("ArrowUp") || state.keys.has("w") || state.keys.has("W")) mz -= 1;
+    if (state.keys.has("ArrowDown") || state.keys.has("s") || state.keys.has("S")) mz += 1;
     if (state.keys.has("ArrowLeft") || state.keys.has("a") || state.keys.has("A")) mx -= 1;
     if (state.keys.has("ArrowRight") || state.keys.has("d") || state.keys.has("D")) mx += 1;
-    if (state.keys.has("ArrowUp") || state.keys.has("w") || state.keys.has("W")) my -= 1;
-    if (state.keys.has("ArrowDown") || state.keys.has("s") || state.keys.has("S")) my += 1;
     if (state.stick.active) {
       mx += state.stick.x;
-      my += state.stick.y;
+      mz += state.stick.y;
     }
-    const len = Math.hypot(mx, my);
+    const len = Math.hypot(mx, mz);
     if (len > 1) {
       mx /= len;
-      my /= len;
+      mz /= len;
     }
-    if (mx !== 0) player.facing = mx > 0 ? 1 : -1;
-    player.x += mx * player.speed * dt;
-    player.y += my * player.speed * dt;
+    const sin = Math.sin(state.yaw);
+    const cos = Math.cos(state.yaw);
+    const dx = (mx * cos + mz * sin) * player.speed * dt;
+    const dz = (-mx * sin + mz * cos) * player.speed * dt;
+    const nx = player.x + dx;
+    const nz = player.z + dz;
+    if (!blocked(nx, player.z)) player.x = nx;
+    if (!blocked(player.x, nz)) player.z = nz;
 
-    if (state.scene === "mall") {
-      player.x = Math.max(20, Math.min(MALL_W - 50, player.x));
-      player.y = Math.max(230, Math.min(MALL_H - 60, player.y));
-      // block into building fronts except door mats
-      for (const r of mallStoreRects(state.floor)) {
-        const body = { x: r.x, y: r.y, w: r.w, h: r.h - 18 };
-        const doorZone = { x: r.door.x - 10, y: r.door.y - 24, w: 56, h: 50 };
-        if (overlaps(playerBox(), body) && !overlaps(playerBox(), doorZone)) {
-          player.y = Math.max(player.y, r.y + r.h - 12);
-        }
-      }
-      state.camX = Math.max(0, Math.min(MALL_W - canvas.width, player.x - canvas.width / 2));
-    } else if (storeWorld) {
-      const room = storeWorld.room;
-      player.x = Math.max(room.x + 8, Math.min(room.x + room.w - player.w - 8, player.x));
-      player.y = Math.max(room.y + 8, Math.min(room.y + room.h - player.h - 8, player.y));
-      state.camX = 0;
-    }
+    camera.position.set(player.x, player.y, player.z);
+    camera.rotation.order = "YXZ";
+    camera.rotation.y = state.yaw;
+    camera.rotation.x = state.pitch;
   }
 
-  function drawRobloxPlayer(x, y) {
-    const top = state.equipped.top ? itemsById[state.equipped.top].swatch : "#ff9ec8";
-    const bottom = state.equipped.bottom ? itemsById[state.equipped.bottom].swatch : "#f7c1d8";
-    const shoes = state.equipped.shoes ? itemsById[state.equipped.shoes].swatch : "#ffffff";
-    ctx.save();
-    ctx.translate(x + player.w / 2, y);
-    ctx.scale(player.facing, 1);
-    // shadow
-    ctx.fillStyle = "rgba(74,43,59,0.15)";
-    ctx.beginPath();
-    ctx.ellipse(0, player.h - 2, 14, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // legs
-    ctx.fillStyle = bottom;
-    ctx.fillRect(-10, 24, 8, 16);
-    ctx.fillRect(2, 24, 8, 16);
-    // torso
-    ctx.fillStyle = top;
-    ctx.fillRect(-12, 10, 24, 16);
-    // arms
-    ctx.fillStyle = "#ffd7bf";
-    ctx.fillRect(-18, 12, 6, 14);
-    ctx.fillRect(12, 12, 6, 14);
-    ctx.fillStyle = top;
-    ctx.fillRect(-18, 12, 6, 6);
-    ctx.fillRect(12, 12, 6, 6);
-    // head
-    ctx.fillStyle = "#ffd7bf";
-    ctx.fillRect(-10, -8, 20, 18);
-    ctx.fillStyle = "#6b3a2c";
-    ctx.fillRect(-12, -12, 24, 8);
-    // face
-    ctx.fillStyle = "#4a2b3b";
-    ctx.fillRect(-5, -1, 3, 3);
-    ctx.fillRect(2, -1, 3, 3);
-    // shoes
-    ctx.fillStyle = shoes;
-    ctx.fillRect(-11, 38, 10, 5);
-    ctx.fillRect(1, 38, 10, 5);
-    ctx.restore();
+  function onLookMove(dx, dy) {
+    state.yaw -= dx * 0.0025;
+    state.pitch -= dy * 0.0022;
+    state.pitch = Math.max(-1.2, Math.min(1.2, state.pitch));
   }
 
-  function drawHanger(obj, item) {
-    const taken = state.inventory.includes(item.id) || state.owned.has(item.id);
-    ctx.save();
-    ctx.globalAlpha = taken ? 0.35 : 1;
-    ctx.strokeStyle = "#c9a27c";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(obj.x, obj.y);
-    ctx.lineTo(obj.x + obj.w, obj.y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(obj.x + obj.w / 2, obj.y - 6, 6, Math.PI, 0);
-    ctx.stroke();
-    // real-looking product photo on the hanger
-    art.drawProductPhoto(ctx, item, obj.x + 6, obj.y + 8, obj.w - 12, 58, item.swatch);
-    ctx.fillStyle = "#4a2b3b";
-    ctx.font = "700 9px Nunito, sans-serif";
-    ctx.fillText("HANGER", obj.x + 6, obj.y + obj.h - 2);
-    ctx.restore();
-  }
+  // input
+  window.addEventListener("keydown", (e) => {
+    state.keys.add(e.key);
+    if (e.key === "e" || e.key === "E") doInteract();
+    if (e.key === "i" || e.key === "I") openInventory();
+  });
+  window.addEventListener("keyup", (e) => state.keys.delete(e.key));
 
-  function drawMannequin(obj, item) {
-    const taken = state.inventory.includes(item.id) || state.owned.has(item.id);
-    ctx.save();
-    ctx.globalAlpha = taken ? 0.35 : 1;
-    const cx = obj.x + obj.w / 2;
-    // Brookhaven-ish blocky mannequin stand
-    ctx.fillStyle = "#e8d5c4";
-    ctx.fillRect(cx - 10, obj.y + obj.h - 10, 20, 10);
-    ctx.fillStyle = "#f0d2c0";
-    ctx.fillRect(cx - 9, obj.y + 4, 18, 16);
-    ctx.fillRect(cx - 14, obj.y + 22, 28, 34);
-    ctx.fillRect(cx - 12, obj.y + 56, 10, 24);
-    ctx.fillRect(cx + 2, obj.y + 56, 10, 24);
-    // product photo plaque in front
-    art.drawProductPhoto(ctx, item, obj.x + 4, obj.y + 28, obj.w - 8, obj.w - 8, item.swatch);
-    ctx.fillStyle = "#4a2b3b";
-    ctx.font = "700 8px Nunito, sans-serif";
-    ctx.fillText("MANNEQUIN", obj.x - 2, obj.y + obj.h + 10);
-    ctx.restore();
-  }
-
-  function drawShelf(obj, item) {
-    const taken = state.inventory.includes(item.id) || state.owned.has(item.id);
-    ctx.save();
-    ctx.globalAlpha = taken ? 0.35 : 1;
-    ctx.fillStyle = "#d9b896";
-    ctx.fillRect(obj.x - 4, obj.y + obj.h - 12, obj.w + 8, 10);
-    ctx.fillStyle = "#b08968";
-    ctx.fillRect(obj.x - 2, obj.y + obj.h - 2, 4, 8);
-    ctx.fillRect(obj.x + obj.w - 2, obj.y + obj.h - 2, 4, 8);
-    art.drawProductPhoto(ctx, item, obj.x + 4, obj.y, obj.w - 8, obj.h - 16, item.swatch);
-    ctx.restore();
-  }
-
-  function drawMall() {
-    const cam = state.camX;
-    // Brookhaven-like sky
-    const sky = ctx.createLinearGradient(0, 0, 0, 220);
-    sky.addColorStop(0, "#9ad9ff");
-    sky.addColorStop(1, "#ffe6f2");
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.save();
-    ctx.translate(-cam, 0);
-
-    // clouds
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
-    for (let i = 0; i < 10; i += 1) {
-      const cx = 80 + i * 210;
-      ctx.fillRect(cx, 36 + (i % 3) * 10, 70, 22);
-      ctx.fillRect(cx + 20, 24 + (i % 3) * 10, 50, 20);
-    }
-
-    // grass plaza strip
-    ctx.fillStyle = "#7dce6f";
-    ctx.fillRect(0, 210, MALL_W, 50);
-    // sidewalk
-    ctx.fillStyle = "#ece7ef";
-    ctx.fillRect(0, 255, MALL_W, 40);
-    ctx.strokeStyle = "rgba(0,0,0,0.06)";
-    for (let x = 0; x < MALL_W; x += 36) {
-      ctx.beginPath();
-      ctx.moveTo(x, 255);
-      ctx.lineTo(x, 295);
-      ctx.stroke();
-    }
-    // road / walkway
-    ctx.fillStyle = "#d5c6d0";
-    ctx.fillRect(0, 295, MALL_W, MALL_H - 295);
-    ctx.fillStyle = "#fff";
-    for (let x = 0; x < MALL_W; x += 60) {
-      ctx.fillRect(x, 420, 28, 6);
-    }
-
-    // fountain plaza (Berry Ave vibes)
-    ctx.fillStyle = "#8fd3ff";
-    ctx.beginPath();
-    ctx.arc(980, 470, 40, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(972, 430, 16, 40);
-    ctx.fillStyle = "#bde7ff";
-    ctx.beginPath();
-    ctx.arc(980, 430, 12, 0, Math.PI * 2);
-    ctx.fill();
-
-    // elevators as blocky booth
-    ctx.fillStyle = "#ffd36b";
-    ctx.fillRect(24, 250, 70, 120);
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(34, 270, 50, 80);
-    ctx.fillStyle = "#5a3b00";
-    ctx.font = "800 12px Nunito, sans-serif";
-    ctx.fillText("ELEV", 40, 245);
-    ctx.fillText(`L${state.floor}`, 50, 315);
-
-    // trees + lamps + benches
-    for (let i = 0; i < 14; i += 1) {
-      art.drawBlockyTree(ctx, 160 + i * 150, 250);
-      if (i % 2 === 0) art.drawStreetLamp(ctx, 230 + i * 150, 300);
-      if (i % 3 === 0) art.drawBench(ctx, 300 + i * 150, 310);
-    }
-
-    // stores as Brookhaven buildings
-    for (const r of mallStoreRects(state.floor)) {
-      art.drawBrookhavenStore(ctx, r, r.store, state.purchasedStores.has(r.store.id));
-    }
-
-    ctx.fillStyle = "rgba(74,43,59,0.7)";
-    ctx.font = "800 20px Playfair Display, serif";
-    ctx.fillText(`Rose Quartz Mall · Level ${state.floor}`, 120, 580);
-    ctx.font = "700 13px Nunito, sans-serif";
-    ctx.fillText("Brookhaven-style street — walk to a store ENTER door", 120, 608);
-
-    drawRobloxPlayer(player.x, player.y);
-    ctx.restore();
-  }
-
-  function drawStore() {
-    const store = storeWorld.store;
-    // interior walls like a Roblox shop
-    ctx.fillStyle = "#f2d6e4";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = store.floorColor || "#f7efe8";
-    ctx.fillRect(storeWorld.room.x, storeWorld.room.y + 80, storeWorld.room.w, storeWorld.room.h - 80);
-    // tile grid
-    ctx.strokeStyle = "rgba(0,0,0,0.04)";
-    for (let x = storeWorld.room.x; x < storeWorld.room.x + storeWorld.room.w; x += 28) {
-      ctx.beginPath();
-      ctx.moveTo(x, storeWorld.room.y + 80);
-      ctx.lineTo(x, storeWorld.room.y + storeWorld.room.h);
-      ctx.stroke();
-    }
-
-    // blocky room walls
-    ctx.fillStyle = "#fffafc";
-    ctx.fillRect(storeWorld.room.x, storeWorld.room.y, storeWorld.room.w, 80);
-    ctx.strokeStyle = store.color;
-    ctx.lineWidth = 4;
-    ctx.strokeRect(storeWorld.room.x, storeWorld.room.y, storeWorld.room.w, storeWorld.room.h);
-
-    // signage board
-    ctx.fillStyle = store.color;
-    ctx.fillRect(60, 50, 300, 44);
-    ctx.fillStyle = "#fff";
-    ctx.font = "800 22px Nunito, sans-serif";
-    ctx.fillText(store.name, 75, 80);
-
-    ctx.fillStyle = "#9a6b80";
-    ctx.font = "700 12px Nunito, sans-serif";
-    ctx.fillText("Tap real-looking items on hangers & mannequins", 380, 75);
-
-    for (const obj of state.interactables) {
-      if (obj.type === "item") {
-        const item = itemsById[obj.itemId];
-        if (obj.kind === "hanger") drawHanger(obj, item);
-        else if (obj.kind === "mannequin") drawMannequin(obj, item);
-        else drawShelf(obj, item);
-      } else if (obj.type === "dressing") {
-        ctx.fillStyle = "#f1d4ff";
-        ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
-        ctx.strokeStyle = "#c084fc";
-        ctx.strokeRect(obj.x, obj.y, obj.w, obj.h);
-        ctx.fillStyle = "#4a2b3b";
-        ctx.font = "800 14px Nunito, sans-serif";
-        ctx.fillText("DRESSING ROOM", obj.x + 30, obj.y + 40);
-        ctx.font = "600 11px Nunito, sans-serif";
-        ctx.fillText("Walk in to try on inventory", obj.x + 28, obj.y + 65);
-        // curtain
-        ctx.fillStyle = "#ff8fb7";
-        ctx.fillRect(obj.x + 20, obj.y + 80, 160, 35);
-      } else if (obj.type === "cashier") {
-        ctx.fillStyle = "#fff4c2";
-        ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
-        ctx.strokeStyle = "#d4a017";
-        ctx.strokeRect(obj.x, obj.y, obj.w, obj.h);
-        ctx.fillStyle = "#5a3b00";
-        ctx.font = "800 14px Nunito, sans-serif";
-        ctx.fillText("CASHIER", obj.x + 60, obj.y + 35);
-        ctx.font = "600 11px Nunito, sans-serif";
-        ctx.fillText("Walk here to buy & get a bag", obj.x + 28, obj.y + 60);
-        // counter
-        ctx.fillStyle = "#e8d5a3";
-        ctx.fillRect(obj.x + 20, obj.y + 75, 160, 30);
-        // cashier person
-        ctx.fillStyle = "#ffd7bf";
-        ctx.fillRect(obj.x + 90, obj.y + 50, 16, 16);
-        ctx.fillStyle = "#ff9ec8";
-        ctx.fillRect(obj.x + 88, obj.y + 66, 20, 12);
-      } else if (obj.type === "exit") {
-        ctx.fillStyle = "#4a2b3b";
-        ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
-        ctx.fillStyle = "#fff";
-        ctx.font = "800 14px Nunito, sans-serif";
-        ctx.fillText("EXIT TO MALL", obj.x + 35, obj.y + 26);
-      }
-    }
-
-    drawRobloxPlayer(player.x, player.y);
-  }
-
-  function draw() {
-    if (state.scene === "mall") drawMall();
-    else drawStore();
-
-    // highlight nearby
-    if (state.nearby?.obj && state.scene === "store") {
-      const o = state.nearby.obj;
-      ctx.strokeStyle = "#ff4f9a";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([4, 3]);
-      ctx.strokeRect(o.x - 4, o.y - 4, o.w + 8, o.h + 8);
-      ctx.setLineDash([]);
-    }
-  }
-
-  function updatePrompt() {
-    const prompt = document.getElementById("prompt");
-    state.nearby = findNearby();
-    if (state.nearby) {
-      prompt.hidden = false;
-      prompt.textContent = `${state.nearby.label} · tap / E / Do`;
-    } else {
-      prompt.hidden = true;
-    }
-  }
-
-  let last = performance.now();
-  function frame(ts) {
-    const dt = Math.min(0.033, (ts - last) / 1000);
-    last = ts;
-    const modalOpen = [...document.querySelectorAll(".modal")].some((m) => !m.hidden);
-    if (!modalOpen) {
-      movePlayer(dt);
-      updatePrompt();
-    }
-    draw();
-    requestAnimationFrame(frame);
-  }
-
-  // UI events — Inventory button is primary access
-  const inventoryBtn = document.getElementById("btnInventory");
-  inventoryBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    openInventory();
+  let dragging = false;
+  let lastX = 0;
+  let lastY = 0;
+  renderer.domElement.addEventListener("pointerdown", (e) => {
+    if (modalOpen()) return;
+    if (e.target.closest && e.target.closest(".stick, .interact-btn, .topbar, .side-panel")) return;
+    dragging = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    renderer.domElement.setPointerCapture(e.pointerId);
+  });
+  renderer.domElement.addEventListener("pointermove", (e) => {
+    if (!dragging || modalOpen()) return;
+    onLookMove(e.clientX - lastX, e.clientY - lastY);
+    lastX = e.clientX;
+    lastY = e.clientY;
+  });
+  renderer.domElement.addEventListener("pointerup", () => {
+    dragging = false;
   });
 
+  document.getElementById("btnStartLook").addEventListener("click", () => {
+    lookHint.hidden = true;
+    state.looking = true;
+  });
+  document.getElementById("btnInventory").addEventListener("click", openInventory);
   document.getElementById("btnBags").addEventListener("click", () => {
     renderBags();
     openModal("bagsModal");
   });
+  document.getElementById("btnInteract").addEventListener("click", doInteract);
   document.getElementById("btnClearOutfit").addEventListener("click", () => {
     state.equipped = { top: null, bottom: null, shoes: null, bag: null, accessory: null };
     renderAvatar(document.getElementById("avatarStage"));
@@ -2212,19 +1906,13 @@ window.MALL_ART = (() => {
   });
   document.getElementById("btnBuyAll").addEventListener("click", buySelected);
   document.getElementById("btnClaimPrize").addEventListener("click", claimPrize);
-  document.getElementById("btnInteract").addEventListener("click", doInteract);
-
   document.getElementById("fittingInventory").addEventListener("click", (e) => {
     const slot = e.target.closest("[data-item]");
     if (slot) tryOn(slot.dataset.item);
   });
-
-  document.getElementById("inventoryGrid").addEventListener("click", (e) => {
-    const slot = e.target.closest("[data-item]");
-    if (!slot) return;
-    toast("Walk into a Dressing Room to try this on");
+  document.getElementById("inventoryGrid").addEventListener("click", () => {
+    toast("Walk into a Dressing Room to try items on");
   });
-
   document.querySelectorAll("[data-close]").forEach((btn) => {
     btn.addEventListener("click", () => closeModal(btn.dataset.close));
   });
@@ -2234,19 +1922,7 @@ window.MALL_ART = (() => {
     });
   });
 
-  window.addEventListener("keydown", (e) => {
-    state.keys.add(e.key);
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
-    if (e.key === "e" || e.key === "E") doInteract();
-    if (e.key === "i" || e.key === "I") openInventory();
-  });
-  window.addEventListener("keyup", (e) => state.keys.delete(e.key));
-
-  canvas.addEventListener("pointerdown", (e) => {
-    clickInteractable(e.clientX, e.clientY);
-  });
-
-  // Virtual stick
+  // stick
   const stick = document.getElementById("stick");
   const knob = document.getElementById("stickKnob");
   function setStick(clientX, clientY) {
@@ -2255,14 +1931,14 @@ window.MALL_ART = (() => {
     const cy = rect.top + rect.height / 2;
     let dx = clientX - cx;
     let dy = clientY - cy;
-    const max = 34;
+    const max = 36;
     const len = Math.hypot(dx, dy) || 1;
     if (len > max) {
       dx = (dx / len) * max;
       dy = (dy / len) * max;
     }
-    knob.style.left = `${32 + dx}px`;
-    knob.style.top = `${32 + dy}px`;
+    knob.style.left = `${35 + dx}px`;
+    knob.style.top = `${35 + dy}px`;
     state.stick.active = true;
     state.stick.x = dx / max;
     state.stick.y = dy / max;
@@ -2271,26 +1947,41 @@ window.MALL_ART = (() => {
     state.stick.active = false;
     state.stick.x = 0;
     state.stick.y = 0;
-    knob.style.left = "32px";
-    knob.style.top = "32px";
+    knob.style.left = "35px";
+    knob.style.top = "35px";
   }
   stick.addEventListener("pointerdown", (e) => {
     stick.setPointerCapture(e.pointerId);
     setStick(e.clientX, e.clientY);
   });
   stick.addEventListener("pointermove", (e) => {
-    if (!state.stick.active) return;
-    setStick(e.clientX, e.clientY);
+    if (state.stick.active) setStick(e.clientX, e.clientY);
   });
   stick.addEventListener("pointerup", clearStick);
   stick.addEventListener("pointercancel", clearStick);
 
-  // Boot
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  function frame() {
+    const dt = Math.min(0.033, clock.getDelta());
+    if (!modalOpen()) {
+      updateMovement(dt);
+      updateNearby();
+    }
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+
+  // boot
   art.preloadAll(Object.values(itemsById));
+  buildHallway(1);
   renderAvatar(document.getElementById("avatarStage"));
   renderEquippedList();
   updateProgress();
-  updateLocationBadge();
   requestAnimationFrame(frame);
 })();
 
