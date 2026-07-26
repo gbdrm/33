@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Rose Quartz Mall — Brookhaven Walk v4</title>
+    <title>Rose Quartz Mall — Brookhaven Walk v5 Fresh</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -1372,14 +1372,16 @@ window.MALL_ART = (() => {
   function mallStoreRects(floor) {
     const list = floorStores(floor);
     return list.map((store, i) => {
-      const x = 120 + i * (STORE_W + 40);
+      const x = 120 + i * (STORE_W + 48);
+      const y = 55;
+      const h = 200;
       return {
         store,
         x,
-        y: 70,
+        y,
         w: STORE_W,
-        h: STORE_H,
-        door: { x: x + STORE_W / 2 - 18, y: 70 + STORE_H - 8, w: 36, h: 18 },
+        h,
+        door: { x: x + STORE_W / 2 - 18, y: y + h - 16, w: 36, h: 18 },
       };
     });
   }
@@ -1869,13 +1871,13 @@ window.MALL_ART = (() => {
 
     if (state.scene === "mall") {
       player.x = Math.max(20, Math.min(MALL_W - 50, player.x));
-      player.y = Math.max(240, Math.min(MALL_H - 60, player.y));
-      // block into store fronts except doors
+      player.y = Math.max(230, Math.min(MALL_H - 60, player.y));
+      // block into building fronts except door mats
       for (const r of mallStoreRects(state.floor)) {
-        const body = { x: r.x, y: r.y, w: r.w, h: r.h - 10 };
-        if (overlaps(playerBox(), body) && !overlaps(playerBox(), { x: r.door.x - 8, y: r.door.y - 20, w: 50, h: 40 })) {
-          // push down
-          player.y = Math.max(player.y, r.y + r.h);
+        const body = { x: r.x, y: r.y, w: r.w, h: r.h - 18 };
+        const doorZone = { x: r.door.x - 10, y: r.door.y - 24, w: 56, h: 50 };
+        if (overlaps(playerBox(), body) && !overlaps(playerBox(), doorZone)) {
+          player.y = Math.max(player.y, r.y + r.h - 12);
         }
       }
       state.camX = Math.max(0, Math.min(MALL_W - canvas.width, player.x - canvas.width / 2));
