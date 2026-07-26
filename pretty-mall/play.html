@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Rose Quartz Mall — Pretty Shopping Adventure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+:root {
+  --blush: #ffd6e8;
+  --blush-deep: #ff8fb7;
+  --rose: #ff4f9a;
+  --pearl: #fff7fb;
+  --cream-pink: #ffeaf3;
+  --lilac: #f1d4ff;
+  --gold: #f0c75e;
+  --gold-deep: #d4a017;
+  --ink: #4a2b3b;
+  --mute: #9a6b80;
+  --card: rgba(255, 255, 255, 0.78);
+  --line: rgba(255, 143, 183, 0.35);
+  --shadow: 0 18px 50px rgba(255, 105, 180, 0.18);
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Nunito", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(900px 500px at 10% -10%, #ffd0ea, transparent 55%),
+    radial-gradient(800px 480px at 90% 0%, #f3d4ff, transparent 50%),
+    radial-gradient(700px 500px at 50% 100%, #ffe3c6, transparent 45%),
+    linear-gradient(180deg, #fff0f7 0%, #ffe8f2 40%, #fff7fb 100%);
+}
+
+.sparkle-layer {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 12% 22%, rgba(255, 255, 255, 0.9) 0 1px, transparent 2px),
+    radial-gradient(circle at 78% 18%, rgba(255, 215, 120, 0.9) 0 1px, transparent 2px),
+    radial-gradient(circle at 40% 70%, rgba(255, 255, 255, 0.75) 0 1px, transparent 2px),
+    radial-gradient(circle at 88% 64%, rgba(255, 182, 220, 0.9) 0 1.5px, transparent 3px),
+    radial-gradient(circle at 22% 84%, rgba(255, 255, 255, 0.7) 0 1px, transparent 2px);
+  opacity: 0.55;
+  animation: twinkle 5s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+@keyframes twinkle {
+  from {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0.7;
+    transform: translateY(-8px);
+  }
+}
+
+.topbar,
+.layout,
+.modal {
+  position: relative;
+  z-index: 1;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 247, 251, 0.75);
+  backdrop-filter: blur(10px);
+}
+
+.brand__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  letter-spacing: 0.01em;
+  color: var(--rose);
+}
+
+.brand__tag {
+  margin: 0.1rem 0 0;
+  font-size: 0.78rem;
+  color: var(--mute);
+}
+
+.wallet,
+.progress-chip {
+  display: flex;
+  flex-direction: column;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  min-width: 110px;
+}
+
+.wallet__label,
+.progress-chip span {
+  font-size: 0.7rem;
+  color: var(--mute);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.wallet__amount {
+  font-weight: 800;
+  color: var(--gold-deep);
+  font-size: 1.15rem;
+}
+
+.pill-btn {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  background: linear-gradient(135deg, var(--rose), #ff7eb3);
+  color: white;
+  font-family: var(--font-body);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(255, 79, 154, 0.28);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.pill-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+.pill-btn--soft {
+  background: white;
+  color: var(--rose);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+
+.pill-btn--gold {
+  background: linear-gradient(135deg, var(--gold), #f6b73c);
+  color: #5a3b00;
+  box-shadow: 0 8px 20px rgba(240, 199, 94, 0.35);
+}
+
+.pill-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.mall-panel,
+.avatar-panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+
+.floors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.floor-btn {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--mute);
+  border-radius: 999px;
+  padding: 0.55rem 0.9rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.floor-btn.is-active {
+  background: linear-gradient(135deg, #ffd0e6, #f2d6ff);
+  color: var(--ink);
+  border-color: transparent;
+}
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.store-card {
+  appearance: none;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 0.9rem;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(255, 230, 242, 0.9));
+  cursor: pointer;
+  min-height: 130px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.store-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(255, 120, 180, 0.2);
+}
+
+.store-card__badge {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  background: #fff4cc;
+  border-radius: 999px;
+  padding: 0.18rem 0.45rem;
+}
+
+.store-card__name {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.store-card__meta {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--mute);
+}
+
+.store-card.has-purchase {
+  outline: 2px solid #ffb3d4;
+}
+
+.store-card.has-purchase::after {
+  content: "bagged";
+  position: absolute;
+  bottom: 0.55rem;
+  right: 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--rose);
+}
+
+.avatar-panel h2,
+.modal h2 {
+  margin: 0;
+  font-family: var(--font-display);
+}
+
+.avatar-hint,
+.tip,
+.store-blurb {
+  color: var(--mute);
+  font-size: 0.9rem;
+}
+
+.avatar-stage {
+  width: 180px;
+  height: 260px;
+  margin: 0.8rem auto;
+  position: relative;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 20%, #fff, transparent 45%),
+    linear-gradient(180deg, #ffe1ef, #ffd0ea);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.avatar-stage--large {
+  width: 220px;
+  height: 310px;
+}
+
+.roblox {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.roblox__body {
+  position: relative;
+  width: 120px;
+  height: 210px;
+}
+
+.roblox__head,
+.roblox__torso,
+.roblox__arm,
+.roblox__leg,
+.roblox__shoe,
+.roblox__bag,
+.roblox__acc {
+  position: absolute;
+  border-radius: 8px;
+}
+
+.roblox__head {
+  width: 44px;
+  height: 44px;
+  left: 38px;
+  top: 10px;
+  background: #ffd7bf;
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.05);
+}
+
+.roblox__face {
+  position: absolute;
+  inset: 0;
+}
+
+.roblox__face::before,
+.roblox__face::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4a2b3b;
+  top: 16px;
+}
+
+.roblox__face::before {
+  left: 11px;
+}
+
+.roblox__face::after {
+  right: 11px;
+}
+
+.roblox__smile {
+  position: absolute;
+  width: 14px;
+  height: 7px;
+  border-bottom: 2px solid #4a2b3b;
+  border-radius: 0 0 12px 12px;
+  left: 15px;
+  top: 26px;
+}
+
+.roblox__hair {
+  position: absolute;
+  width: 52px;
+  height: 22px;
+  left: 34px;
+  top: 4px;
+  border-radius: 18px 18px 8px 8px;
+  background: #6b3a2c;
+  z-index: 2;
+}
+
+.roblox__torso {
+  width: 50px;
+  height: 58px;
+  left: 35px;
+  top: 56px;
+  background: #ff9ec8;
+}
+
+.roblox__arm {
+  width: 18px;
+  height: 54px;
+  top: 58px;
+  background: #ffd7bf;
+}
+
+.roblox__arm--l {
+  left: 14px;
+}
+
+.roblox__arm--r {
+  right: 14px;
+  left: auto;
+}
+
+.roblox__sleeve {
+  position: absolute;
+  width: 18px;
+  height: 20px;
+  top: 0;
+  left: 0;
+  border-radius: 8px;
+  background: #ff9ec8;
+}
+
+.roblox__leg {
+  width: 20px;
+  height: 56px;
+  top: 116px;
+  background: #f7c1d8;
+}
+
+.roblox__leg--l {
+  left: 38px;
+}
+
+.roblox__leg--r {
+  left: 62px;
+}
+
+.roblox__shoe {
+  width: 24px;
+  height: 12px;
+  top: 168px;
+  background: #ffffff;
+  border: 1px solid #f0c1d4;
+}
+
+.roblox__shoe--l {
+  left: 36px;
+}
+
+.roblox__shoe--r {
+  left: 60px;
+}
+
+.roblox__bag {
+  width: 28px;
+  height: 34px;
+  right: 4px;
+  top: 88px;
+  background: #d4a017;
+  border-radius: 8px 8px 10px 10px;
+  box-shadow: inset 0 8px 0 rgba(255, 255, 255, 0.15);
+  display: none;
+}
+
+.roblox__bag.is-on {
+  display: block;
+}
+
+.roblox__acc {
+  width: 34px;
+  height: 16px;
+  left: 43px;
+  top: 2px;
+  background: #ffd700;
+  clip-path: polygon(0 70%, 20% 0, 40% 70%, 60% 0, 80% 70%, 100% 0, 100% 100%, 0 100%);
+  display: none;
+  z-index: 3;
+}
+
+.roblox__acc.is-on {
+  display: block;
+}
+
+.equipped-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.chip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  background: white;
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.prize-banner {
+  margin-top: 0.8rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff4c2, #ffe0f0);
+  font-weight: 800;
+  text-align: center;
+  animation: rise 0.5s ease;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal[hidden] {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(74, 43, 59, 0.35);
+  backdrop-filter: blur(4px);
+}
+
+.modal__card {
+  width: min(100%, 560px);
+  max-height: min(90vh, 820px);
+  overflow: auto;
+  background: linear-gradient(180deg, #fff9fc, #ffeaf4);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  padding: 1.1rem 1.1rem 1.25rem;
+  position: relative;
+  animation: rise 0.25s ease;
+}
+
+.modal__card--wide {
+  width: min(100%, 860px);
+}
+
+.modal__close {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.7rem;
+  border: 0;
+  background: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: var(--mute);
+}
+
+.store-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.4rem;
+  padding-right: 2rem;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--blush-deep);
+}
+
+.store-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.item-grid,
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.7rem;
+}
+
+.inventory-grid {
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+}
+
+.inventory-grid--compact {
+  max-height: 360px;
+  overflow: auto;
+}
+
+.item-card,
+.inv-slot {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: white;
+  padding: 0.65rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-body);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.item-card:hover,
+.inv-slot:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(255, 120, 180, 0.16);
+}
+
+.item-card.is-owned,
+.inv-slot.is-owned {
+  opacity: 0.55;
+}
+
+.swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 14px;
+  margin-bottom: 0.45rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.swatch.diamond {
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  border-radius: 0;
+}
+
+.swatch.circle {
+  border-radius: 50%;
+}
+
+.item-card strong,
+.inv-slot strong {
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.item-card span,
+.inv-slot span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--mute);
+  margin-top: 0.2rem;
+}
+
+.inv-slot.empty {
+  min-height: 96px;
+  background: rgba(255, 255, 255, 0.45);
+  border-style: dashed;
+  cursor: default;
+}
+
+.inv-slot.empty:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.fitting-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
+}
+
+.fitting-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.cashier-scene {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  padding-right: 1.5rem;
+}
+
+.cashier-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #ffe0f0, #fff1c9);
+  border: 1px solid var(--line);
+}
+
+.cashier-face {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #ffd7bf;
+  position: relative;
+  box-shadow: 0 14px 0 10px #ff9ec8;
+}
+
+.cashier-face::before,
+.cashier-face::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #4a2b3b;
+  top: 10px;
+}
+
+.cashier-face::before {
+  left: 6px;
+}
+
+.cashier-face::after {
+  right: 6px;
+}
+
+.cashier-line {
+  margin: 0.35rem 0 0;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.checkout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0.8rem 0 1rem;
+  max-height: 280px;
+  overflow: auto;
+}
+
+.checkout-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 14px;
+  background: white;
+  border: 1px solid var(--line);
+}
+
+.checkout-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--rose);
+}
+
+.cashier-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.bags-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+}
+
+.bag-card {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.7rem;
+  border-radius: 18px;
+  background: white;
+  border: 1px solid var(--line);
+}
+
+.bag-icon {
+  width: 48px;
+  height: 56px;
+  border-radius: 10px 10px 14px 14px;
+  background: linear-gradient(180deg, #ff9ec8, #ff4f9a);
+  box-shadow: inset 0 10px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.bag-icon::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: -8px;
+  height: 12px;
+  border: 3px solid #ff4f9a;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+}
+
+.prize-card {
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .layout,
+  .fitting-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    padding-bottom: 0.85rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .store-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pill-btn {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sparkle-layer,
+  .modal__card,
+  .prize-banner {
+    animation: none;
+  }
+}
+
+</style>
+  </head>
+  <body>
+    <div class="sparkle-layer" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <p class="brand__name">Rose Quartz Mall</p>
+        <p class="brand__tag">3 floors · 21 dreamy stores</p>
+      </div>
+      <div class="wallet" title="Infinite money">
+        <span class="wallet__label">Wallet</span>
+        <span class="wallet__amount">$∞</span>
+      </div>
+      <div class="progress-chip">
+        <span>Stores shopped</span>
+        <strong id="progressText">0 / 21</strong>
+      </div>
+      <button type="button" id="btnInventory" class="pill-btn">Inventory</button>
+      <button type="button" id="btnFitting" class="pill-btn pill-btn--soft">Fitting Room</button>
+      <button type="button" id="btnBags" class="pill-btn pill-btn--soft">Bags</button>
+    </header>
+
+    <main class="layout">
+      <section class="mall-panel">
+        <nav class="floors" aria-label="Mall floors">
+          <button type="button" class="floor-btn is-active" data-floor="1">Level 1 · Beauty & Jewels</button>
+          <button type="button" class="floor-btn" data-floor="2">Level 2 · Haute Fashion</button>
+          <button type="button" class="floor-btn" data-floor="3">Level 3 · Sport & Icons</button>
+        </nav>
+        <div id="storeGrid" class="store-grid"></div>
+      </section>
+
+      <aside class="avatar-panel">
+        <h2>Your Avatar</h2>
+        <p class="avatar-hint">Roblox-style · try looks in the fitting room</p>
+        <div id="avatarStage" class="avatar-stage"></div>
+        <div id="equippedList" class="equipped-list"></div>
+        <p id="prizeBanner" class="prize-banner" hidden>
+          Mall Princess Prize unlocked — you shopped every store!
+        </p>
+      </aside>
+    </main>
+
+    <!-- Store modal -->
+    <div id="storeModal" class="modal" hidden>
+      <div class="modal__card modal__card--wide">
+        <button type="button" class="modal__close" data-close="storeModal" aria-label="Close">×</button>
+        <header class="store-head">
+          <div>
+            <p id="storeFloor" class="eyebrow"></p>
+            <h2 id="storeName"></h2>
+            <p id="storeBlurb" class="store-blurb"></p>
+          </div>
+          <div class="store-actions">
+            <button type="button" id="btnGoFitting" class="pill-btn">Fitting Room</button>
+            <button type="button" id="btnGoCashier" class="pill-btn pill-btn--gold">Talk to Cashier</button>
+          </div>
+        </header>
+        <p class="tip">Tap anything you like — it goes into your big inventory.</p>
+        <div id="itemGrid" class="item-grid"></div>
+      </div>
+    </div>
+
+    <!-- Inventory modal -->
+    <div id="inventoryModal" class="modal" hidden>
+      <div class="modal__card modal__card--wide">
+        <button type="button" class="modal__close" data-close="inventoryModal" aria-label="Close">×</button>
+        <h2>Inventory</h2>
+        <p class="tip">Lots of space (80 slots). Items you’ve tried or kept stay here until you buy them.</p>
+        <div id="inventoryGrid" class="inventory-grid"></div>
+      </div>
+    </div>
+
+    <!-- Fitting room modal -->
+    <div id="fittingModal" class="modal" hidden>
+      <div class="modal__card modal__card--wide fitting-layout">
+        <button type="button" class="modal__close" data-close="fittingModal" aria-label="Close">×</button>
+        <div>
+          <h2>Fitting Room</h2>
+          <p class="tip">Click an inventory item to try it on. Keep what you love, then buy at the cashier.</p>
+          <div id="fittingInventory" class="inventory-grid inventory-grid--compact"></div>
+        </div>
+        <div class="fitting-avatar-wrap">
+          <div id="fittingAvatar" class="avatar-stage avatar-stage--large"></div>
+          <button type="button" id="btnClearOutfit" class="pill-btn pill-btn--soft">Clear try-on</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cashier modal -->
+    <div id="cashierModal" class="modal" hidden>
+      <div class="modal__card">
+        <button type="button" class="modal__close" data-close="cashierModal" aria-label="Close">×</button>
+        <div class="cashier-scene">
+          <div class="cashier-avatar" aria-hidden="true"><span class="cashier-face"></span></div>
+          <div>
+            <p class="eyebrow" id="cashierStore"></p>
+            <h2>Cashier</h2>
+            <p id="cashierLine" class="cashier-line"></p>
+          </div>
+        </div>
+        <div id="checkoutList" class="checkout-list"></div>
+        <div class="cashier-actions">
+          <button type="button" id="btnBuyAll" class="pill-btn pill-btn--gold">Buy selected (∞)</button>
+          <button type="button" data-close="cashierModal" class="pill-btn pill-btn--soft">Maybe later</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bags modal -->
+    <div id="bagsModal" class="modal" hidden>
+      <div class="modal__card">
+        <button type="button" class="modal__close" data-close="bagsModal" aria-label="Close">×</button>
+        <h2>Shopping Bags</h2>
+        <p class="tip">Pretty bags from every purchase you make.</p>
+        <div id="bagsList" class="bags-list"></div>
+      </div>
+    </div>
+
+    <!-- Prize modal -->
+    <div id="prizeModal" class="modal" hidden>
+      <div class="modal__card prize-card">
+        <button type="button" class="modal__close" data-close="prizeModal" aria-label="Close">×</button>
+        <p class="eyebrow">Mall complete</p>
+        <h2>Little Prize Unlocked</h2>
+        <p>You bought something in every store! Here’s your sparkly Mall Princess Crown for your avatar.</p>
+        <div id="prizeAvatar" class="avatar-stage"></div>
+        <button type="button" id="btnClaimPrize" class="pill-btn pill-btn--gold">Wear my crown</button>
+      </div>
+    </div>
+
+    <script>
+window.MALL_DATA = {
+  floors: [
+    { id: 1, name: "Level 1 · Beauty & Jewels", vibe: "Glowy counters, soft perfume, rose-gold light" },
+    { id: 2, name: "Level 2 · Haute Fashion", vibe: "Marble floors, velvet sofas, runway sparkle" },
+    { id: 3, name: "Level 3 · Sport & Icons", vibe: "Sneaker walls, soft lounge music, neon blush" },
+  ],
+
+  stores: [
+    // Level 1 — beauty & jewels (fancy)
+    {
+      id: "sephora",
+      name: "Sephora",
+      floor: 1,
+      fancy: true,
+      color: "#E91E63",
+      blurb: "Makeup playground with endless glow.",
+      cashier: "Welcome to Sephora, gorgeous! Ready to check out that glam?",
+      items: [
+        { id: "sep-palette", name: "Rose Nude Palette", slot: "accessory", price: 52, swatch: "#F4A7B9", shape: "square" },
+        { id: "sep-gloss", name: "Cherry Gloss", slot: "accessory", price: 24, swatch: "#FF4D6D", shape: "circle" },
+        { id: "sep-highlighter", name: "Pearl Highlighter", slot: "accessory", price: 38, swatch: "#FFE8F0", shape: "diamond" },
+        { id: "sep-brush", name: "Pink Brush Set", slot: "accessory", price: 45, swatch: "#FFC0D9", shape: "square" },
+        { id: "sep-perfume", name: "Cloud Perfume Mini", slot: "accessory", price: 68, swatch: "#E7D5FF", shape: "circle" },
+      ],
+    },
+    {
+      id: "chanel",
+      name: "Chanel",
+      floor: 1,
+      fancy: true,
+      color: "#1a1a1a",
+      blurb: "Timeless couture beauty and little black chic.",
+      cashier: "Bonjour. Shall I wrap your Chanel selections?",
+      items: [
+        { id: "cha-bag", name: "Classic Flap Mini", slot: "bag", price: 5800, swatch: "#111111", shape: "square" },
+        { id: "cha-lipstick", name: "Rouge Coco Lip", slot: "accessory", price: 50, swatch: "#B01030", shape: "circle" },
+        { id: "cha-jacket", name: "Tweed Jacket", slot: "top", price: 4200, swatch: "#F2D7E0", shape: "square" },
+        { id: "cha-pumps", name: "Two-Tone Pumps", slot: "shoes", price: 1100, swatch: "#F5F0EB", shape: "diamond" },
+      ],
+    },
+    {
+      id: "dior",
+      name: "Dior",
+      floor: 1,
+      fancy: true,
+      color: "#6B0F2B",
+      blurb: "Couture beauty and soft luxury layers.",
+      cashier: "Welcome to Dior. Let’s make this purchase divine.",
+      items: [
+        { id: "dio-saddle", name: "Saddle Bag", slot: "bag", price: 3900, swatch: "#C7A27C", shape: "square" },
+        { id: "dio-blush", name: "Rosy Glow Blush", slot: "accessory", price: 48, swatch: "#FF8FAB", shape: "circle" },
+        { id: "dio-dress", name: "Bar Jacket Dress", slot: "top", price: 3200, swatch: "#F7E7EF", shape: "diamond" },
+        { id: "dio-heels", name: "J’adior Heels", slot: "shoes", price: 990, swatch: "#FFFFFF", shape: "circle" },
+      ],
+    },
+    {
+      id: "tiffany",
+      name: "Tiffany & Co.",
+      floor: 1,
+      fancy: true,
+      color: "#81D8D0",
+      blurb: "Blue-box sparkle and delicate jewels.",
+      cashier: "Something blue and brilliant today?",
+      items: [
+        { id: "tif-necklace", name: "Heart Tag Necklace", slot: "accessory", price: 425, swatch: "#B8F2EC", shape: "diamond" },
+        { id: "tif-ring", name: "Return to Tiffany Ring", slot: "accessory", price: 375, swatch: "#E8FFFC", shape: "circle" },
+        { id: "tif-bracelet", name: "T Smile Bracelet", slot: "accessory", price: 650, swatch: "#9FE7DF", shape: "square" },
+        { id: "tif-earrings", name: "Diamond Studs", slot: "accessory", price: 1800, swatch: "#FFFFFF", shape: "diamond" },
+      ],
+    },
+    {
+      id: "cartier",
+      name: "Cartier",
+      floor: 1,
+      fancy: true,
+      color: "#B11226",
+      blurb: "Iconic red-box jewels and love bracelets.",
+      cashier: "A Cartier moment — shall I gift-wrap it?",
+      items: [
+        { id: "car-love", name: "Love Bracelet", slot: "accessory", price: 6900, swatch: "#D4AF37", shape: "circle" },
+        { id: "car-watch", name: "Tank Watch", slot: "accessory", price: 3400, swatch: "#F5E6C8", shape: "square" },
+        { id: "car-panthere", name: "Panthère Ring", slot: "accessory", price: 5200, swatch: "#E8C872", shape: "diamond" },
+        { id: "car-nails", name: "Juste un Clou", slot: "accessory", price: 4100, swatch: "#C9A227", shape: "square" },
+      ],
+    },
+    {
+      id: "ysl",
+      name: "Yves Saint Laurent",
+      floor: 1,
+      fancy: true,
+      color: "#2B0A0A",
+      blurb: "Bold beauty and sleek Parisian edges.",
+      cashier: "YSL counter is ready whenever you are.",
+      items: [
+        { id: "ysl-bag", name: "Lou Camera Bag", slot: "bag", price: 1790, swatch: "#4A0E0E", shape: "square" },
+        { id: "ysl-lipstick", name: "Rouge Pur Couture", slot: "accessory", price: 42, swatch: "#8B0000", shape: "circle" },
+        { id: "ysl-blazer", name: "Le Smoking Blazer", slot: "top", price: 2600, swatch: "#1C1C1C", shape: "square" },
+        { id: "ysl-boots", name: "Opyum Boots", slot: "shoes", price: 1290, swatch: "#2A0A0A", shape: "diamond" },
+      ],
+    },
+    {
+      id: "apple",
+      name: "Apple",
+      floor: 1,
+      fancy: false,
+      color: "#A2AAAD",
+      blurb: "Glassy gadgets with soft pink cases.",
+      cashier: "Hi! Want me to ring those up with AppleCare vibes?",
+      items: [
+        { id: "app-iphone", name: "iPhone Pink Case", slot: "accessory", price: 49, swatch: "#FFB6C1", shape: "square" },
+        { id: "app-airpods", name: "AirPods Max Pink", slot: "accessory", price: 549, swatch: "#F8C8DC", shape: "circle" },
+        { id: "app-watch", name: "Watch Soft Rose Band", slot: "accessory", price: 249, swatch: "#E8A0BF", shape: "diamond" },
+        { id: "app-wallet", name: "MagSafe Wallet", slot: "accessory", price: 59, swatch: "#F5D0E0", shape: "square" },
+      ],
+    },
+
+    // Level 2 — haute fashion
+    {
+      id: "zara",
+      name: "Zara",
+      floor: 2,
+      fancy: false,
+      color: "#111111",
+      blurb: "Trend pieces with clean chic energy.",
+      cashier: "Zara till is open — want these in a bag?",
+      items: [
+        { id: "zar-blazer", name: "Satin Blazer", slot: "top", price: 89, swatch: "#F3C4D8", shape: "square" },
+        { id: "zar-skirt", name: "Pleated Midi Skirt", slot: "bottom", price: 59, swatch: "#FFFFFF", shape: "diamond" },
+        { id: "zar-heels", name: "Strappy Heels", slot: "shoes", price: 69, swatch: "#FFCAD4", shape: "circle" },
+        { id: "zar-bag", name: "Mini City Bag", slot: "bag", price: 49, swatch: "#EAD7C4", shape: "square" },
+        { id: "zar-top", name: "Bow Knit Top", slot: "top", price: 39, swatch: "#FFDEE9", shape: "circle" },
+      ],
+    },
+    {
+      id: "gucci",
+      name: "Gucci",
+      floor: 2,
+      fancy: true,
+      color: "#0B6623",
+      blurb: "Maximal logos, soft florals, runway drama.",
+      cashier: "Gucci boutique checkout — fabulous choice.",
+      items: [
+        { id: "guc-bag", name: "GG Marmont Bag", slot: "bag", price: 2500, swatch: "#5C4033", shape: "square" },
+        { id: "guc-hoodie", name: "Logo Hoodie", slot: "top", price: 1200, swatch: "#F7C6D0", shape: "square" },
+        { id: "guc-slides", name: "Horsebit Slides", slot: "shoes", price: 650, swatch: "#D8B4A0", shape: "diamond" },
+        { id: "guc-scarf", name: "Floral Silk Scarf", slot: "accessory", price: 495, swatch: "#FF9EBB", shape: "circle" },
+      ],
+    },
+    {
+      id: "lv",
+      name: "Louis Vuitton",
+      floor: 2,
+      fancy: true,
+      color: "#8B5E3C",
+      blurb: "Monogram dreams and trunk-house polish.",
+      cashier: "Welcome to Louis Vuitton. Shall I prepare a bag?",
+      items: [
+        { id: "lv-neverfull", name: "Neverfull MM", slot: "bag", price: 2100, swatch: "#C2A67E", shape: "square" },
+        { id: "lv-speedy", name: "Speedy Bandoulière", slot: "bag", price: 1840, swatch: "#A67C52", shape: "square" },
+        { id: "lv-scarf", name: "Silk Bandeau", slot: "accessory", price: 250, swatch: "#F4C2C2", shape: "circle" },
+        { id: "lv-sneakers", name: "Trainer Sneakers", slot: "shoes", price: 990, swatch: "#FFFFFF", shape: "diamond" },
+      ],
+    },
+    {
+      id: "prada",
+      name: "Prada",
+      floor: 2,
+      fancy: true,
+      color: "#000000",
+      blurb: "Minimal black, nylon icons, sharp lines.",
+      cashier: "Prada desk — elegant selections.",
+      items: [
+        { id: "pra-reedition", name: "Re-Edition Bag", slot: "bag", price: 1450, swatch: "#222222", shape: "square" },
+        { id: "pra-nylon", name: "Nylon Jacket", slot: "top", price: 1680, swatch: "#1A1A1A", shape: "square" },
+        { id: "pra-loafers", name: "Chocolate Loafers", slot: "shoes", price: 980, swatch: "#5C4033", shape: "diamond" },
+        { id: "pra-skirt", name: "Pleated Techno Skirt", slot: "bottom", price: 1200, swatch: "#2C2C2C", shape: "circle" },
+      ],
+    },
+    {
+      id: "hermes",
+      name: "Hermès",
+      floor: 2,
+      fancy: true,
+      color: "#F37021",
+      blurb: "Orange-box luxury and silk daydreams.",
+      cashier: "Hermès welcomes you. Ready for your orange box?",
+      items: [
+        { id: "her-birkin", name: "Birkin Inspired Tote", slot: "bag", price: 12000, swatch: "#C68642", shape: "square" },
+        { id: "her-scarf", name: "Carré Silk Scarf", slot: "accessory", price: 480, swatch: "#FF8C42", shape: "diamond" },
+        { id: "her-bracelet", name: "Clic H Bracelet", slot: "accessory", price: 740, swatch: "#F7D6E0", shape: "circle" },
+        { id: "her-sandals", name: "Oran Sandals", slot: "shoes", price: 780, swatch: "#E8B4BC", shape: "square" },
+      ],
+    },
+    {
+      id: "balenciaga",
+      name: "Balenciaga",
+      floor: 2,
+      fancy: true,
+      color: "#111111",
+      blurb: "Oversized cool with couture attitude.",
+      cashier: "Balenciaga checkout. Let’s bag the drama.",
+      items: [
+        { id: "bal-hoodie", name: "Oversized Hoodie", slot: "top", price: 950, swatch: "#F5C6D0", shape: "square" },
+        { id: "bal-triple", name: "Triple S Sneakers", slot: "shoes", price: 995, swatch: "#F0E6EE", shape: "circle" },
+        { id: "bal-bag", name: "Hourglass Bag", slot: "bag", price: 2250, swatch: "#2B2B2B", shape: "diamond" },
+        { id: "bal-cap", name: "Logo Cap", slot: "accessory", price: 450, swatch: "#FFFFFF", shape: "square" },
+      ],
+    },
+    {
+      id: "fendi",
+      name: "Fendi",
+      floor: 2,
+      fancy: true,
+      color: "#C9A227",
+      blurb: "FF logos, soft yellows, Italian glam.",
+      cashier: "Ciao! Fendi is ready to wrap your picks.",
+      items: [
+        { id: "fen-baguette", name: "Baguette Bag", slot: "bag", price: 3200, swatch: "#E8D5A3", shape: "square" },
+        { id: "fen-sunglasses", name: "FF Sunglasses", slot: "accessory", price: 490, swatch: "#F5E6C5", shape: "diamond" },
+        { id: "fen-knit", name: "Logo Knit Top", slot: "top", price: 980, swatch: "#FFF0F5", shape: "circle" },
+        { id: "fen-boots", name: "First Boots", slot: "shoes", price: 1250, swatch: "#3B2F2F", shape: "square" },
+      ],
+    },
+
+    // Level 3 — sport & icons
+    {
+      id: "nike",
+      name: "Nike",
+      floor: 3,
+      fancy: false,
+      color: "#111111",
+      blurb: "Sneakers and sporty-soft sets.",
+      cashier: "Just do it — want these boxed up?",
+      items: [
+        { id: "nik-dunk", name: "Dunk Low Pink", slot: "shoes", price: 115, swatch: "#FFB6C1", shape: "circle" },
+        { id: "nik-set", name: "Tech Fleece Set Top", slot: "top", price: 120, swatch: "#F8D7E5", shape: "square" },
+        { id: "nik-shorts", name: "Sport Shorts", slot: "bottom", price: 45, swatch: "#FFFFFF", shape: "diamond" },
+        { id: "nik-bag", name: "Gym Tote", slot: "bag", price: 55, swatch: "#FFC0CB", shape: "square" },
+      ],
+    },
+    {
+      id: "adidas",
+      name: "Adidas",
+      floor: 3,
+      fancy: false,
+      color: "#000000",
+      blurb: "Three stripes with soft pastel energy.",
+      cashier: "Adidas register — great picks!",
+      items: [
+        { id: "adi-samba", name: "Samba OG", slot: "shoes", price: 100, swatch: "#F5F5F5", shape: "circle" },
+        { id: "adi-track", name: "Track Jacket", slot: "top", price: 90, swatch: "#F3C1D4", shape: "square" },
+        { id: "adi-pants", name: "Firebird Pants", slot: "bottom", price: 80, swatch: "#2A2A2A", shape: "diamond" },
+        { id: "adi-bag", name: "Mini Airliner Bag", slot: "bag", price: 70, swatch: "#E8B4BC", shape: "square" },
+      ],
+    },
+    {
+      id: "lululemon",
+      name: "Lululemon",
+      floor: 3,
+      fancy: true,
+      color: "#D31345",
+      blurb: "Buttery soft sets for pretty errands.",
+      cashier: "Need a bag for your Align vibes?",
+      items: [
+        { id: "lulu-align", name: "Align Leggings", slot: "bottom", price: 98, swatch: "#F4C2C2", shape: "square" },
+        { id: "lulu-define", name: "Define Jacket", slot: "top", price: 128, swatch: "#FFE4EC", shape: "diamond" },
+        { id: "lulu-belt", name: "Everywhere Belt Bag", slot: "bag", price: 38, swatch: "#E8A0BF", shape: "circle" },
+        { id: "lulu-scuba", name: "Scuba Hoodie", slot: "top", price: 118, swatch: "#F7D6E0", shape: "square" },
+      ],
+    },
+    {
+      id: "vs",
+      name: "Victoria's Secret",
+      floor: 3,
+      fancy: true,
+      color: "#6B0F2B",
+      blurb: "Soft glam loungewear and sparkle wings energy.",
+      cashier: "Hi angel — ready to check out?",
+      items: [
+        { id: "vs-robe", name: "Satin Robe", slot: "top", price: 79, swatch: "#E8B4BC", shape: "diamond" },
+        { id: "vs-slippers", name: "Feather Slippers", slot: "shoes", price: 59, swatch: "#FFD6E0", shape: "circle" },
+        { id: "vs-tote", name: "Pink Striped Tote", slot: "bag", price: 45, swatch: "#FFC0CB", shape: "square" },
+        { id: "vs-mist", name: "Bare Vanilla Mist", slot: "accessory", price: 22, swatch: "#FFF0F5", shape: "circle" },
+      ],
+    },
+    {
+      id: "coach",
+      name: "Coach",
+      floor: 3,
+      fancy: true,
+      color: "#5C4033",
+      blurb: "Polished leather with soft everyday glam.",
+      cashier: "Coach counter — I’ll wrap these beautifully.",
+      items: [
+        { id: "coa-tabby", name: "Tabby Shoulder Bag", slot: "bag", price: 450, swatch: "#C9A9A6", shape: "square" },
+        { id: "coa-scarf", name: "Signature Scarf", slot: "accessory", price: 95, swatch: "#E6C7B0", shape: "diamond" },
+        { id: "coa-loafers", name: "Leather Loafers", slot: "shoes", price: 220, swatch: "#8B5A2B", shape: "circle" },
+        { id: "coa-card", name: "Card Case", slot: "accessory", price: 75, swatch: "#F5D0C5", shape: "square" },
+      ],
+    },
+    {
+      id: "mk",
+      name: "Michael Kors",
+      floor: 3,
+      fancy: true,
+      color: "#C9A227",
+      blurb: "Gold hardware and jet-set shine.",
+      cashier: "Michael Kors till — fabulous finds!",
+      items: [
+        { id: "mk-jetset", name: "Jet Set Tote", slot: "bag", price: 298, swatch: "#F0E0C0", shape: "square" },
+        { id: "mk-watch", name: "Parker Watch", slot: "accessory", price: 250, swatch: "#D4AF37", shape: "circle" },
+        { id: "mk-heels", name: "Claire Heels", slot: "shoes", price: 150, swatch: "#F5C6CE", shape: "diamond" },
+        { id: "mk-dress", name: "Wrap Dress", slot: "top", price: 175, swatch: "#F8E1E7", shape: "square" },
+      ],
+    },
+    {
+      id: "rolex",
+      name: "Rolex",
+      floor: 3,
+      fancy: true,
+      color: "#006039",
+      blurb: "The fanciest sparkle-on-your-wrist destination.",
+      cashier: "Welcome. A Rolex deserves a proper presentation.",
+      items: [
+        { id: "rol-datejust", name: "Datejust Pink Dial", slot: "accessory", price: 10500, swatch: "#F7C7D9", shape: "circle" },
+        { id: "rol-daytona", name: "Daytona Steel", slot: "accessory", price: 15500, swatch: "#D9D9D9", shape: "square" },
+        { id: "rol-oyster", name: "Oyster Bracelet Shine", slot: "accessory", price: 8900, swatch: "#F0F0F0", shape: "diamond" },
+        { id: "rol-case", name: "Green Presentation Case", slot: "bag", price: 250, swatch: "#0B3D2E", shape: "square" },
+      ],
+    },
+  ],
+
+  prize: {
+    id: "prize-crown",
+    name: "Mall Princess Crown",
+    slot: "accessory",
+    price: 0,
+    swatch: "#FFD700",
+    shape: "diamond",
+    storeId: "prize",
+  },
+
+  inventorySlots: 80,
+
+  cashierLines: [
+    "Ooo these are so cute on you!",
+    "Want a pretty shopping bag with that?",
+    "Infinite wallet? Living the dream.",
+    "I’ll fold everything extra carefully.",
+    "You have amazing taste!",
+  ],
+};
+
+// Fix accidental typo if any left in LV color
+window.MALL_DATA.stores.forEach((store) => {
+  store.items.forEach((item) => {
+    if (typeof item.swatch === "string") {
+      item.swatch = item.swatch.replace(/\s+/g, "");
+    }
+  });
+});
+
+(() => {
+  "use strict";
+
+  const data = window.MALL_DATA;
+  const storesById = Object.fromEntries(data.stores.map((s) => [s.id, s]));
+  const allItems = [];
+  data.stores.forEach((store) => {
+    store.items.forEach((item) => {
+      allItems.push({ ...item, storeId: store.id, storeName: store.name });
+    });
+  });
+  const itemsById = Object.fromEntries(allItems.map((i) => [i.id, i]));
+
+  const state = {
+    floor: 1,
+    currentStoreId: null,
+    inventory: [], // item ids (can have duplicates? no - unique try-ons; owned stay)
+    owned: new Set(), // purchased item ids
+    equipped: {
+      top: null,
+      bottom: null,
+      shoes: null,
+      bag: null,
+      accessory: null,
+    },
+    bags: [], // { storeId, storeName, itemIds, at }
+    purchasedStores: new Set(),
+    prizeClaimed: false,
+    toastTimer: null,
+  };
+
+  const els = {
+    storeGrid: document.getElementById("storeGrid"),
+    storeModal: document.getElementById("storeModal"),
+    storeFloor: document.getElementById("storeFloor"),
+    storeName: document.getElementById("storeName"),
+    storeBlurb: document.getElementById("storeBlurb"),
+    itemGrid: document.getElementById("itemGrid"),
+    inventoryModal: document.getElementById("inventoryModal"),
+    inventoryGrid: document.getElementById("inventoryGrid"),
+    fittingModal: document.getElementById("fittingModal"),
+    fittingInventory: document.getElementById("fittingInventory"),
+    fittingAvatar: document.getElementById("fittingAvatar"),
+    cashierModal: document.getElementById("cashierModal"),
+    cashierStore: document.getElementById("cashierStore"),
+    cashierLine: document.getElementById("cashierLine"),
+    checkoutList: document.getElementById("checkoutList"),
+    bagsModal: document.getElementById("bagsModal"),
+    bagsList: document.getElementById("bagsList"),
+    prizeModal: document.getElementById("prizeModal"),
+    prizeAvatar: document.getElementById("prizeAvatar"),
+    prizeBanner: document.getElementById("prizeBanner"),
+    progressText: document.getElementById("progressText"),
+    avatarStage: document.getElementById("avatarStage"),
+    equippedList: document.getElementById("equippedList"),
+  };
+
+  function toast(message) {
+    let node = document.getElementById("toast");
+    if (!node) {
+      node = document.createElement("div");
+      node.id = "toast";
+      node.style.cssText =
+        "position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);z-index:40;background:#fff;border:1px solid rgba(255,143,183,.45);padding:.7rem 1rem;border-radius:999px;font-weight:800;box-shadow:0 10px 30px rgba(255,105,180,.25);max-width:90vw;text-align:center;";
+      document.body.appendChild(node);
+    }
+    node.textContent = message;
+    node.hidden = false;
+    clearTimeout(state.toastTimer);
+    state.toastTimer = setTimeout(() => {
+      node.hidden = true;
+    }, 1800);
+  }
+
+  function openModal(id) {
+    document.getElementById(id).hidden = false;
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).hidden = true;
+  }
+
+  function renderAvatar(target, equipped = state.equipped) {
+    const top = equipped.top ? itemsById[equipped.top] : null;
+    const bottom = equipped.bottom ? itemsById[equipped.bottom] : null;
+    const shoes = equipped.shoes ? itemsById[equipped.shoes] : null;
+    const bag = equipped.bag ? itemsById[equipped.bag] : null;
+    const acc = equipped.accessory ? itemsById[equipped.accessory] : null;
+
+    const torso = top ? top.swatch : "#ff9ec8";
+    const legs = bottom ? bottom.swatch : "#f7c1d8";
+    const shoe = shoes ? shoes.swatch : "#ffffff";
+    const bagColor = bag ? bag.swatch : "#d4a017";
+    const accColor = acc ? acc.swatch : "#ffd700";
+    const showCrown = acc && acc.id === "prize-crown";
+
+    target.innerHTML = `
+      <div class="roblox" aria-hidden="true">
+        <div class="roblox__body">
+          <div class="roblox__hair"></div>
+          <div class="roblox__acc ${acc ? "is-on" : ""}" style="background:${accColor}; ${
+            showCrown ? "" : "clip-path:none;border-radius:10px;height:12px;top:48px;width:22px;left:49px;"
+          }"></div>
+          <div class="roblox__head"><div class="roblox__face"><div class="roblox__smile"></div></div></div>
+          <div class="roblox__arm roblox__arm--l"><div class="roblox__sleeve" style="background:${torso}"></div></div>
+          <div class="roblox__arm roblox__arm--r"><div class="roblox__sleeve" style="background:${torso}"></div></div>
+          <div class="roblox__torso" style="background:${torso}"></div>
+          <div class="roblox__leg roblox__leg--l" style="background:${legs}"></div>
+          <div class="roblox__leg roblox__leg--r" style="background:${legs}"></div>
+          <div class="roblox__shoe roblox__shoe--l" style="background:${shoe}"></div>
+          <div class="roblox__shoe roblox__shoe--r" style="background:${shoe}"></div>
+          <div class="roblox__bag ${bag ? "is-on" : ""}" style="background:${bagColor}"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderEquippedList() {
+    const chips = Object.entries(state.equipped)
+      .filter(([, id]) => id)
+      .map(([, id]) => {
+        const item = itemsById[id] || (id === data.prize.id ? data.prize : null);
+        return item ? `<span class="chip">${item.name}</span>` : "";
+      });
+    els.equippedList.innerHTML = chips.length
+      ? chips.join("")
+      : `<span class="chip">Base Roblox look</span>`;
+  }
+
+  function updateProgress() {
+    els.progressText.textContent = `${state.purchasedStores.size} / ${data.stores.length}`;
+    if (state.purchasedStores.size >= data.stores.length) {
+      els.prizeBanner.hidden = false;
+      if (!state.prizeClaimed) {
+        openModal("prizeModal");
+        renderAvatar(els.prizeAvatar);
+      }
+    }
+  }
+
+  function renderStores() {
+    const floorStores = data.stores.filter((s) => s.floor === state.floor);
+    els.storeGrid.innerHTML = floorStores
+      .map((store) => {
+        const bought = state.purchasedStores.has(store.id);
+        return `
+          <button type="button" class="store-card ${bought ? "has-purchase" : ""}" data-store="${store.id}">
+            ${store.fancy ? `<span class="store-card__badge">Fancy</span>` : ""}
+            <h3 class="store-card__name">${store.name}</h3>
+            <p class="store-card__meta">${store.items.length} pieces · Floor ${store.floor}</p>
+          </button>
+        `;
+      })
+      .join("");
+  }
+
+  function openStore(storeId) {
+    const store = storesById[storeId];
+    if (!store) return;
+    state.currentStoreId = storeId;
+    els.storeFloor.textContent = `Floor ${store.floor}`;
+    els.storeName.textContent = store.name;
+    els.storeBlurb.textContent = store.blurb;
+    els.itemGrid.innerHTML = store.items
+      .map((item) => {
+        const owned = state.owned.has(item.id);
+        const inInv = state.inventory.includes(item.id);
+        return `
+          <button type="button" class="item-card ${owned ? "is-owned" : ""}" data-item="${item.id}">
+            <div class="swatch ${item.shape}" style="background:${item.swatch}"></div>
+            <strong>${item.name}</strong>
+            <span>${owned ? "Purchased" : inInv ? "In inventory" : `$${item.price.toLocaleString()}`}</span>
+          </button>
+        `;
+      })
+      .join("");
+    openModal("storeModal");
+  }
+
+  function addToInventory(itemId) {
+    if (state.owned.has(itemId)) {
+      toast("You already bought that!");
+      return;
+    }
+    if (state.inventory.includes(itemId)) {
+      toast("Already in your inventory");
+      return;
+    }
+    if (state.inventory.length >= data.inventorySlots) {
+      toast("Inventory is full (wow!)");
+      return;
+    }
+    state.inventory.push(itemId);
+    const item = itemsById[itemId];
+    toast(`Added ${item.name} to inventory`);
+    if (!els.storeModal.hidden) openStore(state.currentStoreId);
+  }
+
+  function renderInventoryGrid(target, { tryOn = false } = {}) {
+    const slots = [];
+    for (let i = 0; i < data.inventorySlots; i += 1) {
+      const itemId = state.inventory[i];
+      if (!itemId) {
+        slots.push(`<div class="inv-slot empty"></div>`);
+        continue;
+      }
+      const item = itemsById[itemId] || (itemId === data.prize.id ? data.prize : null);
+      if (!item) continue;
+      const owned = state.owned.has(itemId);
+      slots.push(`
+        <button type="button" class="inv-slot ${owned ? "is-owned" : ""}" data-item="${itemId}" data-tryon="${tryOn}">
+          <div class="swatch ${item.shape || "square"}" style="background:${item.swatch}"></div>
+          <strong>${item.name}</strong>
+          <span>${item.storeName || item.slot}${owned ? " · owned" : ""}</span>
+        </button>
+      `);
+    }
+    target.innerHTML = slots.join("");
+  }
+
+  function tryOn(itemId) {
+    const item =
+      itemsById[itemId] ||
+      (itemId === data.prize.id
+        ? { ...data.prize, storeName: "Prize" }
+        : null);
+    if (!item) return;
+    state.equipped[item.slot] = itemId;
+    // Ensure prize exists in itemsById for avatar rendering
+    if (itemId === data.prize.id && !itemsById[itemId]) {
+      itemsById[itemId] = { ...data.prize, storeName: "Prize" };
+    }
+    renderAvatar(els.avatarStage);
+    renderAvatar(els.fittingAvatar);
+    renderEquippedList();
+    toast(`Tried on ${item.name}`);
+  }
+
+  function clearTryOn() {
+    state.equipped = { top: null, bottom: null, shoes: null, bag: null, accessory: null };
+    // Keep owned worn items? User asked to try from inventory - clearing try-on is fine
+    // Re-equip purchased items that were bought (optional nicety)
+    renderAvatar(els.avatarStage);
+    renderAvatar(els.fittingAvatar);
+    renderEquippedList();
+    toast("Try-on cleared");
+  }
+
+  function openFittingRoom() {
+    renderInventoryGrid(els.fittingInventory, { tryOn: true });
+    renderAvatar(els.fittingAvatar);
+    openModal("fittingModal");
+  }
+
+  function openCashier() {
+    const store = storesById[state.currentStoreId];
+    if (!store) {
+      toast("Enter a store first");
+      return;
+    }
+    const pending = state.inventory.filter(
+      (id) => itemsById[id]?.storeId === store.id && !state.owned.has(id)
+    );
+    els.cashierStore.textContent = store.name;
+    const extra =
+      data.cashierLines[Math.floor(Math.random() * data.cashierLines.length)];
+    els.cashierLine.textContent = `${store.cashier} ${extra}`;
+
+    if (!pending.length) {
+      els.checkoutList.innerHTML = `<p class="tip">You don’t have unpaid ${store.name} items in inventory yet. Grab something you like first!</p>`;
+      document.getElementById("btnBuyAll").disabled = true;
+    } else {
+      document.getElementById("btnBuyAll").disabled = false;
+      els.checkoutList.innerHTML = pending
+        .map((id) => {
+          const item = itemsById[id];
+          return `
+            <label class="checkout-row">
+              <input type="checkbox" name="buy" value="${id}" checked />
+              <div class="swatch ${item.shape}" style="background:${item.swatch};width:36px;aspect-ratio:1;margin:0;flex:0 0 36px;"></div>
+              <div>
+                <strong>${item.name}</strong>
+                <span style="display:block;color:var(--mute);font-size:.78rem;">$${item.price.toLocaleString()} · infinite wallet covers it</span>
+              </div>
+            </label>
+          `;
+        })
+        .join("");
+    }
+    openModal("cashierModal");
+  }
+
+  function buySelected() {
+    const store = storesById[state.currentStoreId];
+    const checked = [...els.checkoutList.querySelectorAll('input[name="buy"]:checked')].map(
+      (el) => el.value
+    );
+    if (!checked.length) {
+      toast("Select at least one item");
+      return;
+    }
+
+    checked.forEach((id) => state.owned.add(id));
+    state.purchasedStores.add(store.id);
+    state.bags.push({
+      storeId: store.id,
+      storeName: store.name,
+      itemIds: checked,
+      at: Date.now(),
+      color: store.color,
+    });
+
+    // Keep items in inventory (lots of space) but mark owned; also keep wearing
+    closeModal("cashierModal");
+    toast(`${store.name} cashier: “Here’s your pretty shopping bag!”`);
+    renderStores();
+    updateProgress();
+    if (!els.storeModal.hidden) openStore(store.id);
+  }
+
+  function renderBags() {
+    if (!state.bags.length) {
+      els.bagsList.innerHTML = `<p class="tip">No bags yet — buy something from a cashier!</p>`;
+      return;
+    }
+    els.bagsList.innerHTML = state.bags
+      .slice()
+      .reverse()
+      .map((bag) => {
+        const names = bag.itemIds.map((id) => itemsById[id]?.name || "Item").join(", ");
+        return `
+          <div class="bag-card">
+            <div class="bag-icon" style="background:linear-gradient(180deg, ${bag.color}aa, ${bag.color})"></div>
+            <div>
+              <strong>${bag.storeName} Shopping Bag</strong>
+              <span style="display:block;color:var(--mute);font-size:.82rem;">${names}</span>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  function claimPrize() {
+    const prize = { ...data.prize, storeName: "Prize" };
+    itemsById[prize.id] = prize;
+    if (!state.inventory.includes(prize.id)) {
+      state.inventory.unshift(prize.id);
+    }
+    state.owned.add(prize.id);
+    state.equipped.accessory = prize.id;
+    state.prizeClaimed = true;
+    renderAvatar(els.avatarStage);
+    renderAvatar(els.prizeAvatar);
+    renderEquippedList();
+    closeModal("prizeModal");
+    toast("Mall Princess Crown added — you earned it!");
+  }
+
+  // Events
+  document.querySelectorAll(".floor-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.floor = Number(btn.dataset.floor);
+      document.querySelectorAll(".floor-btn").forEach((b) => b.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      renderStores();
+    });
+  });
+
+  els.storeGrid.addEventListener("click", (e) => {
+    const card = e.target.closest("[data-store]");
+    if (card) openStore(card.dataset.store);
+  });
+
+  els.itemGrid.addEventListener("click", (e) => {
+    const card = e.target.closest("[data-item]");
+    if (card) addToInventory(card.dataset.item);
+  });
+
+  document.getElementById("btnInventory").addEventListener("click", () => {
+    renderInventoryGrid(els.inventoryGrid, { tryOn: false });
+    openModal("inventoryModal");
+  });
+
+  document.getElementById("btnFitting").addEventListener("click", openFittingRoom);
+  document.getElementById("btnGoFitting").addEventListener("click", () => {
+    closeModal("storeModal");
+    openFittingRoom();
+  });
+  document.getElementById("btnGoCashier").addEventListener("click", openCashier);
+  document.getElementById("btnClearOutfit").addEventListener("click", clearTryOn);
+  document.getElementById("btnBuyAll").addEventListener("click", buySelected);
+  document.getElementById("btnBags").addEventListener("click", () => {
+    renderBags();
+    openModal("bagsModal");
+  });
+  document.getElementById("btnClaimPrize").addEventListener("click", claimPrize);
+
+  els.inventoryGrid.addEventListener("click", (e) => {
+    const slot = e.target.closest("[data-item]");
+    if (!slot) return;
+    toast("Open the Fitting Room to try items on");
+  });
+
+  els.fittingInventory.addEventListener("click", (e) => {
+    const slot = e.target.closest("[data-item]");
+    if (slot) tryOn(slot.dataset.item);
+  });
+
+  document.querySelectorAll("[data-close]").forEach((btn) => {
+    btn.addEventListener("click", () => closeModal(btn.dataset.close));
+  });
+
+  document.querySelectorAll(".modal").forEach((modal) => {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.hidden = true;
+    });
+  });
+
+  // Boot
+  if (data.stores.length < 20) {
+    console.warn("Expected at least 20 stores");
+  }
+  renderStores();
+  renderAvatar(els.avatarStage);
+  renderEquippedList();
+  updateProgress();
+})();
+
+</script>
+  </body>
+</html>
