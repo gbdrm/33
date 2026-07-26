@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Rose Quartz Mall — Pretty Shopping Adventure</title>
+    <title>Rose Quartz Mall — Walk & Shop</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Playfair+Display:wght@700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Playfair+Display:wght@700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -18,79 +18,58 @@
     <header class="topbar">
       <div class="brand">
         <p class="brand__name">Rose Quartz Mall</p>
-        <p class="brand__tag">3 floors · 21 dreamy stores</p>
+        <p class="brand__tag">Walk the floors · shop for real</p>
       </div>
-      <div class="wallet" title="Infinite money">
-        <span class="wallet__label">Wallet</span>
-        <span class="wallet__amount">$∞</span>
-      </div>
-      <div class="progress-chip">
-        <span>Stores shopped</span>
-        <strong id="progressText">0 / 21</strong>
-      </div>
-      <button type="button" id="btnInventory" class="pill-btn">Inventory</button>
-      <button type="button" id="btnFitting" class="pill-btn pill-btn--soft">Fitting Room</button>
+      <div class="wallet"><span>Wallet</span><strong>$∞</strong></div>
+      <div class="progress-chip"><span>Stores bagged</span><strong id="progressText">0 / 21</strong></div>
+      <button type="button" id="btnInventory" class="pill-btn pill-btn--inventory">Inventory</button>
       <button type="button" id="btnBags" class="pill-btn pill-btn--soft">Bags</button>
     </header>
 
-    <main class="layout">
-      <section class="mall-panel">
-        <nav class="floors" aria-label="Mall floors">
-          <button type="button" class="floor-btn is-active" data-floor="1">Level 1 · Beauty & Jewels</button>
-          <button type="button" class="floor-btn" data-floor="2">Level 2 · Haute Fashion</button>
-          <button type="button" class="floor-btn" data-floor="3">Level 3 · Sport & Icons</button>
-        </nav>
-        <div id="storeGrid" class="store-grid"></div>
-      </section>
+    <main class="play-shell">
+      <div class="canvas-wrap">
+        <canvas id="game" width="1100" height="640" aria-label="Walkable mall"></canvas>
+        <div id="locationBadge" class="location-badge">Mall Corridor · Level 1</div>
+        <div id="prompt" class="prompt" hidden></div>
+        <p id="prizeBanner" class="prize-banner" hidden>Mall Princess Prize unlocked — every store bagged!</p>
+      </div>
 
-      <aside class="avatar-panel">
-        <h2>Your Avatar</h2>
-        <p class="avatar-hint">Roblox-style · try looks in the fitting room</p>
+      <aside class="side-panel">
+        <h2>You</h2>
         <div id="avatarStage" class="avatar-stage"></div>
         <div id="equippedList" class="equipped-list"></div>
-        <p id="prizeBanner" class="prize-banner" hidden>
-          Mall Princess Prize unlocked — you shopped every store!
-        </p>
+        <div class="help">
+          <p><strong>Move:</strong> WASD / arrows · drag the stick on iPad</p>
+          <p><strong>Take item:</strong> walk to a hanger or mannequin, tap it (or press E)</p>
+          <p><strong>Try on:</strong> walk into the Dressing Room</p>
+          <p><strong>Buy:</strong> walk up to the Cashier</p>
+          <p><strong>Leave store:</strong> walk to the EXIT mat</p>
+        </div>
       </aside>
     </main>
 
-    <!-- Store modal -->
-    <div id="storeModal" class="modal" hidden>
-      <div class="modal__card modal__card--wide">
-        <button type="button" class="modal__close" data-close="storeModal" aria-label="Close">×</button>
-        <header class="store-head">
-          <div>
-            <p id="storeFloor" class="eyebrow"></p>
-            <h2 id="storeName"></h2>
-            <p id="storeBlurb" class="store-blurb"></p>
-          </div>
-          <div class="store-actions">
-            <button type="button" id="btnGoFitting" class="pill-btn">Fitting Room</button>
-            <button type="button" id="btnGoCashier" class="pill-btn pill-btn--gold">Talk to Cashier</button>
-          </div>
-        </header>
-        <p class="tip">Tap anything you like — it goes into your big inventory.</p>
-        <div id="itemGrid" class="item-grid"></div>
+    <div class="touch-controls" id="touchControls">
+      <div class="stick" id="stick">
+        <div class="stick__knob" id="stickKnob"></div>
       </div>
+      <button type="button" id="btnInteract" class="interact-btn">Do</button>
     </div>
 
-    <!-- Inventory modal -->
     <div id="inventoryModal" class="modal" hidden>
       <div class="modal__card modal__card--wide">
-        <button type="button" class="modal__close" data-close="inventoryModal" aria-label="Close">×</button>
+        <button type="button" class="modal__close" data-close="inventoryModal">×</button>
         <h2>Inventory</h2>
-        <p class="tip">Lots of space (80 slots). Items you’ve tried or kept stay here until you buy them.</p>
+        <p class="tip">80 slots. Walk to a dressing room to try things on.</p>
         <div id="inventoryGrid" class="inventory-grid"></div>
       </div>
     </div>
 
-    <!-- Fitting room modal -->
     <div id="fittingModal" class="modal" hidden>
       <div class="modal__card modal__card--wide fitting-layout">
-        <button type="button" class="modal__close" data-close="fittingModal" aria-label="Close">×</button>
+        <button type="button" class="modal__close" data-close="fittingModal">×</button>
         <div>
-          <h2>Fitting Room</h2>
-          <p class="tip">Click an inventory item to try it on. Keep what you love, then buy at the cashier.</p>
+          <h2>Dressing Room</h2>
+          <p class="tip">Tap an item to try it on your Roblox-style avatar. Keep what you love, then walk to the cashier.</p>
           <div id="fittingInventory" class="inventory-grid inventory-grid--compact"></div>
         </div>
         <div class="fitting-avatar-wrap">
@@ -100,10 +79,9 @@
       </div>
     </div>
 
-    <!-- Cashier modal -->
     <div id="cashierModal" class="modal" hidden>
       <div class="modal__card">
-        <button type="button" class="modal__close" data-close="cashierModal" aria-label="Close">×</button>
+        <button type="button" class="modal__close" data-close="cashierModal">×</button>
         <div class="cashier-scene">
           <div class="cashier-avatar" aria-hidden="true"><span class="cashier-face"></span></div>
           <div>
@@ -114,33 +92,32 @@
         </div>
         <div id="checkoutList" class="checkout-list"></div>
         <div class="cashier-actions">
-          <button type="button" id="btnBuyAll" class="pill-btn pill-btn--gold">Buy selected (∞)</button>
-          <button type="button" data-close="cashierModal" class="pill-btn pill-btn--soft">Maybe later</button>
+          <button type="button" id="btnBuyAll" class="pill-btn pill-btn--gold">Buy selected ($∞)</button>
+          <button type="button" data-close="cashierModal" class="pill-btn pill-btn--soft">Not yet</button>
         </div>
       </div>
     </div>
 
-    <!-- Bags modal -->
     <div id="bagsModal" class="modal" hidden>
       <div class="modal__card">
-        <button type="button" class="modal__close" data-close="bagsModal" aria-label="Close">×</button>
+        <button type="button" class="modal__close" data-close="bagsModal">×</button>
         <h2>Shopping Bags</h2>
-        <p class="tip">Pretty bags from every purchase you make.</p>
         <div id="bagsList" class="bags-list"></div>
       </div>
     </div>
 
-    <!-- Prize modal -->
     <div id="prizeModal" class="modal" hidden>
       <div class="modal__card prize-card">
-        <button type="button" class="modal__close" data-close="prizeModal" aria-label="Close">×</button>
+        <button type="button" class="modal__close" data-close="prizeModal">×</button>
         <p class="eyebrow">Mall complete</p>
         <h2>Little Prize Unlocked</h2>
-        <p>You bought something in every store! Here’s your sparkly Mall Princess Crown for your avatar.</p>
+        <p>You bought something in every store! Claim your Mall Princess Crown.</p>
         <div id="prizeAvatar" class="avatar-stage"></div>
         <button type="button" id="btnClaimPrize" class="pill-btn pill-btn--gold">Wear my crown</button>
       </div>
     </div>
+
+    <div id="itemPeek" class="item-peek" hidden></div>
 
     <script src="data.js"></script>
     <script src="game.js"></script>
