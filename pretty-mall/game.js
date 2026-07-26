@@ -5,6 +5,20 @@
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
 
+  // iPad / older Safari may not have roundRect
+  if (!ctx.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+      const radius = typeof r === "number" ? r : 10;
+      this.moveTo(x + radius, y);
+      this.arcTo(x + w, y, x + w, y + h, radius);
+      this.arcTo(x + w, y + h, x, y + h, radius);
+      this.arcTo(x, y + h, x, y, radius);
+      this.arcTo(x, y, x + w, y, radius);
+      this.closePath();
+      return this;
+    };
+  }
+
   const storesById = Object.fromEntries(data.stores.map((s) => [s.id, s]));
   const itemsById = {};
   data.stores.forEach((store) => {
@@ -764,10 +778,12 @@
       }
     }
 
-    // floor label
+    // floor label + how-to
     ctx.fillStyle = "rgba(74,43,59,0.55)";
     ctx.font = "800 20px Playfair Display, serif";
-    ctx.fillText(`Rose Quartz Mall · Level ${state.floor}`, 120, 600);
+    ctx.fillText(`Rose Quartz Mall · Level ${state.floor}`, 120, 580);
+    ctx.font = "700 14px Nunito, sans-serif";
+    ctx.fillText("This pink hallway IS the mall — walk to a store door and tap ENTER", 120, 608);
 
     drawRobloxPlayer(player.x, player.y);
     ctx.restore();
