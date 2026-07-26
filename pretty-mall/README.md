@@ -1,30 +1,33 @@
 # Rose Quartz Mall
 
-A pretty, girly mall shopping game with a Roblox-style avatar, **21 real stores** across **3 floors**, a huge inventory, fitting room try-ons, cashier checkouts, and a completion prize.
+Walk through a pretty 3-level mall with a Roblox-style avatar, **21 real stores**, hangers & mannequins, dressing rooms, and cashiers.
 
-## Play
+## Play on iPad (Safari)
 
-Open `index.html`, or:
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/gbdrm/33/cursor/pretty-mall-shopping-game-7cc5/pretty-mall/play.html
+
+## Play on computer
 
 ```bash
 cd pretty-mall
 python3 -m http.server 8090
 ```
 
-Then visit `http://localhost:8090`.
+Open `http://localhost:8090`.
 
-### iPad / Safari
+## Controls
 
-Use the single-file page:
+- **Move:** WASD / arrows · drag the on-screen stick on iPad
+- **Inventory button:** tap **Inventory** in the top bar anytime (or press `I`)
+- **Take item:** walk to a hanger/mannequin/shelf and tap it (or press `E` / **Do**)
+- **Try on:** walk into the **Dressing Room**
+- **Buy:** walk up to the **Cashier** (infinite money, get a shopping bag)
+- **Leave store:** walk onto the **EXIT** mat
+- **Change floor:** walk to the gold **ELEV** and interact
 
-https://htmlpreview.github.io/?https://raw.githubusercontent.com/gbdrm/33/cursor/pretty-mall-shopping-game-7cc5/pretty-mall/play.html
+## Features
 
-## How to play
-
-1. Pick a floor, then tap a store (Sephora, Nike, Zara, and more).
-2. Tap items you like — they go into your **80-slot inventory**.
-3. Open the **Fitting Room** and tap inventory items to try them on your avatar.
-4. Talk to the **Cashier**, buy what you want (wallet is **$∞**), and get a shopping bag.
-5. Buy at least one thing in **every store** to unlock the Mall Princess Crown prize.
-
-Most stores are marked **Fancy**. Sephora is on Level 1.
+- Sephora + Nike + Zara + many fancy houses (Chanel, Dior, Hermès, Rolex, …)
+- 170 realistic catalog items (materials, product names, prices)
+- 80-slot inventory
+- Prize crown when you buy something in every store
