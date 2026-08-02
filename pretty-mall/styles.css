@@ -369,6 +369,148 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
   transition: width 0.25s ease;
 }
 .mission-hud__progress { margin: 0.35rem 0 0; font-size: 0.75rem; font-weight: 700; }
+.mission-hud__stars {
+  margin: 0.35rem 0 0;
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+  color: #ffd36b;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+.mission-hud.is-urgent {
+  border-color: #ff4f9a;
+  box-shadow: 0 0 0 2px rgba(255, 79, 154, 0.35);
+  animation: hud-pulse 0.55s ease-in-out infinite;
+}
+@keyframes hud-pulse {
+  50% { transform: scale(1.02); }
+}
+
+.shop-panel[hidden] { display: none; }
+.shop-panel {
+  position: fixed;
+  left: 50%;
+  bottom: 6.4rem;
+  transform: translateX(-50%);
+  z-index: 14;
+  width: min(94vw, 520px);
+  max-height: min(42vh, 320px);
+  overflow: auto;
+  padding: 0.75rem;
+  border-radius: 22px;
+  background: rgba(255, 248, 252, 0.96);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.shop-panel__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: flex-start;
+  margin-bottom: 0.55rem;
+}
+.shop-panel__head h2 {
+  margin: 0.1rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+.shop-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+.shop-panel__actions .pill-btn {
+  padding: 0.45rem 0.7rem;
+  font-size: 0.78rem;
+}
+.shop-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+.shop-card {
+  appearance: none;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 0.4rem;
+  text-align: left;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+.shop-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+  margin-bottom: 0.3rem;
+  background: #ffe8f4;
+}
+.shop-card strong {
+  display: block;
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+.shop-card span {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--mute);
+  margin-top: 0.1rem;
+}
+.shop-card.is-owned,
+.shop-card.is-held { opacity: 0.55; }
+
+.directory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+.directory-btn {
+  appearance: none;
+  border: 0;
+  border-radius: 16px;
+  padding: 0.85rem 0.7rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(74, 43, 59, 0.18);
+}
+.directory-btn small {
+  display: block;
+  margin-top: 0.25rem;
+  font-weight: 700;
+  opacity: 0.85;
+  font-size: 0.72rem;
+}
+
+.star-burst {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: none;
+  place-items: center;
+  pointer-events: none;
+  background: rgba(255, 120, 180, 0.16);
+}
+.star-burst.show {
+  display: grid;
+  animation: star-pop 0.95s ease forwards;
+}
+.star-burst span {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3.4rem);
+  color: #fff;
+  text-shadow: 0 8px 24px rgba(176, 72, 124, 0.45);
+}
+@keyframes star-pop {
+  0% { opacity: 0; transform: scale(0.7); }
+  30% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
 .friend-chat {
   position: fixed;
   left: 0.75rem;

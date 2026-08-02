@@ -54,19 +54,28 @@
     runwayPlays: 0,
     storesEntered: new Set(),
     mission: null,
+    hop: null,
+    hopGrabs: 0,
+    hopStores: 0,
+    hopBuys: 0,
+    hopTryOns: 0,
+    hopZara: 0,
+    hopSessionStart: { stores: 0, grabs: 0, buys: 0, tryOns: 0, zara: 0 },
     npcs: [],
     chatTimer: 4,
     runwayLive: false,
     runwayTaps: 0,
     runwayGood: 0,
     runwayBeatT: 0,
+    magnetCooldown: 0,
+    lastTickSecond: -1,
   };
 
   const player = {
     x: 0,
     y: 1.6,
     z: 8,
-    speed: 5.4,
+    speed: 7.8,
     radius: 0.35,
   };
 
@@ -81,12 +90,72 @@
     };
   }
 
+  function hopProgress() {
+    if (!state.hop) return 0;
+    const s = state.hopSessionStart;
+    switch (state.hop.track) {
+      case "grabs":
+        return Math.max(0, state.hopGrabs - s.grabs);
+      case "stores":
+        return Math.max(0, state.hopStores - s.stores);
+      case "buys":
+        return Math.max(0, state.hopBuys - s.buys);
+      case "tryOns":
+        return Math.max(0, state.hopTryOns - s.tryOns);
+      case "combo":
+        return state.combo;
+      case "zara":
+        return Math.max(0, state.hopZara - s.zara);
+      default:
+        return 0;
+    }
+  }
+
   function setMission(mission) {
     state.mission = mission || fun.pickMission();
     renderMissionHud();
   }
 
+  function startHop(challenge) {
+    const hop = challenge || fun.pickHop(state.hop?.id);
+    state.hop = {
+      ...hop,
+      startedAt: performance.now(),
+      endsAt: performance.now() + hop.seconds * 1000,
+    };
+    state.hopSessionStart = {
+      stores: state.hopStores,
+      grabs: state.hopGrabs,
+      buys: state.hopBuys,
+      tryOns: state.hopTryOns,
+      zara: state.hopZara,
+    };
+    state.lastTickSecond = -1;
+    renderMissionHud();
+    fun.showChat(`Hot Hop: ${hop.title} — ${hop.seconds}s!!`);
+    fun.floatText("HOT HOP!");
+    fun.confetti(24);
+  }
+
   function renderMissionHud() {
+    const hop = state.hop;
+    const hud = document.getElementById("missionHud");
+    const timerEl = document.getElementById("hopTimer");
+    const starsEl = document.getElementById("hopStars");
+    if (hop) {
+      const leftMs = Math.max(0, hop.endsAt - performance.now());
+      const left = leftMs / 1000;
+      const val = Math.min(hop.goal, hopProgress());
+      document.getElementById("missionTitle").textContent = hop.title;
+      document.getElementById("missionDetail").textContent = hop.detail;
+      document.getElementById("missionProgress").textContent = `${val} / ${hop.goal}`;
+      document.getElementById("missionBar").style.width = `${(val / hop.goal) * 100}%`;
+      timerEl.textContent = `${Math.ceil(left)}s`;
+      const stars = fun.hopStars(left, hop.seconds);
+      starsEl.textContent = fun.starText(stars);
+      hud.classList.toggle("is-urgent", left <= 10);
+      return;
+    }
     if (!state.mission) return;
     const m = state.mission;
     const val = Math.min(m.goal, m.check(missionCtx()));
@@ -94,10 +163,62 @@
     document.getElementById("missionDetail").textContent = m.detail;
     document.getElementById("missionProgress").textContent = `${val} / ${m.goal}`;
     document.getElementById("missionBar").style.width = `${(val / m.goal) * 100}%`;
+    timerEl.textContent = "--";
+    starsEl.textContent = "★★★";
+    hud.classList.remove("is-urgent");
+  }
+
+  function showStarBurst(text) {
+    let el = document.getElementById("starBurst");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "starBurst";
+      el.className = "star-burst";
+      el.innerHTML = "<span></span>";
+      document.body.appendChild(el);
+    }
+    el.querySelector("span").textContent = text;
+    el.classList.remove("show");
+    void el.offsetWidth;
+    el.classList.add("show");
+    setTimeout(() => el.classList.remove("show"), 950);
+  }
+
+  function completeHop(success) {
+    if (!state.hop) return;
+    const hop = state.hop;
+    const left = Math.max(0, (hop.endsAt - performance.now()) / 1000);
+    state.hop = null;
+    document.getElementById("missionHud").classList.remove("is-urgent");
+    if (success) {
+      const stars = fun.hopStars(left, hop.seconds);
+      const bonus = hop.reward + stars * 40;
+      state.stylePoints += bonus;
+      document.getElementById("stylePoints").textContent = String(state.stylePoints);
+      fun.confetti(70);
+      fun.sfxMission();
+      fun.floatText(`${fun.starText(stars)} +${bonus}`);
+      showStarBurst(`${fun.starText(stars)} HOT HOP`);
+      fun.showChat(stars === 3 ? "THREE STARS?? Obsessed." : "Challenge cleared — keep hopping!");
+    } else {
+      fun.sfxFail();
+      fun.floatText("Time’s up!");
+      fun.showChat("Timer ate you. Smash New Challenge.");
+      toast("Hot Hop failed — tap New Challenge");
+    }
+    setMission(fun.pickMission());
+    startHop(fun.pickHop(hop.id));
+  }
+
+  function checkHopComplete() {
+    if (!state.hop) return;
+    renderMissionHud();
+    if (hopProgress() >= state.hop.goal) completeHop(true);
   }
 
   function checkMissionComplete() {
-    if (!state.mission) return;
+    checkHopComplete();
+    if (!state.mission || state.hop) return;
     const m = state.mission;
     const val = m.check(missionCtx());
     renderMissionHud();
@@ -122,6 +243,7 @@
       document.getElementById("stylePoints").textContent = String(state.stylePoints);
       fun.floatText(`Combo x${state.combo}! +${bonus}`);
     }
+    checkHopComplete();
   }
 
   // DOM
@@ -195,6 +317,76 @@
   }
   function modalOpen() {
     return [...document.querySelectorAll(".modal")].some((m) => !m.hidden) || !lookHint.hidden;
+  }
+
+  function hideShopPanel() {
+    const panel = document.getElementById("shopPanel");
+    if (panel) panel.hidden = true;
+  }
+
+  function renderShopPanel() {
+    const panel = document.getElementById("shopPanel");
+    if (!panel || !state.storeId) {
+      hideShopPanel();
+      return;
+    }
+    const store = storesById[state.storeId];
+    document.getElementById("shopPanelStore").textContent = store.name;
+    document.getElementById("shopPanelTitle").textContent = "Tap to grab — no hanger hunt";
+    const grid = document.getElementById("shopPanelGrid");
+    grid.innerHTML = store.items
+      .map((raw) => {
+        const item = itemsById[raw.id];
+        const owned = state.owned.has(item.id);
+        const held = state.inventory.includes(item.id);
+        const cls = owned ? "is-owned" : held ? "is-held" : "";
+        const status = owned ? "owned" : held ? "in bag pile" : "tap to grab";
+        return `<button type="button" class="shop-card ${cls}" data-shop-item="${item.id}">
+          <img src="${art.photoUrlForItem(item)}" alt="" loading="lazy" />
+          <strong>${item.name}</strong>
+          <span>${status}</span>
+        </button>`;
+      })
+      .join("");
+    panel.hidden = false;
+  }
+
+  function grabFeatured(count = 3) {
+    if (!state.storeId) return toast("Warp into a store first");
+    const store = storesById[state.storeId];
+    const available = store.items
+      .map((i) => i.id)
+      .filter((id) => !state.owned.has(id) && !state.inventory.includes(id));
+    if (!available.length) return toast("Nothing left to grab here");
+    const picks = available.sort(() => Math.random() - 0.5).slice(0, count);
+    picks.forEach((id) => addToInventory(id, { quiet: true }));
+    fun.confetti(30);
+    fun.floatText(`Grabbed ${picks.length}!`);
+    fun.showChat("Instant haul. Respect.");
+    renderShopPanel();
+  }
+
+  function renderDirectory() {
+    const grid = document.getElementById("directoryGrid");
+    if (!grid) return;
+    grid.innerHTML = data.stores
+      .map((store) => {
+        const done = state.purchasedStores.has(store.id) ? "bagged ✓" : "warp in";
+        return `<button type="button" class="directory-btn" data-warp="${store.id}" style="background:linear-gradient(135deg, ${store.color || "#ff4f9a"}, #4a2b3b)">
+          ${store.name}<small>${done}</small>
+        </button>`;
+      })
+      .join("");
+  }
+
+  function warpToStore(storeId) {
+    const store = storesById[storeId];
+    if (!store) return;
+    closeModal("directoryModal");
+    buildStore(storeId);
+    fun.sfxWarp();
+    fun.floatText(`Warped → ${store.name}`);
+    toast(`Warped to ${store.name}`);
   }
 
   function getTexture(url) {
@@ -303,6 +495,8 @@
 
   function buildHallway(floor) {
     clearWorld();
+    hideShopPanel();
+    state.storeId = null;
     scene.background = new THREE.Color("#f3c9e0");
     scene.fog = new THREE.Fog("#f3c9e0", 40, 75);
     addLights();
@@ -435,10 +629,13 @@
     scene.fog = new THREE.Fog("#ffe6f2", 20, 40);
     addLights();
     state.storeId = storeId;
-    state.storesEntered.add(storeId);
+    if (!state.storesEntered.has(storeId)) {
+      state.storesEntered.add(storeId);
+      state.hopStores += 1;
+    }
     state.stylePoints += 8;
     document.getElementById("stylePoints").textContent = String(state.stylePoints);
-    fun.showChat(`Okay we’re in ${store.name}. Grab the cutest thing.`);
+    fun.showChat(`Okay we’re in ${store.name}. Tap the shop panel — go fast.`);
     checkMissionComplete();
 
     // room shell
@@ -518,6 +715,7 @@
     state.yaw = Math.PI;
     state.pitch = 0;
     updateLocationBadge();
+    renderShopPanel();
     toast(`You walked into ${store.name}`);
   }
 
@@ -636,20 +834,35 @@
     openModal("inventoryModal");
   }
 
-  function addToInventory(itemId) {
-    if (state.owned.has(itemId)) return toast("Already purchased");
-    if (state.inventory.includes(itemId)) return toast("Already in Inventory");
-    if (state.inventory.length >= data.inventorySlots) return toast("Inventory full");
+  function addToInventory(itemId, opts = {}) {
+    if (state.owned.has(itemId)) {
+      if (!opts.quiet) toast("Already purchased");
+      return false;
+    }
+    if (state.inventory.includes(itemId)) {
+      if (!opts.quiet) toast("Already in Inventory");
+      return false;
+    }
+    if (state.inventory.length >= data.inventorySlots) {
+      if (!opts.quiet) toast("Inventory full");
+      return false;
+    }
     state.inventory.push(itemId);
+    state.hopGrabs += 1;
+    if (itemsById[itemId]?.storeId === "zara") state.hopZara += 1;
     state.stylePoints += 15;
     document.getElementById("stylePoints").textContent = String(state.stylePoints);
     bumpCombo();
     fun.sfxGrab();
-    fun.confetti(18);
-    fun.floatText("Cute find!");
-    toast(`Took ${itemsById[itemId].name}`);
-    if (Math.random() < 0.45) fun.showChat();
+    if (!opts.quiet) {
+      fun.confetti(18);
+      fun.floatText("Cute find!");
+      toast(`Took ${itemsById[itemId].name}`);
+      if (Math.random() < 0.45) fun.showChat();
+    }
+    if (state.storeId) renderShopPanel();
     checkMissionComplete();
+    return true;
   }
 
   function tryOn(itemId) {
@@ -657,6 +870,7 @@
     if (!item) return;
     state.equipped[item.slot] = itemId;
     state.tryOns += 1;
+    state.hopTryOns += 1;
     state.stylePoints += 10;
     document.getElementById("stylePoints").textContent = String(state.stylePoints);
     renderAvatar(document.getElementById("avatarStage"));
@@ -710,6 +924,7 @@
     checked.forEach((id) => state.owned.add(id));
     state.purchasedStores.add(store.id);
     state.purchases += 1;
+    state.hopBuys += 1;
     state.bags.push({ storeId: store.id, storeName: store.name, itemIds: [...checked], color: store.color });
     state.stylePoints += 40 + checked.length * 20;
     document.getElementById("stylePoints").textContent = String(state.stylePoints);
@@ -720,6 +935,7 @@
     fun.showChat("The bag is everything. Post that fit.");
     toast(`${store.name} cashier: here’s your shopping bag`);
     updateProgress();
+    if (state.storeId) renderShopPanel();
     checkMissionComplete();
   }
 
@@ -820,20 +1036,52 @@
 
   function doInteract() {
     const n = state.nearby;
-    if (!n) return;
+    if (!n) {
+      // Do = auto-grab nearest shelf item when inside a store
+      if (state.storeId) {
+        const store = storesById[state.storeId];
+        const next = store.items.find(
+          (i) => !state.owned.has(i.id) && !state.inventory.includes(i.id)
+        );
+        if (next) {
+          addToInventory(next.id);
+          return;
+        }
+      }
+      return;
+    }
     if (n.type === "door" && n.storeId) buildStore(n.storeId);
     else if (n.type === "exit") {
       state.storeId = null;
+      hideShopPanel();
       buildHallway(state.floor);
       toast("Back in the mall hallway");
     } else if (n.type === "elevator") {
       state.floor = n.nextFloor;
       state.storeId = null;
+      hideShopPanel();
       buildHallway(state.floor);
       toast(`Elevator → Level ${state.floor}`);
     } else if (n.type === "dressing") openDressingRoom();
     else if (n.type === "cashier") openCashier();
+    else if (n.type === "runway") openRunway();
     else if (n.type === "item") addToInventory(n.itemId);
+  }
+
+  function magnetGrab(dt) {
+    if (!state.storeId || modalOpen()) return;
+    state.magnetCooldown = Math.max(0, state.magnetCooldown - dt);
+    if (state.magnetCooldown > 0) return;
+    raycaster.setFromCamera(centerNDC, camera);
+    const hits = raycaster.intersectObjects(state.interactables, false);
+    if (!hits.length || hits[0].distance > 2.4) return;
+    const ud = hits[0].object.userData;
+    if (ud?.type !== "item") return;
+    if (state.owned.has(ud.itemId) || state.inventory.includes(ud.itemId)) return;
+    if (addToInventory(ud.itemId, { quiet: true })) {
+      fun.floatText("Auto-grab!");
+      state.magnetCooldown = 0.35;
+    }
   }
 
   function updateMovement(dt) {
@@ -852,19 +1100,73 @@
       mx /= len;
       mz /= len;
     }
+    const sprintMul = state.sprint ? 1.65 : 1;
+    const danceMul = state.danceT > 0 ? 1.15 : 1;
+    const speed = player.speed * sprintMul * danceMul;
     const sin = Math.sin(state.yaw);
     const cos = Math.cos(state.yaw);
-    const dx = (mx * cos + mz * sin) * player.speed * dt;
-    const dz = (-mx * sin + mz * cos) * player.speed * dt;
+    const dx = (mx * cos + mz * sin) * speed * dt;
+    const dz = (-mx * sin + mz * cos) * speed * dt;
     const nx = player.x + dx;
     const nz = player.z + dz;
     if (!blocked(nx, player.z)) player.x = nx;
     if (!blocked(player.x, nz)) player.z = nz;
 
-    camera.position.set(player.x, player.y, player.z);
+    // bob while dancing
+    const bob = state.danceT > 0 ? Math.sin(performance.now() / 90) * 0.05 : 0;
+    camera.position.set(player.x, player.y + bob, player.z);
     camera.rotation.order = "YXZ";
     camera.rotation.y = state.yaw;
     camera.rotation.x = state.pitch;
+  }
+
+  function openRunway() {
+    state.runwayLive = true;
+    state.runwayTaps = 0;
+    state.runwayGood = 0;
+    state.runwayBeatT = 0;
+    document.getElementById("runwayScoreText").textContent = "Score 0";
+    renderAvatar(document.getElementById("runwayAvatar"));
+    openModal("runwayModal");
+    fun.showChat("Hit the beat — don’t miss!");
+  }
+
+  function tapRunway() {
+    if (!state.runwayLive) return;
+    state.runwayTaps += 1;
+    // good if near pulse peaks (~0.7s cycle)
+    const phase = (performance.now() / 700) % 1;
+    if (phase < 0.22 || phase > 0.78) state.runwayGood += 1;
+    const score = Math.min(100, state.runwayGood * 12 + Object.values(state.equipped).filter(Boolean).length * 8);
+    document.getElementById("runwayScoreText").textContent = `Score ${score}`;
+    fun.sfxGrab();
+    const beat = document.getElementById("runwayBeat");
+    beat.style.transform = "scale(1.2)";
+    setTimeout(() => {
+      beat.style.transform = "";
+    }, 120);
+  }
+
+  function finishRunway() {
+    if (!state.runwayLive) {
+      closeModal("runwayModal");
+      return;
+    }
+    state.runwayLive = false;
+    state.runwayPlays += 1;
+    const filled = Object.values(state.equipped).filter(Boolean).length;
+    const score = Math.min(
+      100,
+      fun.runwayScore(filled) + Math.min(30, state.runwayGood * 6)
+    );
+    state.stylePoints += 80 + score;
+    document.getElementById("stylePoints").textContent = String(state.stylePoints);
+    fun.confetti(60);
+    fun.floatText(`Runway ${score}`);
+    fun.sfxMission();
+    fun.showChat(score >= 80 ? "RUNWAY LEGEND." : "Cute walk — try again for higher.");
+    closeModal("runwayModal");
+    checkMissionComplete();
   }
 
   function onLookMove(dx, dy) {
@@ -905,13 +1207,58 @@
   document.getElementById("btnStartLook").addEventListener("click", () => {
     lookHint.hidden = true;
     state.looking = true;
+    fun.ensureAudio();
+    fun.startMusic();
+    if (!state.hop) startHop();
   });
   document.getElementById("btnInventory").addEventListener("click", openInventory);
   document.getElementById("btnBags").addEventListener("click", () => {
     renderBags();
     openModal("bagsModal");
   });
+  document.getElementById("btnDirectory").addEventListener("click", () => {
+    renderDirectory();
+    openModal("directoryModal");
+  });
+  document.getElementById("btnHop").addEventListener("click", () => {
+    startHop(fun.pickHop(state.hop?.id));
+  });
+  document.getElementById("btnRunway").addEventListener("click", openRunway);
+  document.getElementById("btnRunwayFromFit")?.addEventListener("click", () => {
+    closeModal("fittingModal");
+    openRunway();
+  });
+  document.getElementById("btnRunwayTap")?.addEventListener("click", tapRunway);
+  document.getElementById("btnRunwayFinish")?.addEventListener("click", finishRunway);
   document.getElementById("btnInteract").addEventListener("click", doInteract);
+  document.getElementById("btnSprint")?.addEventListener("click", () => {
+    state.sprint = !state.sprint;
+    document.getElementById("btnSprint").classList.toggle("is-on", state.sprint);
+    toast(state.sprint ? "Sprint ON" : "Sprint off");
+  });
+  document.getElementById("btnDance")?.addEventListener("click", () => {
+    state.danceT = 3.5;
+    fun.confetti(20);
+    fun.floatText("Dance break!");
+    fun.showChat("Why are we dancing in the mall? Love that for us.");
+  });
+  document.getElementById("btnGrabFeatured")?.addEventListener("click", () => grabFeatured(3));
+  document.getElementById("btnShopDress")?.addEventListener("click", openDressingRoom);
+  document.getElementById("btnShopCashier")?.addEventListener("click", openCashier);
+  document.getElementById("btnShopExit")?.addEventListener("click", () => {
+    state.storeId = null;
+    hideShopPanel();
+    buildHallway(state.floor);
+    toast("Back in the mall hallway");
+  });
+  document.getElementById("shopPanelGrid")?.addEventListener("click", (e) => {
+    const card = e.target.closest("[data-shop-item]");
+    if (card) addToInventory(card.dataset.shopItem);
+  });
+  document.getElementById("directoryGrid")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-warp]");
+    if (btn) warpToStore(btn.dataset.warp);
+  });
   document.getElementById("btnClearOutfit").addEventListener("click", () => {
     state.equipped = { top: null, bottom: null, shoes: null, bag: null, accessory: null };
     renderAvatar(document.getElementById("avatarStage"));
@@ -925,7 +1272,7 @@
     if (slot) tryOn(slot.dataset.item);
   });
   document.getElementById("inventoryGrid").addEventListener("click", () => {
-    toast("Walk into a Dressing Room to try items on");
+    toast("Open Dressing from the shop panel or walk into a Dressing Room");
   });
   document.querySelectorAll("[data-close]").forEach((btn) => {
     btn.addEventListener("click", () => closeModal(btn.dataset.close));
@@ -980,11 +1327,41 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
+  function updateHopTimer() {
+    if (!state.hop) return;
+    const leftMs = state.hop.endsAt - performance.now();
+    const leftSec = Math.ceil(Math.max(0, leftMs) / 1000);
+    if (leftSec !== state.lastTickSecond) {
+      state.lastTickSecond = leftSec;
+      document.getElementById("hopTimer").textContent = `${leftSec}s`;
+      if (leftSec <= 8 && leftSec > 0) fun.sfxTick();
+      const stars = fun.hopStars(Math.max(0, leftMs / 1000), state.hop.seconds);
+      document.getElementById("hopStars").textContent = fun.starText(stars);
+      document.getElementById("missionHud").classList.toggle("is-urgent", leftSec <= 10);
+    }
+    if (leftMs <= 0) completeHop(false);
+  }
+
   function frame() {
     const dt = Math.min(0.033, clock.getDelta());
+    if (state.comboTimer > 0) {
+      state.comboTimer -= dt;
+      if (state.comboTimer <= 0) {
+        state.combo = 0;
+        document.getElementById("comboText").textContent = "x0";
+      }
+    }
+    if (state.danceT > 0) state.danceT -= dt;
+    state.chatTimer -= dt;
+    if (state.chatTimer <= 0) {
+      state.chatTimer = 9 + Math.random() * 8;
+      if (state.looking && Math.random() < 0.55) fun.showChat();
+    }
+    updateHopTimer();
     if (!modalOpen()) {
       updateMovement(dt);
       updateNearby();
+      magnetGrab(dt);
     }
     renderer.render(scene, camera);
     requestAnimationFrame(frame);
@@ -996,5 +1373,6 @@
   renderAvatar(document.getElementById("avatarStage"));
   renderEquippedList();
   updateProgress();
+  setMission(fun.pickMission());
   requestAnimationFrame(frame);
 })();

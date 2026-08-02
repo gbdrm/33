@@ -1,13 +1,13 @@
-// Juice layer: missions, chat, confetti, sounds, runway mini-game
+// Juice layer: timed Hot Hop challenges, missions, chat, confetti, sounds, runway
 window.MALL_FUN = (() => {
   const FRIEND_LINES = [
-    "Omg wait that is SO cute on you!!",
-    "Girl run to Sephora before it gets busy",
-    "Okay the vibe is elite today",
-    "If you buy that bag I need pics",
+    "GO GO GO the timer is screaming!!",
+    "Warp. Grab. Cashier. Slay.",
+    "That was actually chaotic in a cute way",
+    "Hot Hop queen behavior fr",
+    "Three stars or cry — pick one",
     "Main character energy unlocked",
-    "Slay. Literally. In the mall.",
-    "There’s a runway later — get cute fast",
+    "If you miss this challenge I’m blocking you (jk)",
     "Your style points are going crazy",
     "Cashier better give you a pretty bag",
     "I’d wear that to Berry Ave tbh",
@@ -19,7 +19,10 @@ window.MALL_FUN = (() => {
       title: "Pink Hunt",
       detail: "Grab 3 pink / rose items",
       goal: 3,
-      check: (ctx) => ctx.inventory.filter((id) => /pink|rose|blush|berry|peony|dragée|sakura|confetti|foam|mist/i.test(ctx.items[id]?.name || "")).length,
+      check: (ctx) =>
+        ctx.inventory.filter((id) =>
+          /pink|rose|blush|berry|peony|dragée|sakura|confetti|foam|mist/i.test(ctx.items[id]?.name || "")
+        ).length,
       reward: 120,
     },
     {
@@ -61,6 +64,63 @@ window.MALL_FUN = (() => {
       goal: 1,
       check: (ctx) => ctx.runwayPlays,
       reward: 200,
+    },
+  ];
+
+  const HOP_POOL = [
+    {
+      id: "grab5",
+      title: "Grab Frenzy",
+      detail: "Throw 5 items into inventory",
+      goal: 5,
+      seconds: 45,
+      track: "grabs",
+      reward: 180,
+    },
+    {
+      id: "twoStores",
+      title: "Store Hop",
+      detail: "Enter 2 stores before time’s up",
+      goal: 2,
+      seconds: 40,
+      track: "stores",
+      reward: 160,
+    },
+    {
+      id: "buy1",
+      title: "Checkout Rush",
+      detail: "Buy something at a cashier",
+      goal: 1,
+      seconds: 50,
+      track: "buys",
+      reward: 200,
+    },
+    {
+      id: "try2",
+      title: "Glow Timer",
+      detail: "Try on 2 looks in dressing",
+      goal: 2,
+      seconds: 55,
+      track: "tryOns",
+      reward: 150,
+    },
+    {
+      id: "combo",
+      title: "Combo Storm",
+      detail: "Reach combo x5",
+      goal: 5,
+      seconds: 35,
+      track: "combo",
+      reward: 170,
+    },
+    {
+      id: "zara",
+      title: "Zara Sprint",
+      detail: "Grab 2 items from Zara",
+      goal: 2,
+      seconds: 40,
+      track: "zara",
+      reward: 190,
     },
   ];
 
@@ -107,6 +167,17 @@ window.MALL_FUN = (() => {
   }
   function sfxChat() {
     beep(990, 0.05, "sine", 0.02);
+  }
+  function sfxWarp() {
+    beep(440, 0.06, "sawtooth", 0.02);
+    setTimeout(() => beep(880, 0.12, "sine", 0.035), 60);
+  }
+  function sfxTick() {
+    beep(1200, 0.03, "square", 0.015);
+  }
+  function sfxFail() {
+    beep(220, 0.18, "triangle", 0.04);
+    setTimeout(() => beep(160, 0.22, "triangle", 0.035), 120);
   }
 
   function startMusic() {
@@ -157,7 +228,8 @@ window.MALL_FUN = (() => {
     const box = document.getElementById("friendChat");
     if (!box) return;
     box.hidden = false;
-    box.querySelector(".friend-chat__text").textContent = line || FRIEND_LINES[Math.floor(Math.random() * FRIEND_LINES.length)];
+    box.querySelector(".friend-chat__text").textContent =
+      line || FRIEND_LINES[Math.floor(Math.random() * FRIEND_LINES.length)];
     sfxChat();
     clearTimeout(showChat._t);
     showChat._t = setTimeout(() => {
@@ -170,6 +242,22 @@ window.MALL_FUN = (() => {
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
+  function pickHop(excludeId) {
+    const pool = HOP_POOL.filter((h) => h.id !== excludeId);
+    return { ...pool[Math.floor(Math.random() * pool.length)] };
+  }
+
+  function hopStars(secondsLeft, totalSeconds) {
+    const ratio = secondsLeft / totalSeconds;
+    if (ratio >= 0.45) return 3;
+    if (ratio >= 0.2) return 2;
+    return 1;
+  }
+
+  function starText(n) {
+    return "★".repeat(n) + "☆".repeat(3 - n);
+  }
+
   function runwayScore(outfitSlotsFilled) {
     const base = 40 + outfitSlotsFilled * 12;
     const timing = 20 + Math.floor(Math.random() * 40);
@@ -179,7 +267,11 @@ window.MALL_FUN = (() => {
   return {
     FRIEND_LINES,
     MISSION_POOL,
+    HOP_POOL,
     pickMission,
+    pickHop,
+    hopStars,
+    starText,
     confetti,
     floatText,
     showChat,
@@ -188,6 +280,9 @@ window.MALL_FUN = (() => {
     sfxGrab,
     sfxBuy,
     sfxMission,
+    sfxWarp,
+    sfxTick,
+    sfxFail,
     runwayScore,
     ensureAudio,
   };

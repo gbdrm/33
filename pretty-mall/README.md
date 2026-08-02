@@ -1,10 +1,14 @@
-# Rose Quartz Mall
+# Rose Quartz Mall — Hot Hop
 
-Walk through a pretty 3-level mall with a Roblox-style avatar, **21 real stores**, hangers & mannequins, dressing rooms, and cashiers.
+First-person fancy mall shopping with timed **Hot Hop** challenges, warp directory, and instant shop panels.
 
 ## Play on iPad (Safari)
 
-https://htmlpreview.github.io/?https://raw.githubusercontent.com/gbdrm/33/cursor/pretty-mall-shopping-game-7cc5/pretty-mall/play.html
+Use the newest cache-bust file (v12):
+
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/gbdrm/33/cursor/pretty-mall-shopping-game-7cc5/pretty-mall/fp-v12.html
+
+Or `play-now.html` on the same branch.
 
 ## Play on computer
 
@@ -13,21 +17,24 @@ cd pretty-mall
 python3 -m http.server 8090
 ```
 
-Open `http://localhost:8090`.
+Open `http://localhost:8090` (modular) or `fp-v12.html` (all-in-one).
 
 ## Controls
 
-- **Move:** WASD / arrows · drag the on-screen stick on iPad
-- **Inventory button:** tap **Inventory** in the top bar anytime (or press `I`)
-- **Take item:** walk to a hanger/mannequin/shelf and tap it (or press `E` / **Do**)
-- **Try on:** walk into the **Dressing Room**
-- **Buy:** walk up to the **Cashier** (infinite money, get a shopping bag)
-- **Leave store:** walk onto the **EXIT** mat
-- **Change floor:** walk to the gold **ELEV** and interact
+- **Move:** WASD / arrows · on-screen stick on iPad
+- **Sprint / Dance:** right-side buttons
+- **Warp:** teleport straight to any store
+- **Shop panel:** tap items instantly inside a store (or **Grab 3 cute**)
+- **Do:** interact / auto-grab next cute item
+- **New Challenge:** start a fresh timed Hot Hop
+- **Runway:** tap-the-beat mini-game
+- **Dressing / Cashier:** from the shop panel buttons
 
-## Features
+## What’s in v12
 
-- Sephora + Nike + Zara + many fancy houses (Chanel, Dior, Hermès, Rolex, …)
-- 170 realistic catalog items (materials, product names, prices)
-- 80-slot inventory
-- Prize crown when you buy something in every store
+- Timed Hot Hop challenges with ★★★ ratings
+- Warp directory (no endless hallway trudging)
+- Instant shop grid + magnet auto-grab
+- Faster movement + sprint
+- Fancy boutiques + Zara
+- VIP prize set for shopping every store
