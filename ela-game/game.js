@@ -6,7 +6,7 @@ let gameState = {
     totalScore: 0,
     level: 1,
     questions: [],
-    totalQuestions: 10
+    totalQuestions: 30
 };
 
 // Game Data
