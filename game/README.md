@@ -1,6 +1,6 @@
-# 🔥 Phoenix Treasure Hunt ✨
+# 🏃‍♀️ Adventure Quest - Division Treasure Hunt ✨
 
-An actual FUN flying game for 3rd-6th graders! Fly a phoenix through the sky, collect falling stars, find treasure chests, and solve division problems to unlock them. Real gameplay with movement, animations, and particle effects!
+An actual FUN adventure game where you control a real adventurer character! Collect treasures by solving division problems - you MUST solve them (can't skip!), plus unlock awesome power-ups at 300, 600, 900+ point milestones!
 
 ## 🎮 Play Now
 
@@ -14,78 +14,121 @@ python3 -m http.server 8080
 
 Then visit `http://localhost:8080`.
 
-## 🔥 How to Play
+## 🎯 How to Play
 
 1. **Choose Your Grade** (3rd, 4th, 5th, or 6th) to set difficulty
-2. **Fly Your Phoenix** using:
+2. **Move Your Adventurer** using:
    - Arrow keys (← ↑ → ↓)
    - WASD keys
    - Mouse click/drag
    - Touch and drag (mobile/tablet)
-3. **Collect Falling Stars** ⭐ for 10 points each
-4. **Find Treasure Chests** 💎 that appear randomly
-5. **Solve Division Problems** to unlock chests for 50 bonus points
-6. **Build Streaks** by answering correctly
+3. **Touch Stars** ⭐ to trigger quick division problems (you MUST solve to collect!)
+4. **Find Treasure Chests** 💎 for bigger challenges and 50 bonus points
+5. **Reach Milestones** at 300, 600, 900+ points to unlock power-ups!
+6. **Use Power-ups** strategically to maximize your score
 
-## ✨ Why This is Actually Fun
+## ⭐ Key Features
 
-Unlike boring math drill software, this is a REAL GAME where:
-- You control a flying phoenix character
-- You chase and collect items
-- Math problems only appear when you find treasure (feels like a reward/unlock)
-- Beautiful particle effects and animations
-- Smooth movement and responsive controls
-- It feels like playing a game, not doing homework!
+### Math You Can't Skip!
+- **Forced Learning**: Every star triggers a division problem
+- **Must Solve**: Can't collect stars without answering correctly
+- **Quick Format**: 3 choices for stars, 4 for chests
+- **Immediate Feedback**: See correct answer if you're wrong
 
-## 🎯 Features
+### Real Adventurer Character
+- Hand-drawn animated character with:
+  - Walking legs with bounce animation
+  - Swinging arms
+  - Bobbing hair
+  - Face with eyes and smile
+  - Drop shadow
+- NOT just an emoji - actual character art!
+- Shows active power-up with glowing aura
 
-### Actual Gameplay
-- **Real-time Movement**: Smooth phoenix controls with physics
-- **Collision Detection**: Catch stars and find chests
-- **Particle Effects**: Explosions, trails, sparkles
-- **Dynamic Spawning**: Items appear randomly
-- **Score System**: Track stars, chests, streaks, and total score
+### 🏆 Milestone Power-ups
 
-### Educational Content
-- **Grade-Based Difficulty**:
-  - 3rd Grade: ÷2-8, numbers up to 80
-  - 4th Grade: ÷2-12, numbers up to 144
-  - 5th Grade: ÷3-15, numbers up to 180
-  - 6th Grade: ÷4-20, numbers up to 240
-- **Hundreds of Unique Problems**: Randomly generated
-- **Progressive Difficulty**: Gets harder as you play
-- **Immediate Feedback**: See correct answers when wrong
+Every 300 points unlocks a special reward:
 
-### Visual Design
-- Beautiful gradient sky background
-- Floating clouds
-- Fire trail behind phoenix
-- Particle explosions on collection
-- Smooth animations throughout
+| Points | Power-up | Effect | Duration |
+|--------|----------|--------|----------|
+| 300 | ⚡ Speed Boost | Move 2x faster | 20 sec |
+| 600 | 🧲 Star Magnet | Auto-attract stars | 15 sec |
+| 900 | 💰 Double Points | Earn 2x points | 15 sec |
+| 1200 | 🛡️ Shield | Invincibility | 20 sec |
+| 1500 | 🍀 Lucky Streak | Answer hints | 10 sec |
 
-## 🎨 Game Mechanics
+Power-ups rotate through the list as you keep earning milestones!
 
-- **Stars**: Fall from the sky at different speeds and sway side to side
-- **Chests**: Appear less frequently but give 5x more points
-- **Phoenix**: Leaves a fire trail and responds to your controls
-- **Math Challenges**: Pause the game and show multiple choice answers
-- **Streak System**: Track consecutive correct answers
+### Beautiful Gameplay
+- Floating clouds in background
+- Particle explosions when collecting items
+- Massive celebration effects at milestones (50 particles!)
+- Visual power-up timer bar
+- Smooth character animations
+- Gradient sky background
 
-## 🏆 Scoring
+## 📊 Scoring System
 
-- Collect a Star: +10 points
-- Unlock a Chest: +50 points
-- Build streaks for bragging rights!
+- **Star Collection**: 10 points (20 with Double Points power-up)
+- **Treasure Chest**: 50 points (100 with Double Points power-up)
+- **Milestone Bonus**: Power-up reward every 300 points
+- **Streak Tracking**: Build consecutive correct answers
+
+## 🎓 Educational Value
+
+### Grade-Based Difficulty
+- **3rd Grade**: ÷2-8, numbers up to 80 (easier)
+- **4th Grade**: ÷2-12, numbers up to 144 (medium)
+- **5th Grade**: ÷3-15, numbers up to 180 (advanced)
+- **6th Grade**: ÷4-20, numbers up to 240 (expert)
+
+### Learning Benefits
+- **Mandatory Practice**: Can't skip problems
+- **Fast-Paced**: Quick 3-choice format keeps engagement high
+- **Positive Reinforcement**: Celebrate with power-ups and effects
+- **Progressive Difficulty**: Problems get harder as you advance
+- **Immediate Feedback**: Learn from mistakes right away
+- **Goal-Oriented**: Clear milestones to work toward
+
+## 🎨 Why This Works
+
+Traditional math drill software is boring because:
+- ❌ Just problem after problem
+- ❌ No gameplay elements
+- ❌ Easy to skip or quit
+- ❌ No rewards or progression
+
+This game is engaging because:
+- ✅ Real character you control
+- ✅ Math is part of collecting treasures
+- ✅ Can't skip - must solve to progress
+- ✅ Exciting power-up rewards
+- ✅ Beautiful animations and effects
+- ✅ Clear goals and milestones
+
+Kids actually WANT to play this to unlock the next power-up!
 
 ## 📱 Device Support
 
 - **Desktop**: Full keyboard and mouse support
-- **Tablets**: Touch controls work perfectly
-- **Phones**: Responsive canvas adapts to screen size
-- **All Browsers**: Modern HTML5 Canvas support
+- **Tablets**: Touch controls optimized
+- **Phones**: Responsive design adapts
+- **All Browsers**: Modern HTML5 Canvas
 
-Perfect for making division practice something kids actually want to play! 🎮🔥
+## 🚀 Technical Features
+
+- Custom character rendering with animation
+- Real-time collision detection
+- Power-up system with visual timers
+- Milestone tracking and rewards
+- Particle effect system
+- Modal-based problem challenges
+- Grade-adaptive difficulty
+- Score multipliers
+- Smooth 60 FPS gameplay
+
+Perfect for making division practice actually fun and unavoidable! 🎮✨
 
 ---
 
-Built with pure JavaScript, HTML5 Canvas, and CSS - no external libraries required!
+Built with pure JavaScript, HTML5 Canvas, and CSS3 - no external libraries!
