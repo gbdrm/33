@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ Star Quest Division 🌟</title>
+    <title>🔥 Phoenix Treasure Hunt ✨</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,165 +16,121 @@
         <!-- Grade Selection Screen -->
         <div id="gradeScreen" class="screen active">
             <div class="title-box">
-                <h1 class="game-title">✨ Star Quest Division 🌟</h1>
-                <p class="subtitle">Choose your grade level to start!</p>
+                <h1 class="game-title">🔥 Phoenix Treasure Hunt ✨</h1>
+                <p class="subtitle">Fly your phoenix, collect treasures, and unlock magical chests!</p>
             </div>
             
             <div class="grade-selection">
                 <button class="grade-btn" data-grade="3">
                     <span class="grade-number">3rd</span>
                     <span class="grade-label">Grade</span>
-                    <span class="grade-info">Easy Division</span>
+                    <span class="grade-info">Easy Flight</span>
                 </button>
                 <button class="grade-btn" data-grade="4">
                     <span class="grade-number">4th</span>
                     <span class="grade-label">Grade</span>
-                    <span class="grade-info">Medium Challenge</span>
+                    <span class="grade-info">Medium Flight</span>
                 </button>
                 <button class="grade-btn" data-grade="5">
                     <span class="grade-number">5th</span>
                     <span class="grade-label">Grade</span>
-                    <span class="grade-info">Advanced Math</span>
+                    <span class="grade-info">Advanced Flight</span>
                 </button>
                 <button class="grade-btn" data-grade="6">
                     <span class="grade-number">6th</span>
                     <span class="grade-label">Grade</span>
-                    <span class="grade-info">Expert Level</span>
+                    <span class="grade-info">Expert Flight</span>
                 </button>
             </div>
 
-            <div class="unicorn-animation">
-                <div class="unicorn">🦄</div>
-                <div class="floating-stars">
-                    <span class="star">⭐</span>
-                    <span class="star">✨</span>
-                    <span class="star">💫</span>
-                    <span class="star">🌟</span>
-                </div>
+            <div class="instructions">
+                <h3>🎮 How to Play:</h3>
+                <ul>
+                    <li>🔥 <strong>Move your phoenix</strong> with arrow keys or mouse/touch</li>
+                    <li>⭐ <strong>Collect stars</strong> as you fly through the magical sky</li>
+                    <li>💎 <strong>Find treasure chests</strong> that appear on screen</li>
+                    <li>🔢 <strong>Solve division problems</strong> to unlock the chests</li>
+                    <li>🏆 <strong>Keep your combo alive</strong> and collect treasures!</li>
+                </ul>
             </div>
         </div>
 
-        <!-- Start Screen -->
-        <div id="startScreen" class="screen">
-            <div class="title-box">
-                <h1 class="game-title">✨ Star Quest Division 🌟</h1>
-                <p class="subtitle">Collect magical stars and power up your skills with division challenges!</p>
-                <p class="grade-selected">Selected: <span id="selectedGrade">4th</span> Grade</p>
-            </div>
-            <div class="unicorn-animation">
-                <div class="unicorn">🦄</div>
-                <div class="floating-stars">
-                    <span class="star">⭐</span>
-                    <span class="star">✨</span>
-                    <span class="star">💫</span>
-                    <span class="star">🌟</span>
-                </div>
-            </div>
-            <button id="startBtn" class="btn btn-large">Start Adventure! 🎀</button>
-            <button id="changeGradeBtn" class="btn-secondary">Change Grade</button>
-        </div>
-
-        <!-- Game Screen -->
+        <!-- Game Play Screen -->
         <div id="gameScreen" class="screen">
-            <div class="header">
-                <div class="score-container">
-                    <div class="score-item">
-                        <span class="label">⭐ Stars:</span>
-                        <span id="score" class="value">0</span>
-                    </div>
-                    <div class="score-item">
-                        <span class="label">🎯 Level:</span>
-                        <span id="level" class="value">1</span>
-                    </div>
-                    <div class="score-item">
-                        <span class="label">🔥 Streak:</span>
-                        <span id="streak" class="value">0</span>
-                    </div>
+            <div class="game-header">
+                <div class="stat-display">
+                    <span class="stat-icon">⭐</span>
+                    <span id="starsCollected">0</span>
+                </div>
+                <div class="stat-display">
+                    <span class="stat-icon">💎</span>
+                    <span id="chestsOpened">0</span>
+                </div>
+                <div class="stat-display">
+                    <span class="stat-icon">🔥</span>
+                    <span id="streak">0</span>
+                </div>
+                <div class="stat-display">
+                    <span class="stat-icon">🏆</span>
+                    <span id="totalScore">0</span>
                 </div>
             </div>
 
-            <div class="game-content">
-                <div class="unicorn-character">
-                    <div class="unicorn-large">🦄</div>
-                    <div class="speech-bubble" id="speechBubble">Let's solve some problems!</div>
-                </div>
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
 
-                <div class="question-card">
-                    <div class="question-header">✨ Division Problem ✨</div>
-                    <div id="question" class="question-text">12 ÷ 3 = ?</div>
-                    
-                    <div class="answer-buttons" id="answerButtons">
-                        <button class="answer-btn" data-answer="0">4</button>
-                        <button class="answer-btn" data-answer="1">6</button>
-                        <button class="answer-btn" data-answer="2">8</button>
-                        <button class="answer-btn" data-answer="3">3</button>
-                    </div>
-                </div>
-
-                <div class="progress-bar-container">
-                    <div class="progress-label">Problems in this level: <span id="problemsCompleted">0</span>/5</div>
-                    <div class="progress-bar">
-                        <div id="progressFill" class="progress-fill"></div>
-                    </div>
-                </div>
+            <div class="game-controls">
+                <p>Use ← → ↑ ↓ Arrow Keys or Click/Touch to Move!</p>
             </div>
         </div>
 
-        <!-- Bonus Challenge Screen -->
-        <div id="bonusChallengeScreen" class="screen">
-            <div class="bonus-content">
-                <div class="bonus-header">
-                    <h2 class="bonus-title">🔥 BONUS CHALLENGE! 🔥</h2>
-                    <p class="bonus-subtitle">You're on fire with a <span id="bonusStreak">5</span> streak!</p>
-                    <p class="bonus-description">Type your answer to earn DOUBLE points!</p>
+        <!-- Chest Unlock Modal -->
+        <div id="chestModal" class="modal">
+            <div class="modal-content chest-content">
+                <div class="chest-animation">
+                    <div class="big-chest">💎</div>
+                    <div class="sparkle-ring">✨✨✨</div>
                 </div>
-
-                <div class="bonus-unicorn">
-                    <div class="unicorn-excited">🦄✨</div>
-                </div>
-
-                <div class="bonus-question-card">
-                    <div class="question-header">💎 Expert Challenge 💎</div>
-                    <div id="bonusQuestion" class="question-text">48 ÷ 6 = ?</div>
+                <h2 class="modal-title">Treasure Chest Found!</h2>
+                <p class="modal-subtitle">Solve this division problem to unlock it:</p>
+                
+                <div class="chest-question">
+                    <div id="chestProblem" class="chest-problem-text">24 ÷ 6 = ?</div>
                     
-                    <div class="input-container">
-                        <input 
-                            type="number" 
-                            id="answerInput" 
-                            class="answer-input" 
-                            placeholder="Type answer..."
-                            autocomplete="off"
-                        >
-                        <button id="submitAnswerBtn" class="btn submit-btn">Submit! ✨</button>
+                    <div class="chest-answers" id="chestAnswers">
+                        <button class="chest-answer-btn">4</button>
+                        <button class="chest-answer-btn">6</button>
+                        <button class="chest-answer-btn">8</button>
+                        <button class="chest-answer-btn">3</button>
                     </div>
-                    <div id="bonusFeedback" class="bonus-feedback"></div>
                 </div>
 
-                <button id="skipBonusBtn" class="btn-skip">Skip Challenge</button>
+                <div id="chestFeedback" class="chest-feedback"></div>
             </div>
         </div>
 
-        <!-- Level Complete Screen -->
-        <div id="levelCompleteScreen" class="screen">
-            <div class="celebration">
-                <h2 class="celebration-title">🎉 Level Complete! 🎉</h2>
-                <div class="stars-earned">
-                    <div class="big-star">⭐</div>
-                    <div class="big-star">⭐</div>
-                    <div class="big-star">⭐</div>
-                </div>
-                <p class="celebration-message" id="levelMessage">Amazing work!</p>
-                <div class="stats">
-                    <div class="stat-item">
-                        <span class="stat-label">Total Stars:</span>
-                        <span id="totalStars" class="stat-value">0</span>
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen">
+            <div class="game-over-content">
+                <h1 class="game-over-title">🌟 Great Flying! 🌟</h1>
+                <div class="final-stats">
+                    <div class="final-stat">
+                        <span class="final-stat-icon">⭐</span>
+                        <span class="final-stat-label">Stars Collected:</span>
+                        <span id="finalStars" class="final-stat-value">0</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Current Streak:</span>
-                        <span id="currentStreak" class="stat-value">0</span>
+                    <div class="final-stat">
+                        <span class="final-stat-icon">💎</span>
+                        <span class="final-stat-label">Chests Opened:</span>
+                        <span id="finalChests" class="final-stat-value">0</span>
+                    </div>
+                    <div class="final-stat">
+                        <span class="final-stat-icon">🏆</span>
+                        <span class="final-stat-label">Total Score:</span>
+                        <span id="finalScore" class="final-stat-value">0</span>
                     </div>
                 </div>
-                <button id="nextLevelBtn" class="btn btn-large">Next Level! 💖</button>
+                <button id="playAgainBtn" class="btn btn-large">Play Again! 🎮</button>
+                <button id="changeGradeBtn2" class="btn-secondary">Change Grade</button>
             </div>
         </div>
     </div>

@@ -1,449 +1,585 @@
-// Game State
-let gameState = {
-    score: 0,
-    level: 1,
-    streak: 0,
-    problemsInLevel: 0,
-    problemsPerLevel: 5,
-    currentProblem: null,
-    correctAnswer: null,
-    bonusChallengeActive: false,
-    bonusChallengesCompleted: 0,
-    selectedGrade: 4,
-    streakNeededForBonus: 5
+// Game Configuration
+const gradeConfigs = {
+    3: { ranges: [{ min: 2, max: 4, dividendMax: 40 }, { min: 2, max: 5, dividendMax: 50 }, { min: 2, max: 6, dividendMax: 60 }, { min: 2, max: 8, dividendMax: 80 }] },
+    4: { ranges: [{ min: 2, max: 5, dividendMax: 50 }, { min: 2, max: 8, dividendMax: 72 }, { min: 2, max: 10, dividendMax: 90 }, { min: 2, max: 12, dividendMax: 144 }] },
+    5: { ranges: [{ min: 3, max: 8, dividendMax: 80 }, { min: 3, max: 10, dividendMax: 100 }, { min: 3, max: 12, dividendMax: 144 }, { min: 2, max: 15, dividendMax: 180 }] },
+    6: { ranges: [{ min: 4, max: 10, dividendMax: 100 }, { min: 4, max: 12, dividendMax: 144 }, { min: 3, max: 15, dividendMax: 180 }, { min: 3, max: 20, dividendMax: 240 }] }
 };
 
-// Division problems for different grade levels
-const gradeConfigs = {
-    3: {
-        ranges: [
-            { min: 2, max: 4, dividendMax: 40 },
-            { min: 2, max: 5, dividendMax: 50 },
-            { min: 2, max: 6, dividendMax: 60 },
-            { min: 2, max: 8, dividendMax: 80 }
-        ]
-    },
-    4: {
-        ranges: [
-            { min: 2, max: 5, dividendMax: 50 },
-            { min: 2, max: 8, dividendMax: 72 },
-            { min: 2, max: 10, dividendMax: 90 },
-            { min: 2, max: 12, dividendMax: 144 }
-        ]
-    },
-    5: {
-        ranges: [
-            { min: 3, max: 8, dividendMax: 80 },
-            { min: 3, max: 10, dividendMax: 100 },
-            { min: 3, max: 12, dividendMax: 144 },
-            { min: 2, max: 15, dividendMax: 180 }
-        ]
-    },
-    6: {
-        ranges: [
-            { min: 4, max: 10, dividendMax: 100 },
-            { min: 4, max: 12, dividendMax: 144 },
-            { min: 3, max: 15, dividendMax: 180 },
-            { min: 3, max: 20, dividendMax: 240 }
-        ]
-    }
+// Game State
+let game = {
+    selectedGrade: 4,
+    score: 0,
+    starsCollected: 0,
+    chestsOpened: 0,
+    streak: 0,
+    level: 0,
+    paused: false,
+    gameOver: false,
+    canvas: null,
+    ctx: null,
+    phoenix: null,
+    stars: [],
+    chests: [],
+    obstacles: [],
+    currentChest: null,
+    keys: {},
+    mouse: { x: 0, y: 0, down: false },
+    particles: [],
+    cloudParticles: []
 };
 
 // DOM Elements
 const gradeScreen = document.getElementById('gradeScreen');
-const startScreen = document.getElementById('startScreen');
 const gameScreen = document.getElementById('gameScreen');
-const bonusChallengeScreen = document.getElementById('bonusChallengeScreen');
-const levelCompleteScreen = document.getElementById('levelCompleteScreen');
-const startBtn = document.getElementById('startBtn');
-const changeGradeBtn = document.getElementById('changeGradeBtn');
-const nextLevelBtn = document.getElementById('nextLevelBtn');
-const submitAnswerBtn = document.getElementById('submitAnswerBtn');
-const skipBonusBtn = document.getElementById('skipBonusBtn');
+const gameOverScreen = document.getElementById('gameOverScreen');
+const chestModal = document.getElementById('chestModal');
 
-const scoreEl = document.getElementById('score');
-const levelEl = document.getElementById('level');
+const starsCollectedEl = document.getElementById('starsCollected');
+const chestsOpenedEl = document.getElementById('chestsOpened');
 const streakEl = document.getElementById('streak');
-const questionEl = document.getElementById('question');
-const answerButtonsEl = document.getElementById('answerButtons');
-const speechBubbleEl = document.getElementById('speechBubble');
-const progressFillEl = document.getElementById('progressFill');
-const problemsCompletedEl = document.getElementById('problemsCompleted');
-const totalStarsEl = document.getElementById('totalStars');
-const currentStreakEl = document.getElementById('currentStreak');
-const levelMessageEl = document.getElementById('levelMessage');
-const selectedGradeEl = document.getElementById('selectedGrade');
+const totalScoreEl = document.getElementById('totalScore');
 
-const bonusQuestionEl = document.getElementById('bonusQuestion');
-const answerInputEl = document.getElementById('answerInput');
-const bonusFeedbackEl = document.getElementById('bonusFeedback');
-const bonusStreakEl = document.getElementById('bonusStreak');
+const chestProblemEl = document.getElementById('chestProblem');
+const chestAnswersEl = document.getElementById('chestAnswers');
+const chestFeedbackEl = document.getElementById('chestFeedback');
+
+const finalStarsEl = document.getElementById('finalStars');
+const finalChestsEl = document.getElementById('finalChests');
+const finalScoreEl = document.getElementById('finalScore');
 
 // Event Listeners
-startBtn.addEventListener('click', startGame);
-changeGradeBtn.addEventListener('click', () => {
-    startScreen.classList.remove('active');
+document.querySelectorAll('.grade-btn').forEach(btn => {
+    btn.addEventListener('click', () => startGame(parseInt(btn.dataset.grade)));
+});
+
+document.getElementById('playAgainBtn').addEventListener('click', () => {
+    gameOverScreen.classList.remove('active');
     gradeScreen.classList.add('active');
 });
-nextLevelBtn.addEventListener('click', nextLevel);
-submitAnswerBtn.addEventListener('click', submitBonusAnswer);
-skipBonusBtn.addEventListener('click', skipBonusChallenge);
 
-// Grade selection buttons
-document.querySelectorAll('.grade-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const grade = parseInt(btn.dataset.grade);
-        selectGrade(grade);
-    });
+document.getElementById('changeGradeBtn2').addEventListener('click', () => {
+    gameOverScreen.classList.remove('active');
+    gradeScreen.classList.add('active');
 });
 
-// Allow Enter key to submit answer
-answerInputEl.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        submitBonusAnswer();
+// Phoenix Class
+class Phoenix {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.width = 60;
+        this.height = 60;
+        this.speed = 5;
+        this.vx = 0;
+        this.vy = 0;
+        this.trail = [];
     }
-});
 
-// Select grade level
-function selectGrade(grade) {
-    gameState.selectedGrade = grade;
-    selectedGradeEl.textContent = `${grade}th`;
-    gradeScreen.classList.remove('active');
-    startScreen.classList.add('active');
+    update() {
+        // Keyboard controls
+        if (game.keys['ArrowLeft'] || game.keys['a']) this.vx = -this.speed;
+        else if (game.keys['ArrowRight'] || game.keys['d']) this.vx = this.speed;
+        else this.vx *= 0.9;
+
+        if (game.keys['ArrowUp'] || game.keys['w']) this.vy = -this.speed;
+        else if (game.keys['ArrowDown'] || game.keys['s']) this.vy = this.speed;
+        else this.vy *= 0.9;
+
+        // Mouse/Touch controls
+        if (game.mouse.down) {
+            const dx = game.mouse.x - this.x;
+            const dy = game.mouse.y - this.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance > 20) {
+                this.vx = (dx / distance) * this.speed;
+                this.vy = (dy / distance) * this.speed;
+            }
+        }
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Boundaries
+        if (this.x < 0) this.x = 0;
+        if (this.x > game.canvas.width - this.width) this.x = game.canvas.width - this.width;
+        if (this.y < 0) this.y = 0;
+        if (this.y > game.canvas.height - this.height) this.y = game.canvas.height - this.height;
+
+        // Trail effect
+        this.trail.push({ x: this.x + this.width / 2, y: this.y + this.height / 2, life: 20 });
+        this.trail = this.trail.filter(t => t.life-- > 0);
+    }
+
+    draw() {
+        const ctx = game.ctx;
+        
+        // Draw trail
+        this.trail.forEach((t, i) => {
+            const alpha = t.life / 20;
+            ctx.fillStyle = `rgba(255, ${150 + i * 5}, 0, ${alpha * 0.5})`;
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // Draw phoenix
+        ctx.font = `${this.width}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🔥', this.x + this.width / 2, this.y + this.height / 2);
+    }
+
+    getBounds() {
+        return {
+            x: this.x + 10,
+            y: this.y + 10,
+            width: this.width - 20,
+            height: this.height - 20
+        };
+    }
 }
 
-// Generate a division problem
+// Star Class
+class Star {
+    constructor() {
+        this.x = Math.random() * game.canvas.width;
+        this.y = -30;
+        this.width = 30;
+        this.height = 30;
+        this.speed = 1 + Math.random() * 2;
+        this.sway = Math.random() * 2 - 1;
+        this.collected = false;
+    }
+
+    update() {
+        this.y += this.speed;
+        this.x += this.sway;
+    }
+
+    draw() {
+        const ctx = game.ctx;
+        ctx.font = `${this.width}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText('⭐', this.x, this.y);
+    }
+
+    getBounds() {
+        return {
+            x: this.x - this.width / 2,
+            y: this.y - this.height / 2,
+            width: this.width,
+            height: this.height
+        };
+    }
+}
+
+// Chest Class
+class Chest {
+    constructor() {
+        this.x = Math.random() * (game.canvas.width - 60);
+        this.y = -50;
+        this.width = 50;
+        this.height = 50;
+        this.speed = 1.5;
+        this.collected = false;
+    }
+
+    update() {
+        this.y += this.speed;
+    }
+
+    draw() {
+        const ctx = game.ctx;
+        ctx.font = `${this.width}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText('💎', this.x + this.width / 2, this.y + this.height / 2);
+        
+        // Sparkle effect
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+        ctx.beginPath();
+        ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2 + 5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    getBounds() {
+        return {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height
+        };
+    }
+}
+
+// Cloud Particle Class
+class Cloud {
+    constructor() {
+        this.x = Math.random() * game.canvas.width;
+        this.y = Math.random() * game.canvas.height;
+        this.size = 20 + Math.random() * 30;
+        this.speed = 0.2 + Math.random() * 0.5;
+        this.opacity = 0.3 + Math.random() * 0.3;
+    }
+
+    update() {
+        this.x += this.speed;
+        if (this.x > game.canvas.width + this.size) {
+            this.x = -this.size;
+            this.y = Math.random() * game.canvas.height;
+        }
+    }
+
+    draw() {
+        const ctx = game.ctx;
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.arc(this.x + this.size / 2, this.y - this.size / 3, this.size * 0.7, 0, Math.PI * 2);
+        ctx.arc(this.x + this.size, this.y, this.size * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+// Collision Detection
+function checkCollision(a, b) {
+    return a.x < b.x + b.width &&
+           a.x + a.width > b.x &&
+           a.y < b.y + b.height &&
+           a.y + a.height > b.y;
+}
+
+// Generate Division Problem
 function generateProblem() {
-    const gradeConfig = gradeConfigs[gameState.selectedGrade];
-    const levelIndex = Math.min(gameState.level - 1, gradeConfig.ranges.length - 1);
+    const gradeConfig = gradeConfigs[game.selectedGrade];
+    const levelIndex = Math.min(game.level, gradeConfig.ranges.length - 1);
     const range = gradeConfig.ranges[levelIndex];
     
-    // Pick a random divisor
     const divisor = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
-    
-    // Pick a random quotient that makes sense
     const maxQuotient = Math.floor(range.dividendMax / divisor);
     const quotient = Math.floor(Math.random() * maxQuotient) + 1;
-    
-    // Calculate dividend
     const dividend = divisor * quotient;
-    
-    gameState.currentProblem = { dividend, divisor };
-    gameState.correctAnswer = quotient;
     
     return { dividend, divisor, answer: quotient };
 }
 
-// Generate wrong answers that are close but not correct
-function generateWrongAnswers(correctAnswer) {
-    const wrong = new Set();
+// Show Chest Modal
+function showChestModal(chest) {
+    game.paused = true;
+    game.currentChest = chest;
     
-    // Add answers that are off by 1-3
+    const problem = generateProblem();
+    game.currentAnswer = problem.answer;
+    
+    chestProblemEl.textContent = `${problem.dividend} ÷ ${problem.divisor} = ?`;
+    
+    // Generate wrong answers
+    const wrongAnswers = new Set();
     const offsets = [-3, -2, -1, 1, 2, 3];
-    
-    while (wrong.size < 3) {
+    while (wrongAnswers.size < 3) {
         const offset = offsets[Math.floor(Math.random() * offsets.length)];
-        const wrongAnswer = correctAnswer + offset;
-        
-        if (wrongAnswer > 0 && wrongAnswer !== correctAnswer) {
-            wrong.add(wrongAnswer);
+        const wrong = problem.answer + offset;
+        if (wrong > 0 && wrong !== problem.answer) {
+            wrongAnswers.add(wrong);
         }
     }
     
-    return Array.from(wrong);
-}
-
-// Display a new problem
-function displayProblem() {
-    const problem = generateProblem();
-    questionEl.textContent = `${problem.dividend} ÷ ${problem.divisor} = ?`;
-    
-    // Generate answer options
-    const wrongAnswers = generateWrongAnswers(problem.answer);
-    const allAnswers = [problem.answer, ...wrongAnswers];
-    
-    // Shuffle answers
+    const allAnswers = [problem.answer, ...Array.from(wrongAnswers)];
     allAnswers.sort(() => Math.random() - 0.5);
     
-    // Clear previous buttons
-    answerButtonsEl.innerHTML = '';
-    
-    // Create answer buttons
+    chestAnswersEl.innerHTML = '';
     allAnswers.forEach(answer => {
         const btn = document.createElement('button');
-        btn.className = 'answer-btn';
+        btn.className = 'chest-answer-btn';
         btn.textContent = answer;
-        btn.addEventListener('click', () => checkAnswer(answer, btn));
-        answerButtonsEl.appendChild(btn);
+        btn.onclick = () => checkChestAnswer(answer, btn);
+        chestAnswersEl.appendChild(btn);
     });
     
-    updateProgress();
+    chestFeedbackEl.textContent = '';
+    chestModal.classList.add('active');
 }
 
-// Check if answer is correct
-function checkAnswer(selectedAnswer, btn) {
-    const buttons = document.querySelectorAll('.answer-btn');
-    
-    // Disable all buttons
+// Check Chest Answer
+function checkChestAnswer(answer, btn) {
+    const buttons = chestAnswersEl.querySelectorAll('.chest-answer-btn');
     buttons.forEach(b => b.style.pointerEvents = 'none');
     
-    if (selectedAnswer === gameState.correctAnswer) {
-        // Correct answer
+    if (answer === game.currentAnswer) {
         btn.classList.add('correct');
-        gameState.score += 10;
-        gameState.streak++;
-        gameState.problemsInLevel++;
+        chestFeedbackEl.textContent = '🎉 Correct! Treasure unlocked! 🎉';
+        chestFeedbackEl.style.color = '#4caf50';
         
-        // Bonus points for streak
-        if (gameState.streak >= 3) {
-            gameState.score += gameState.streak * 2;
-        }
+        game.chestsOpened++;
+        game.score += 50;
+        game.streak++;
+        game.currentChest.collected = true;
         
-        updateScore();
-        showFeedback(true);
-        createParticles(true);
+        createParticleExplosion(game.currentChest.x + 25, game.currentChest.y + 25, '💎');
         
         setTimeout(() => {
-            // Check if streak qualifies for bonus challenge
-            if (gameState.streak >= gameState.streakNeededForBonus && gameState.streak % gameState.streakNeededForBonus === 0) {
-                showBonusChallenge();
-            } else if (gameState.problemsInLevel >= gameState.problemsPerLevel) {
-                showLevelComplete();
-            } else {
-                displayProblem();
-            }
+            closeChestModal();
         }, 1500);
     } else {
-        // Wrong answer
         btn.classList.add('incorrect');
-        gameState.streak = 0;
+        chestFeedbackEl.textContent = `Oops! The answer was ${game.currentAnswer}`;
+        chestFeedbackEl.style.color = '#f44336';
+        game.streak = 0;
         
-        // Highlight correct answer
         buttons.forEach(b => {
-            if (parseInt(b.textContent) === gameState.correctAnswer) {
+            if (parseInt(b.textContent) === game.currentAnswer) {
                 b.classList.add('correct');
             }
         });
         
-        updateScore();
-        showFeedback(false);
-        
         setTimeout(() => {
-            displayProblem();
+            closeChestModal();
         }, 2000);
+    }
+    
+    updateUI();
+}
+
+// Close Chest Modal
+function closeChestModal() {
+    chestModal.classList.remove('active');
+    game.paused = false;
+    if (game.currentChest) {
+        game.chests = game.chests.filter(c => c !== game.currentChest);
+        game.currentChest = null;
     }
 }
 
-// Show feedback in speech bubble
-function showFeedback(isCorrect) {
-    const correctMessages = [
-        "Amazing! You're a star! ⭐",
-        "Perfect! Keep it up! 🌟",
-        "Brilliant work! 💫",
-        "You're on fire! 🔥",
-        "Spectacular! ✨",
-        "Fantastic job! 🎯"
-    ];
-    
-    const incorrectMessages = [
-        "Oops! Try again! 💪",
-        "Don't worry, you've got this! 🌈",
-        "Keep practicing! You're learning! 📚",
-        "Almost there! Try the next one! 💜"
-    ];
-    
-    const messages = isCorrect ? correctMessages : incorrectMessages;
-    const message = messages[Math.floor(Math.random() * messages.length)];
-    
-    speechBubbleEl.textContent = message;
-    speechBubbleEl.style.animation = 'none';
-    setTimeout(() => {
-        speechBubbleEl.style.animation = 'pulse 0.5s ease';
-    }, 10);
-}
-
-// Create particle effects
-function createParticles(isCorrect) {
-    const particlesContainer = document.getElementById('particles');
-    const colors = isCorrect ? ['#f093fb', '#f5576c', '#feca57', '#48dbfb'] : ['#ff6b6b'];
-    const symbols = isCorrect ? ['⭐', '✨', '💫', '🌟'] : ['💔'];
-    
+// Create Particle Explosion
+function createParticleExplosion(x, y, emoji) {
     for (let i = 0; i < 15; i++) {
-        const particle = document.createElement('div');
-        particle.style.position = 'fixed';
-        particle.style.left = '50%';
-        particle.style.top = '50%';
-        particle.style.fontSize = '2rem';
-        particle.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-        particle.style.pointerEvents = 'none';
-        particle.style.zIndex = '1000';
-        
         const angle = (Math.PI * 2 * i) / 15;
-        const velocity = 100 + Math.random() * 100;
-        const tx = Math.cos(angle) * velocity;
-        const ty = Math.sin(angle) * velocity;
-        
-        particle.animate([
-            { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
-            { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1)`, opacity: 0 }
-        ], {
-            duration: 1000,
-            easing: 'cubic-bezier(0, .9, .57, 1)'
-        }).onfinish = () => particle.remove();
-        
-        particlesContainer.appendChild(particle);
+        const velocity = 3 + Math.random() * 3;
+        game.particles.push({
+            x, y,
+            vx: Math.cos(angle) * velocity,
+            vy: Math.sin(angle) * velocity,
+            life: 30,
+            emoji: emoji
+        });
     }
 }
 
-// Update score display
-function updateScore() {
-    scoreEl.textContent = gameState.score;
-    levelEl.textContent = gameState.level;
-    streakEl.textContent = gameState.streak;
-}
-
-// Update progress bar
-function updateProgress() {
-    const progress = (gameState.problemsInLevel / gameState.problemsPerLevel) * 100;
-    progressFillEl.style.width = `${progress}%`;
-    problemsCompletedEl.textContent = gameState.problemsInLevel;
-}
-
-// Show level complete screen
-function showLevelComplete() {
-    gameScreen.classList.remove('active');
-    bonusChallengeScreen.classList.remove('active');
-    levelCompleteScreen.classList.add('active');
+// Update Game
+function update() {
+    if (game.paused || game.gameOver) return;
     
-    totalStarsEl.textContent = gameState.score;
-    currentStreakEl.textContent = gameState.streak;
+    // Update phoenix
+    game.phoenix.update();
     
-    const messages = [
-        "You're crushing it! 💪",
-        "Incredible progress! 🚀",
-        "You're a math superstar! ⭐",
-        "Outstanding performance! 🎯",
-        "You're unstoppable! 🔥"
-    ];
+    // Update clouds
+    game.cloudParticles.forEach(cloud => cloud.update());
     
-    levelMessageEl.textContent = messages[Math.floor(Math.random() * messages.length)];
-}
-
-// Show bonus challenge
-function showBonusChallenge() {
-    gameScreen.classList.remove('active');
-    bonusChallengeScreen.classList.add('active');
-    gameState.bonusChallengeActive = true;
-    
-    bonusStreakEl.textContent = gameState.streak;
-    
-    // Generate a bonus problem
-    const problem = generateProblem();
-    bonusQuestionEl.textContent = `${problem.dividend} ÷ ${problem.divisor} = ?`;
-    
-    // Clear input and feedback
-    answerInputEl.value = '';
-    bonusFeedbackEl.textContent = '';
-    bonusFeedbackEl.className = 'bonus-feedback';
-    
-    // Enable submit button
-    submitAnswerBtn.disabled = false;
-    
-    // Focus on input
-    setTimeout(() => answerInputEl.focus(), 100);
-}
-
-// Submit bonus answer
-function submitBonusAnswer() {
-    const userAnswer = parseInt(answerInputEl.value);
-    
-    if (isNaN(userAnswer)) {
-        bonusFeedbackEl.textContent = 'Please enter a number!';
-        bonusFeedbackEl.className = 'bonus-feedback incorrect';
-        return;
+    // Spawn stars
+    if (Math.random() < 0.03) {
+        game.stars.push(new Star());
     }
     
-    // Disable submit button
-    submitAnswerBtn.disabled = true;
+    // Spawn chests
+    if (Math.random() < 0.005 && game.chests.length < 2) {
+        game.chests.push(new Chest());
+    }
     
-    if (userAnswer === gameState.correctAnswer) {
-        // Correct - double points!
-        const bonusPoints = 20;
-        gameState.score += bonusPoints;
-        gameState.bonusChallengesCompleted++;
+    // Update stars
+    game.stars = game.stars.filter(star => {
+        star.update();
         
-        bonusFeedbackEl.textContent = `🎉 Correct! +${bonusPoints} BONUS points! 🎉`;
-        bonusFeedbackEl.className = 'bonus-feedback correct';
+        const phoenixBounds = game.phoenix.getBounds();
+        const starBounds = star.getBounds();
         
-        createParticles(true);
-        updateScore();
+        if (!star.collected && checkCollision(phoenixBounds, starBounds)) {
+            star.collected = true;
+            game.starsCollected++;
+            game.score += 10;
+            createParticleExplosion(star.x, star.y, '✨');
+            updateUI();
+            return false;
+        }
         
-        setTimeout(() => {
-            continueAfterBonus();
-        }, 2000);
-    } else {
-        // Incorrect - show correct answer
-        bonusFeedbackEl.textContent = `Not quite! The answer is ${gameState.correctAnswer}`;
-        bonusFeedbackEl.className = 'bonus-feedback incorrect';
-        
-        setTimeout(() => {
-            continueAfterBonus();
-        }, 2500);
+        return star.y < game.canvas.height + 50;
+    });
+    
+    // Update chests
+    game.chests.forEach(chest => {
+        if (!chest.collected) {
+            chest.update();
+            
+            const phoenixBounds = game.phoenix.getBounds();
+            const chestBounds = chest.getBounds();
+            
+            if (checkCollision(phoenixBounds, chestBounds)) {
+                showChestModal(chest);
+            }
+        }
+    });
+    
+    game.chests = game.chests.filter(chest => !chest.collected && chest.y < game.canvas.height + 50);
+    
+    // Update particles
+    game.particles = game.particles.filter(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.2;
+        p.life--;
+        return p.life > 0;
+    });
+    
+    // Level up
+    if (game.starsCollected > 0 && game.starsCollected % 20 === 0 && game.level < 3) {
+        game.level++;
     }
 }
 
-// Skip bonus challenge
-function skipBonusChallenge() {
-    continueAfterBonus();
+// Draw Game
+function draw() {
+    const ctx = game.ctx;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
+    
+    // Draw gradient background
+    const gradient = ctx.createLinearGradient(0, 0, 0, game.canvas.height);
+    gradient.addColorStop(0, '#87CEEB');
+    gradient.addColorStop(0.5, '#E0F6FF');
+    gradient.addColorStop(1, '#FFE5E5');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+    
+    // Draw clouds
+    game.cloudParticles.forEach(cloud => cloud.draw());
+    
+    // Draw stars
+    game.stars.forEach(star => star.draw());
+    
+    // Draw chests
+    game.chests.forEach(chest => chest.draw());
+    
+    // Draw particles
+    game.particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = p.life / 30;
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.emoji, p.x, p.y);
+        ctx.restore();
+    });
+    
+    // Draw phoenix
+    game.phoenix.draw();
 }
 
-// Continue after bonus challenge
-function continueAfterBonus() {
-    gameState.bonusChallengeActive = false;
-    bonusChallengeScreen.classList.remove('active');
-    
-    if (gameState.problemsInLevel >= gameState.problemsPerLevel) {
-        showLevelComplete();
-    } else {
-        gameScreen.classList.add('active');
-        displayProblem();
-    }
+// Game Loop
+function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
 }
 
-// Start next level
-function nextLevel() {
-    gameState.level++;
-    gameState.problemsInLevel = 0;
+// Update UI
+function updateUI() {
+    starsCollectedEl.textContent = game.starsCollected;
+    chestsOpenedEl.textContent = game.chestsOpened;
+    streakEl.textContent = game.streak;
+    totalScoreEl.textContent = game.score;
+}
+
+// Start Game
+function startGame(grade) {
+    game.selectedGrade = grade;
+    game.score = 0;
+    game.starsCollected = 0;
+    game.chestsOpened = 0;
+    game.streak = 0;
+    game.level = 0;
+    game.paused = false;
+    game.gameOver = false;
+    game.stars = [];
+    game.chests = [];
+    game.particles = [];
+    game.cloudParticles = [];
     
-    levelCompleteScreen.classList.remove('active');
+    gradeScreen.classList.remove('active');
     gameScreen.classList.add('active');
     
-    updateScore();
-    displayProblem();
+    game.canvas = document.getElementById('gameCanvas');
+    game.ctx = game.canvas.getContext('2d');
+    
+    game.phoenix = new Phoenix(game.canvas.width / 2 - 30, game.canvas.height / 2);
+    
+    // Create clouds
+    for (let i = 0; i < 5; i++) {
+        game.cloudParticles.push(new Cloud());
+    }
+    
+    updateUI();
+    gameLoop();
 }
 
-// Start the game
-function startGame() {
-    startScreen.classList.remove('active');
-    gameScreen.classList.add('active');
-    
-    gameState.score = 0;
-    gameState.level = 1;
-    gameState.streak = 0;
-    gameState.problemsInLevel = 0;
-    gameState.problemsPerLevel = 5;
-    gameState.currentProblem = null;
-    gameState.correctAnswer = null;
-    gameState.bonusChallengeActive = false;
-    gameState.bonusChallengesCompleted = 0;
-    
-    updateScore();
-    displayProblem();
-}
+// Keyboard Controls
+window.addEventListener('keydown', (e) => {
+    game.keys[e.key] = true;
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+        e.preventDefault();
+    }
+});
 
-// Initialize
+window.addEventListener('keyup', (e) => {
+    game.keys[e.key] = false;
+});
+
+// Mouse/Touch Controls
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Star Quest Division - Ready to play!');
-    // Set default grade
-    gameState.selectedGrade = 4;
+    const canvas = document.getElementById('gameCanvas');
+    
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        game.mouse.x = (e.clientX - rect.left) * scaleX;
+        game.mouse.y = (e.clientY - rect.top) * scaleY;
+        game.mouse.down = true;
+    });
+    
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        game.mouse.x = (e.clientX - rect.left) * scaleX;
+        game.mouse.y = (e.clientY - rect.top) * scaleY;
+    });
+    
+    canvas.addEventListener('mouseup', () => {
+        game.mouse.down = false;
+    });
+    
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        game.mouse.x = (touch.clientX - rect.left) * scaleX;
+        game.mouse.y = (touch.clientY - rect.top) * scaleY;
+        game.mouse.down = true;
+    });
+    
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        game.mouse.x = (touch.clientX - rect.left) * scaleX;
+        game.mouse.y = (touch.clientY - rect.top) * scaleY;
+    });
+    
+    canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        game.mouse.down = false;
+    });
 });
