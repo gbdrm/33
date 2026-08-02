@@ -1,59 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>THR33 — Orbit Arcade</title>
-    <meta name="description" content="THR33 is a fast orbit arcade game. Weave, collect, and survive." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Syne:wght@700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="atmosphere" aria-hidden="true"></div>
-    <main class="shell">
-      <header class="brand">
-        <p class="brand__mark">THR33</p>
-        <p class="brand__tag">orbit arcade</p>
-      </header>
-
-      <section class="stage" aria-label="THR33 game stage">
-        <canvas id="game" width="420" height="720" role="img" aria-label="Game canvas"></canvas>
-
-        <div id="hud" class="hud" hidden>
-          <div class="hud__block">
-            <span class="hud__label">Score</span>
-            <span id="score">0</span>
-          </div>
-          <div class="hud__block hud__block--center">
-            <span class="hud__label">Wave</span>
-            <span id="wave">1</span>
-          </div>
-          <div class="hud__block hud__block--right">
-            <span class="hud__label">Shields</span>
-            <span id="shields" class="shields" aria-live="polite">●●●</span>
-          </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Star Quest Division 🌟</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="sparkles"></div>
+    
+    <div class="game-container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <div class="title-box">
+                <h1 class="game-title">✨ Star Quest Division 🌟</h1>
+                <p class="subtitle">Collect magical stars and power up your skills with division challenges!</p>
+            </div>
+            <div class="unicorn-animation">
+                <div class="unicorn">🦄</div>
+                <div class="floating-stars">
+                    <span class="star">⭐</span>
+                    <span class="star">✨</span>
+                    <span class="star">💫</span>
+                    <span class="star">🌟</span>
+                </div>
+            </div>
+            <button id="startBtn" class="btn btn-large">Start Adventure! 🎀</button>
         </div>
 
-        <div id="overlay" class="overlay">
-          <div class="overlay__panel">
-            <h1 id="title">THR33</h1>
-            <p id="subtitle" class="overlay__copy">
-              Drift the ring. Collect mint cores. Avoid crimson shards.
-            </p>
-            <p id="best" class="overlay__best"></p>
-            <button id="start" type="button" class="cta">Enter orbit</button>
-            <p class="overlay__hint">
-              Drag to steer on iPad · ← → / A D on keyboard · Space to pause
-            </p>
-          </div>
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="header">
+                <div class="score-container">
+                    <div class="score-item">
+                        <span class="label">⭐ Stars:</span>
+                        <span id="score" class="value">0</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="label">🎯 Level:</span>
+                        <span id="level" class="value">1</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="label">🔥 Streak:</span>
+                        <span id="streak" class="value">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-content">
+                <div class="unicorn-character">
+                    <div class="unicorn-large">🦄</div>
+                    <div class="speech-bubble" id="speechBubble">Let's solve some problems!</div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-header">✨ Division Problem ✨</div>
+                    <div id="question" class="question-text">12 ÷ 3 = ?</div>
+                    
+                    <div class="answer-buttons" id="answerButtons">
+                        <button class="answer-btn" data-answer="0">4</button>
+                        <button class="answer-btn" data-answer="1">6</button>
+                        <button class="answer-btn" data-answer="2">8</button>
+                        <button class="answer-btn" data-answer="3">3</button>
+                    </div>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div class="progress-label">Problems in this level: <span id="problemsCompleted">0</span>/5</div>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </section>
-    </main>
+
+        <!-- Level Complete Screen -->
+        <div id="levelCompleteScreen" class="screen">
+            <div class="celebration">
+                <h2 class="celebration-title">🎉 Level Complete! 🎉</h2>
+                <div class="stars-earned">
+                    <div class="big-star">⭐</div>
+                    <div class="big-star">⭐</div>
+                    <div class="big-star">⭐</div>
+                </div>
+                <p class="celebration-message" id="levelMessage">Amazing work!</p>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Stars:</span>
+                        <span id="totalStars" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Current Streak:</span>
+                        <span id="currentStreak" class="stat-value">0</span>
+                    </div>
+                </div>
+                <button id="nextLevelBtn" class="btn btn-large">Next Level! 💖</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-particles" id="particles"></div>
+    
     <script src="game.js"></script>
-  </body>
+</body>
 </html>
