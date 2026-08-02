@@ -22,6 +22,16 @@ Then visit `http://localhost:8080`.
 
 Collect mint and amber cores. Avoid crimson shards. Every **33** cores restores a shield and scores a THR33 bonus.
 
+## Power-Ups
+
+As you progress through waves, special power-ups will appear:
+
+- **🧲 MAGNET** (purple) - Attracts nearby cores to your ship for 8 seconds
+- **⏱️ TIME SLOW** (blue) - Slows down falling objects for 8 seconds
+- **2X POINTS** (yellow) - Doubles all points earned for 8 seconds
+- **+ SHIELD** (green) - Instantly adds an extra shield (if below max)
+
+Power-ups spawn more frequently in higher waves, giving you strategic tools to build massive combos and survive longer!
 
 ## Play on iPad
 
