@@ -13,7 +13,7 @@
   const fun = window.MALL_FUN;
 
   // Fancy boutiques only — delete non-fancy stores
-  data.stores = data.stores.filter((s) => s.fancy);
+  data.stores = data.stores.filter((s) => s.fancy || s.id === "zara");
 
   const storesById = Object.fromEntries(data.stores.map((s) => [s.id, s]));
   const itemsById = {};

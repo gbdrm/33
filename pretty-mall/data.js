@@ -620,6 +620,128 @@ window.MALL_DATA = {
       ]
     },
     {
+      "id": "zara",
+      "name": "Zara",
+      "floor": 2,
+      "fancy": false,
+      "color": "#111111",
+      "floorColor": "#f7f3f5",
+      "blurb": "Long rails, mirror walls, packed hangers.",
+      "cashier": "Zara till is open — bag these up?",
+      "items": [
+        {
+          "id": "zar-1",
+          "name": "Satin Effect Blazer — Soft Pink",
+          "slot": "top",
+          "price": 89.9,
+          "swatch": "#F3C4D8",
+          "shape": "square",
+          "material": "satin weave",
+          "detail": "structured shoulders",
+          "display": "hanger"
+        },
+        {
+          "id": "zar-2",
+          "name": "Pleated Midi Skirt — Ecru",
+          "slot": "bottom",
+          "price": 59.9,
+          "swatch": "#F5F0E8",
+          "shape": "diamond",
+          "material": "woven fabric",
+          "detail": "elastic waist",
+          "display": "hanger"
+        },
+        {
+          "id": "zar-3",
+          "name": "Strappy Heeled Sandals — Light Pink",
+          "slot": "shoes",
+          "price": 69.9,
+          "swatch": "#FFCAD4",
+          "shape": "circle",
+          "material": "synthetic upper",
+          "detail": "stiletto 9cm",
+          "display": "mannequin"
+        },
+        {
+          "id": "zar-4",
+          "name": "Mini City Bag — Beige",
+          "slot": "bag",
+          "price": 49.9,
+          "swatch": "#EAD7C4",
+          "shape": "square",
+          "material": "faux leather",
+          "detail": "top handle + strap",
+          "display": "mannequin"
+        },
+        {
+          "id": "zar-5",
+          "name": "Bow Knit Top — Pale Rose",
+          "slot": "top",
+          "price": 39.9,
+          "swatch": "#FFDEE9",
+          "shape": "circle",
+          "material": "fine knit",
+          "detail": "cropped bow detail",
+          "display": "hanger"
+        },
+        {
+          "id": "zar-6",
+          "name": "Wide-Leg Tailored Trousers — Black",
+          "slot": "bottom",
+          "price": 59.9,
+          "swatch": "#1A1A1A",
+          "shape": "square",
+          "material": "crepe",
+          "detail": "high waist",
+          "display": "hanger"
+        },
+        {
+          "id": "zar-7",
+          "name": "Faux Leather Bomber — Chocolate",
+          "slot": "top",
+          "price": 89.9,
+          "swatch": "#5C4033",
+          "shape": "square",
+          "material": "coated fabric",
+          "detail": "zip bomber",
+          "display": "hanger"
+        },
+        {
+          "id": "zar-8",
+          "name": "Ballet Flats with Strap — Ballet Pink",
+          "slot": "shoes",
+          "price": 45.9,
+          "swatch": "#F4C2C2",
+          "shape": "diamond",
+          "material": "split leather",
+          "detail": "mary-jane style",
+          "display": "mannequin"
+        },
+        {
+          "id": "zar-9",
+          "name": "Linen-Blend Shirt Dress — White",
+          "slot": "top",
+          "price": 69.9,
+          "swatch": "#FFFFFF",
+          "shape": "square",
+          "material": "linen blend",
+          "detail": "belted shirt dress",
+          "display": "mannequin"
+        },
+        {
+          "id": "zar-10",
+          "name": "Rhinestone Hoop Earrings",
+          "slot": "accessory",
+          "price": 19.9,
+          "swatch": "#F8E8EF",
+          "shape": "circle",
+          "material": "metal + crystal",
+          "detail": "medium hoops",
+          "display": "shelf"
+        }
+      ]
+    },
+    {
       "id": "gucci",
       "name": "Gucci",
       "floor": 2,
