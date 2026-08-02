@@ -326,11 +326,11 @@ function showBattle(enemy) {
         battleAnswersEl.appendChild(btn);
     });
     
-    // Start timer (20 seconds)
+    // Start timer (30 seconds)
     game.timeLeft = 100;
     if (game.timerInterval) clearInterval(game.timerInterval);
     game.timerInterval = setInterval(() => {
-        game.timeLeft -= 0.5;
+        game.timeLeft -= 0.333;
         timerFillEl.style.width = game.timeLeft + '%';
         if (game.timeLeft <= 0) {
             clearInterval(game.timerInterval);
