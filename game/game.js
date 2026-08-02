@@ -6,27 +6,60 @@ let gameState = {
     problemsInLevel: 0,
     problemsPerLevel: 5,
     currentProblem: null,
-    correctAnswer: null
+    correctAnswer: null,
+    bonusChallengeActive: false,
+    bonusChallengesCompleted: 0,
+    selectedGrade: 4,
+    streakNeededForBonus: 5
 };
 
-// Division problems appropriate for 4th grade
-const divisionRanges = [
-    // Level 1: Easy division (2-5)
-    { min: 2, max: 5, dividendMax: 50 },
-    // Level 2: Medium division (2-8)
-    { min: 2, max: 8, dividendMax: 72 },
-    // Level 3: Harder division (2-10)
-    { min: 2, max: 10, dividendMax: 90 },
-    // Level 4+: All division (2-12)
-    { min: 2, max: 12, dividendMax: 144 }
-];
+// Division problems for different grade levels
+const gradeConfigs = {
+    3: {
+        ranges: [
+            { min: 2, max: 4, dividendMax: 40 },
+            { min: 2, max: 5, dividendMax: 50 },
+            { min: 2, max: 6, dividendMax: 60 },
+            { min: 2, max: 8, dividendMax: 80 }
+        ]
+    },
+    4: {
+        ranges: [
+            { min: 2, max: 5, dividendMax: 50 },
+            { min: 2, max: 8, dividendMax: 72 },
+            { min: 2, max: 10, dividendMax: 90 },
+            { min: 2, max: 12, dividendMax: 144 }
+        ]
+    },
+    5: {
+        ranges: [
+            { min: 3, max: 8, dividendMax: 80 },
+            { min: 3, max: 10, dividendMax: 100 },
+            { min: 3, max: 12, dividendMax: 144 },
+            { min: 2, max: 15, dividendMax: 180 }
+        ]
+    },
+    6: {
+        ranges: [
+            { min: 4, max: 10, dividendMax: 100 },
+            { min: 4, max: 12, dividendMax: 144 },
+            { min: 3, max: 15, dividendMax: 180 },
+            { min: 3, max: 20, dividendMax: 240 }
+        ]
+    }
+};
 
 // DOM Elements
+const gradeScreen = document.getElementById('gradeScreen');
 const startScreen = document.getElementById('startScreen');
 const gameScreen = document.getElementById('gameScreen');
+const bonusChallengeScreen = document.getElementById('bonusChallengeScreen');
 const levelCompleteScreen = document.getElementById('levelCompleteScreen');
 const startBtn = document.getElementById('startBtn');
+const changeGradeBtn = document.getElementById('changeGradeBtn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
+const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+const skipBonusBtn = document.getElementById('skipBonusBtn');
 
 const scoreEl = document.getElementById('score');
 const levelEl = document.getElementById('level');
@@ -39,15 +72,51 @@ const problemsCompletedEl = document.getElementById('problemsCompleted');
 const totalStarsEl = document.getElementById('totalStars');
 const currentStreakEl = document.getElementById('currentStreak');
 const levelMessageEl = document.getElementById('levelMessage');
+const selectedGradeEl = document.getElementById('selectedGrade');
+
+const bonusQuestionEl = document.getElementById('bonusQuestion');
+const answerInputEl = document.getElementById('answerInput');
+const bonusFeedbackEl = document.getElementById('bonusFeedback');
+const bonusStreakEl = document.getElementById('bonusStreak');
 
 // Event Listeners
 startBtn.addEventListener('click', startGame);
+changeGradeBtn.addEventListener('click', () => {
+    startScreen.classList.remove('active');
+    gradeScreen.classList.add('active');
+});
 nextLevelBtn.addEventListener('click', nextLevel);
+submitAnswerBtn.addEventListener('click', submitBonusAnswer);
+skipBonusBtn.addEventListener('click', skipBonusChallenge);
+
+// Grade selection buttons
+document.querySelectorAll('.grade-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const grade = parseInt(btn.dataset.grade);
+        selectGrade(grade);
+    });
+});
+
+// Allow Enter key to submit answer
+answerInputEl.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        submitBonusAnswer();
+    }
+});
+
+// Select grade level
+function selectGrade(grade) {
+    gameState.selectedGrade = grade;
+    selectedGradeEl.textContent = `${grade}th`;
+    gradeScreen.classList.remove('active');
+    startScreen.classList.add('active');
+}
 
 // Generate a division problem
 function generateProblem() {
-    const levelIndex = Math.min(gameState.level - 1, divisionRanges.length - 1);
-    const range = divisionRanges[levelIndex];
+    const gradeConfig = gradeConfigs[gameState.selectedGrade];
+    const levelIndex = Math.min(gameState.level - 1, gradeConfig.ranges.length - 1);
+    const range = gradeConfig.ranges[levelIndex];
     
     // Pick a random divisor
     const divisor = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
@@ -135,7 +204,10 @@ function checkAnswer(selectedAnswer, btn) {
         createParticles(true);
         
         setTimeout(() => {
-            if (gameState.problemsInLevel >= gameState.problemsPerLevel) {
+            // Check if streak qualifies for bonus challenge
+            if (gameState.streak >= gameState.streakNeededForBonus && gameState.streak % gameState.streakNeededForBonus === 0) {
+                showBonusChallenge();
+            } else if (gameState.problemsInLevel >= gameState.problemsPerLevel) {
                 showLevelComplete();
             } else {
                 displayProblem();
@@ -240,6 +312,7 @@ function updateProgress() {
 // Show level complete screen
 function showLevelComplete() {
     gameScreen.classList.remove('active');
+    bonusChallengeScreen.classList.remove('active');
     levelCompleteScreen.classList.add('active');
     
     totalStarsEl.textContent = gameState.score;
@@ -254,6 +327,87 @@ function showLevelComplete() {
     ];
     
     levelMessageEl.textContent = messages[Math.floor(Math.random() * messages.length)];
+}
+
+// Show bonus challenge
+function showBonusChallenge() {
+    gameScreen.classList.remove('active');
+    bonusChallengeScreen.classList.add('active');
+    gameState.bonusChallengeActive = true;
+    
+    bonusStreakEl.textContent = gameState.streak;
+    
+    // Generate a bonus problem
+    const problem = generateProblem();
+    bonusQuestionEl.textContent = `${problem.dividend} ÷ ${problem.divisor} = ?`;
+    
+    // Clear input and feedback
+    answerInputEl.value = '';
+    bonusFeedbackEl.textContent = '';
+    bonusFeedbackEl.className = 'bonus-feedback';
+    
+    // Enable submit button
+    submitAnswerBtn.disabled = false;
+    
+    // Focus on input
+    setTimeout(() => answerInputEl.focus(), 100);
+}
+
+// Submit bonus answer
+function submitBonusAnswer() {
+    const userAnswer = parseInt(answerInputEl.value);
+    
+    if (isNaN(userAnswer)) {
+        bonusFeedbackEl.textContent = 'Please enter a number!';
+        bonusFeedbackEl.className = 'bonus-feedback incorrect';
+        return;
+    }
+    
+    // Disable submit button
+    submitAnswerBtn.disabled = true;
+    
+    if (userAnswer === gameState.correctAnswer) {
+        // Correct - double points!
+        const bonusPoints = 20;
+        gameState.score += bonusPoints;
+        gameState.bonusChallengesCompleted++;
+        
+        bonusFeedbackEl.textContent = `🎉 Correct! +${bonusPoints} BONUS points! 🎉`;
+        bonusFeedbackEl.className = 'bonus-feedback correct';
+        
+        createParticles(true);
+        updateScore();
+        
+        setTimeout(() => {
+            continueAfterBonus();
+        }, 2000);
+    } else {
+        // Incorrect - show correct answer
+        bonusFeedbackEl.textContent = `Not quite! The answer is ${gameState.correctAnswer}`;
+        bonusFeedbackEl.className = 'bonus-feedback incorrect';
+        
+        setTimeout(() => {
+            continueAfterBonus();
+        }, 2500);
+    }
+}
+
+// Skip bonus challenge
+function skipBonusChallenge() {
+    continueAfterBonus();
+}
+
+// Continue after bonus challenge
+function continueAfterBonus() {
+    gameState.bonusChallengeActive = false;
+    bonusChallengeScreen.classList.remove('active');
+    
+    if (gameState.problemsInLevel >= gameState.problemsPerLevel) {
+        showLevelComplete();
+    } else {
+        gameScreen.classList.add('active');
+        displayProblem();
+    }
 }
 
 // Start next level
@@ -273,15 +427,15 @@ function startGame() {
     startScreen.classList.remove('active');
     gameScreen.classList.add('active');
     
-    gameState = {
-        score: 0,
-        level: 1,
-        streak: 0,
-        problemsInLevel: 0,
-        problemsPerLevel: 5,
-        currentProblem: null,
-        correctAnswer: null
-    };
+    gameState.score = 0;
+    gameState.level = 1;
+    gameState.streak = 0;
+    gameState.problemsInLevel = 0;
+    gameState.problemsPerLevel = 5;
+    gameState.currentProblem = null;
+    gameState.correctAnswer = null;
+    gameState.bonusChallengeActive = false;
+    gameState.bonusChallengesCompleted = 0;
     
     updateScore();
     displayProblem();
@@ -290,4 +444,6 @@ function startGame() {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Star Quest Division - Ready to play!');
+    // Set default grade
+    gameState.selectedGrade = 4;
 });

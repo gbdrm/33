@@ -68,10 +68,93 @@ body {
     to { opacity: 1; transform: scale(1); }
 }
 
+/* Grade Selection Screen */
+.grade-selection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 40px 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.grade-btn {
+    font-family: 'Fredoka', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 30px 20px;
+    border: 3px solid #764ba2;
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.grade-btn:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #764ba2;
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(118, 75, 162, 0.4);
+}
+
+.grade-number {
+    font-size: 3rem;
+    font-weight: 700;
+    font-family: 'Bubblegum Sans', cursive;
+}
+
+.grade-label {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.grade-info {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
 /* Start Screen */
 .title-box {
     text-align: center;
     margin-bottom: 30px;
+}
+
+.grade-selected {
+    font-size: 1.1rem;
+    color: #764ba2;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.grade-selected span {
+    color: #f5576c;
+    font-size: 1.3rem;
+}
+
+.btn-secondary {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 12px 30px;
+    border: 2px solid #764ba2;
+    border-radius: 50px;
+    background: white;
+    color: #764ba2;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 15px auto 0;
+}
+
+.btn-secondary:hover {
+    background: #764ba2;
+    color: white;
+    transform: translateY(-2px);
 }
 
 .game-title {
@@ -369,6 +452,137 @@ body {
     width: 0%;
 }
 
+/* Bonus Challenge Screen */
+.bonus-content {
+    text-align: center;
+}
+
+.bonus-header {
+    margin-bottom: 20px;
+}
+
+.bonus-title {
+    font-family: 'Bubblegum Sans', cursive;
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, #f5576c 0%, #feca57 50%, #f093fb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+.bonus-subtitle {
+    font-size: 1.3rem;
+    color: #555;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.bonus-subtitle span {
+    color: #f5576c;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.bonus-description {
+    font-size: 1.1rem;
+    color: #764ba2;
+    font-weight: 600;
+}
+
+.bonus-unicorn {
+    margin: 20px 0;
+}
+
+.unicorn-excited {
+    font-size: 4rem;
+    animation: bounce 0.8s ease-in-out infinite;
+}
+
+.bonus-question-card {
+    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    margin: 20px 0;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    margin-top: 25px;
+}
+
+.answer-input {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 2rem;
+    font-weight: 600;
+    padding: 15px 25px;
+    border: 3px solid #764ba2;
+    border-radius: 15px;
+    text-align: center;
+    width: 200px;
+    background: white;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.answer-input:focus {
+    outline: none;
+    border-color: #f093fb;
+    box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.2);
+    transform: scale(1.05);
+}
+
+.answer-input::placeholder {
+    color: #bbb;
+    font-size: 1.2rem;
+}
+
+.submit-btn {
+    font-size: 1.3rem;
+    padding: 15px 40px;
+}
+
+.bonus-feedback {
+    margin-top: 20px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    min-height: 30px;
+}
+
+.bonus-feedback.correct {
+    color: #4caf50;
+    animation: pulse 0.5s ease;
+}
+
+.bonus-feedback.incorrect {
+    color: #f44336;
+    animation: shake 0.5s ease;
+}
+
+.btn-skip {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    border: 2px solid #999;
+    border-radius: 20px;
+    background: transparent;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+.btn-skip:hover {
+    background: #f5f5f5;
+    border-color: #666;
+    color: #666;
+}
+
 /* Level Complete Screen */
 .celebration {
     text-align: center;
@@ -481,5 +695,23 @@ body {
     .stats {
         flex-direction: column;
         gap: 20px;
+    }
+
+    .grade-selection {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .grade-number {
+        font-size: 2.5rem;
+    }
+
+    .bonus-title {
+        font-size: 2rem;
+    }
+
+    .answer-input {
+        width: 150px;
+        font-size: 1.5rem;
     }
 }

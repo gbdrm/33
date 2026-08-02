@@ -13,11 +13,53 @@
     <div class="sparkles"></div>
     
     <div class="game-container">
+        <!-- Grade Selection Screen -->
+        <div id="gradeScreen" class="screen active">
+            <div class="title-box">
+                <h1 class="game-title">✨ Star Quest Division 🌟</h1>
+                <p class="subtitle">Choose your grade level to start!</p>
+            </div>
+            
+            <div class="grade-selection">
+                <button class="grade-btn" data-grade="3">
+                    <span class="grade-number">3rd</span>
+                    <span class="grade-label">Grade</span>
+                    <span class="grade-info">Easy Division</span>
+                </button>
+                <button class="grade-btn" data-grade="4">
+                    <span class="grade-number">4th</span>
+                    <span class="grade-label">Grade</span>
+                    <span class="grade-info">Medium Challenge</span>
+                </button>
+                <button class="grade-btn" data-grade="5">
+                    <span class="grade-number">5th</span>
+                    <span class="grade-label">Grade</span>
+                    <span class="grade-info">Advanced Math</span>
+                </button>
+                <button class="grade-btn" data-grade="6">
+                    <span class="grade-number">6th</span>
+                    <span class="grade-label">Grade</span>
+                    <span class="grade-info">Expert Level</span>
+                </button>
+            </div>
+
+            <div class="unicorn-animation">
+                <div class="unicorn">🦄</div>
+                <div class="floating-stars">
+                    <span class="star">⭐</span>
+                    <span class="star">✨</span>
+                    <span class="star">💫</span>
+                    <span class="star">🌟</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Start Screen -->
-        <div id="startScreen" class="screen active">
+        <div id="startScreen" class="screen">
             <div class="title-box">
                 <h1 class="game-title">✨ Star Quest Division 🌟</h1>
                 <p class="subtitle">Collect magical stars and power up your skills with division challenges!</p>
+                <p class="grade-selected">Selected: <span id="selectedGrade">4th</span> Grade</p>
             </div>
             <div class="unicorn-animation">
                 <div class="unicorn">🦄</div>
@@ -29,6 +71,7 @@
                 </div>
             </div>
             <button id="startBtn" class="btn btn-large">Start Adventure! 🎀</button>
+            <button id="changeGradeBtn" class="btn-secondary">Change Grade</button>
         </div>
 
         <!-- Game Screen -->
@@ -74,6 +117,40 @@
                         <div id="progressFill" class="progress-fill"></div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Bonus Challenge Screen -->
+        <div id="bonusChallengeScreen" class="screen">
+            <div class="bonus-content">
+                <div class="bonus-header">
+                    <h2 class="bonus-title">🔥 BONUS CHALLENGE! 🔥</h2>
+                    <p class="bonus-subtitle">You're on fire with a <span id="bonusStreak">5</span> streak!</p>
+                    <p class="bonus-description">Type your answer to earn DOUBLE points!</p>
+                </div>
+
+                <div class="bonus-unicorn">
+                    <div class="unicorn-excited">🦄✨</div>
+                </div>
+
+                <div class="bonus-question-card">
+                    <div class="question-header">💎 Expert Challenge 💎</div>
+                    <div id="bonusQuestion" class="question-text">48 ÷ 6 = ?</div>
+                    
+                    <div class="input-container">
+                        <input 
+                            type="number" 
+                            id="answerInput" 
+                            class="answer-input" 
+                            placeholder="Type answer..."
+                            autocomplete="off"
+                        >
+                        <button id="submitAnswerBtn" class="btn submit-btn">Submit! ✨</button>
+                    </div>
+                    <div id="bonusFeedback" class="bonus-feedback"></div>
+                </div>
+
+                <button id="skipBonusBtn" class="btn-skip">Skip Challenge</button>
             </div>
         </div>
 
