@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELA Quest - Learn English Language Arts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-gradient"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">📚 ELA Quest</h1>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">Score:</span>
+                    <span id="total-score" class="stat-value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Level:</span>
+                    <span id="level" class="stat-value">1</span>
+                </div>
+            </div>
+        </header>
+
+        <div id="welcome-screen" class="screen active">
+            <div class="welcome-card">
+                <h2 class="welcome-title">Welcome to ELA Quest!</h2>
+                <p class="welcome-subtitle">Master English Language Arts through fun games</p>
+                
+                <div class="game-modes">
+                    <button class="mode-btn" data-mode="vocabulary">
+                        <span class="mode-icon">📖</span>
+                        <span class="mode-title">Vocabulary Match</span>
+                        <span class="mode-desc">Match words with definitions</span>
+                    </button>
+                    
+                    <button class="mode-btn" data-mode="grammar">
+                        <span class="mode-icon">✏️</span>
+                        <span class="mode-title">Grammar Challenge</span>
+                        <span class="mode-desc">Fix sentence errors</span>
+                    </button>
+                    
+                    <button class="mode-btn" data-mode="spelling">
+                        <span class="mode-icon">🔤</span>
+                        <span class="mode-title">Spelling Bee</span>
+                        <span class="mode-desc">Spell words correctly</span>
+                    </button>
+                    
+                    <button class="mode-btn" data-mode="parts-of-speech">
+                        <span class="mode-icon">🎯</span>
+                        <span class="mode-title">Parts of Speech</span>
+                        <span class="mode-desc">Identify word types</span>
+                    </button>
+                    
+                    <button class="mode-btn" data-mode="reading">
+                        <span class="mode-icon">📝</span>
+                        <span class="mode-title">Reading Quest</span>
+                        <span class="mode-desc">Answer comprehension questions</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <button id="back-btn" class="back-btn">← Back</button>
+                <h2 id="game-title" class="game-title"></h2>
+                <div class="game-stats">
+                    <span class="game-stat">Question <span id="question-num">1</span>/<span id="total-questions">10</span></span>
+                    <span class="game-stat">Score: <span id="game-score">0</span></span>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div id="progress" class="progress-fill"></div>
+            </div>
+
+            <div id="game-content" class="game-content">
+                <div id="question-container" class="question-container"></div>
+                <div id="options-container" class="options-container"></div>
+                <div id="feedback" class="feedback"></div>
+            </div>
+
+            <div id="result-screen" class="result-card" style="display: none;">
+                <div class="result-icon" id="result-icon"></div>
+                <h3 id="result-title" class="result-title"></h3>
+                <p id="result-score" class="result-score"></p>
+                <div class="result-actions">
+                    <button id="play-again-btn" class="btn btn-primary">Play Again</button>
+                    <button id="menu-btn" class="btn btn-secondary">Main Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="celebration" class="celebration"></div>
+
+    <script src="game.js"></script>
+</body>
+</html>
