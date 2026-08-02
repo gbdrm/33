@@ -29,6 +29,10 @@ Then visit `http://localhost:8080` in your browser.
 npx serve code-quest
 ```
 
+## 🧪 Testing
+
+Want to verify all challenges work correctly? Open `test.html` in your browser or visit `http://localhost:8080/test.html` when running a local server. This page automatically tests all 12 challenges with sample solutions and shows detailed results.
+
 ## 📚 What You'll Learn
 
 ### Easy Challenges
