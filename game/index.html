@@ -1,59 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>THR33 — Orbit Arcade</title>
-    <meta name="description" content="THR33 is a fast orbit arcade game. Weave, collect, and survive." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Syne:wght@700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="atmosphere" aria-hidden="true"></div>
-    <main class="shell">
-      <header class="brand">
-        <p class="brand__mark">THR33</p>
-        <p class="brand__tag">orbit arcade</p>
-      </header>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Math Runner - Division Dash! 🏃‍♀️</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <div class="title-box">
+                <h1 class="game-title">⚡ MATH RUNNER ⚡</h1>
+                <h2 class="subtitle-big">DIVISION DASH!</h2>
+                <p class="tagline">Run! Jump! Blast enemies with division power!</p>
+            </div>
+            
+            <div class="grade-grid">
+                <button class="grade-card" data-grade="3">
+                    <div class="grade-num">3</div>
+                    <div class="grade-name">Grade 3</div>
+                </button>
+                <button class="grade-card" data-grade="4">
+                    <div class="grade-num">4</div>
+                    <div class="grade-name">Grade 4</div>
+                </button>
+                <button class="grade-card" data-grade="5">
+                    <div class="grade-num">5</div>
+                    <div class="grade-name">Grade 5</div>
+                </button>
+                <button class="grade-card" data-grade="6">
+                    <div class="grade-num">6</div>
+                    <div class="grade-name">Grade 6</div>
+                </button>
+            </div>
 
-      <section class="stage" aria-label="THR33 game stage">
-        <canvas id="game" width="420" height="720" role="img" aria-label="Game canvas"></canvas>
-
-        <div id="hud" class="hud" hidden>
-          <div class="hud__block">
-            <span class="hud__label">Score</span>
-            <span id="score">0</span>
-          </div>
-          <div class="hud__block hud__block--center">
-            <span class="hud__label">Wave</span>
-            <span id="wave">1</span>
-          </div>
-          <div class="hud__block hud__block--right">
-            <span class="hud__label">Shields</span>
-            <span id="shields" class="shields" aria-live="polite">●●●</span>
-          </div>
+            <div class="how-to-play">
+                <h3>🎮 Controls:</h3>
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <span class="control-key">SPACE</span>
+                        <span class="control-action">Jump!</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key">↓</span>
+                        <span class="control-action">Slide!</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key">CLICK</span>
+                        <span class="control-action">Blast Enemy!</span>
+                    </div>
+                </div>
+                <p class="game-tip">💡 Answer division problems to destroy enemies and earn points!</p>
+            </div>
         </div>
 
-        <div id="overlay" class="overlay">
-          <div class="overlay__panel">
-            <h1 id="title">THR33</h1>
-            <p id="subtitle" class="overlay__copy">
-              Drift the ring. Collect mint cores. Avoid crimson shards.
-            </p>
-            <p id="best" class="overlay__best"></p>
-            <button id="start" type="button" class="cta">Enter orbit</button>
-            <p class="overlay__hint">
-              Drag to steer on iPad · ← → / A D on keyboard · Space to pause
-            </p>
-          </div>
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="game-hud">
+                <div class="hud-left">
+                    <div class="hud-item">
+                        <span class="hud-icon">💎</span>
+                        <span id="score" class="hud-value">0</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-icon">🔥</span>
+                        <span id="combo" class="hud-value">x1</span>
+                    </div>
+                </div>
+                <div class="hud-right">
+                    <div class="hud-item">
+                        <span class="hud-icon">💗</span>
+                        <span id="lives" class="hud-value">❤️❤️❤️</span>
+                    </div>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+            <div class="action-hint" id="actionHint">Press SPACE to JUMP!</div>
         </div>
-      </section>
-    </main>
+
+        <!-- Battle Modal -->
+        <div id="battleModal" class="modal">
+            <div class="modal-content battle-content">
+                <div class="enemy-display">
+                    <div class="enemy-icon" id="enemyIcon">👾</div>
+                    <div class="enemy-health-bar">
+                        <div class="health-fill" id="enemyHealth"></div>
+                    </div>
+                </div>
+                
+                <h2 class="battle-title">MATH BATTLE!</h2>
+                <div class="battle-problem" id="battleProblem">36 ÷ 6 = ?</div>
+                
+                <div class="battle-answers" id="battleAnswers">
+                    <button class="battle-btn">6</button>
+                    <button class="battle-btn">5</button>
+                    <button class="battle-btn">7</button>
+                    <button class="battle-btn">4</button>
+                </div>
+
+                <div class="timer-bar">
+                    <div class="timer-fill" id="timerFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen">
+            <div class="game-over-box">
+                <h1 class="game-over-title">GAME OVER!</h1>
+                <div class="final-score-big">
+                    <div class="score-label">Final Score</div>
+                    <div id="finalScore" class="score-number">0</div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-icon">👾</div>
+                        <div class="stat-number" id="enemiesDefeated">0</div>
+                        <div class="stat-label">Enemies</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-number" id="gemsCollected">0</div>
+                        <div class="stat-label">Gems</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-number" id="maxCombo">1</div>
+                        <div class="stat-label">Max Combo</div>
+                    </div>
+                </div>
+                <button id="playAgainBtn" class="btn-play">PLAY AGAIN! 🎮</button>
+                <button id="changeGradeBtn" class="btn-secondary">Change Grade</button>
+            </div>
+        </div>
+    </div>
+
     <script src="game.js"></script>
-  </body>
+</body>
 </html>
