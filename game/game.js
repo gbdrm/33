@@ -1,370 +1,281 @@
-// Game Configuration
+// Grade configurations
 const gradeConfigs = {
-    3: { ranges: [{ min: 2, max: 4, dividendMax: 40 }, { min: 2, max: 5, dividendMax: 50 }, { min: 2, max: 6, dividendMax: 60 }, { min: 2, max: 8, dividendMax: 80 }] },
-    4: { ranges: [{ min: 2, max: 5, dividendMax: 50 }, { min: 2, max: 8, dividendMax: 72 }, { min: 2, max: 10, dividendMax: 90 }, { min: 2, max: 12, dividendMax: 144 }] },
-    5: { ranges: [{ min: 3, max: 8, dividendMax: 80 }, { min: 3, max: 10, dividendMax: 100 }, { min: 3, max: 12, dividendMax: 144 }, { min: 2, max: 15, dividendMax: 180 }] },
-    6: { ranges: [{ min: 4, max: 10, dividendMax: 100 }, { min: 4, max: 12, dividendMax: 144 }, { min: 3, max: 15, dividendMax: 180 }, { min: 3, max: 20, dividendMax: 240 }] }
+    3: { ranges: [{ min: 2, max: 4, dividendMax: 40 }, { min: 2, max: 5, dividendMax: 50 }] },
+    4: { ranges: [{ min: 2, max: 6, dividendMax: 60 }, { min: 2, max: 8, dividendMax: 80 }] },
+    5: { ranges: [{ min: 3, max: 10, dividendMax: 100 }, { min: 3, max: 12, dividendMax: 120 }] },
+    6: { ranges: [{ min: 4, max: 12, dividendMax: 144 }, { min: 3, max: 15, dividendMax: 180 }] }
 };
 
-// Game State
+// Game state
 let game = {
     selectedGrade: 4,
     score: 0,
-    starsCollected: 0,
-    chestsOpened: 0,
-    streak: 0,
-    level: 0,
+    lives: 3,
+    combo: 1,
+    maxCombo: 1,
+    gemsCollected: 0,
+    enemiesDefeated: 0,
+    running: false,
     paused: false,
-    gameOver: false,
     canvas: null,
     ctx: null,
-    adventurer: null,
-    stars: [],
-    currentStar: null,
-    chests: [],
+    player: null,
+    enemies: [],
     obstacles: [],
-    currentChest: null,
+    gems: [],
+    platforms: [],
+    scrollSpeed: 5,
     keys: {},
-    mouse: { x: 0, y: 0, down: false },
-    particles: [],
-    cloudParticles: [],
-    lastMilestone: 0,
-    activePowerup: null,
-    powerupTimer: 0
+    currentEnemy: null,
+    timerInterval: null,
+    timeLeft: 100
 };
 
-// Power-ups
-const powerups = [
-    {
-        name: '⚡ Speed Boost',
-        icon: '⚡',
-        description: 'Phoenix flies 2x faster for 20 seconds!',
-        effect: 'speed',
-        duration: 1200 // 20 seconds at 60fps
-    },
-    {
-        name: '🌟 Star Magnet',
-        icon: '🧲',
-        description: 'Automatically attract nearby stars for 15 seconds!',
-        effect: 'magnet',
-        duration: 900
-    },
-    {
-        name: '💎 Double Points',
-        icon: '💰',
-        description: 'Earn 2x points for everything for 15 seconds!',
-        effect: 'double',
-        duration: 900
-    },
-    {
-        name: '🛡️ Shield',
-        icon: '🛡️',
-        description: 'Invincibility for 20 seconds!',
-        effect: 'shield',
-        duration: 1200
-    },
-    {
-        name: '🎯 Lucky Streak',
-        icon: '🍀',
-        description: 'All answers show hints for 10 seconds!',
-        effect: 'lucky',
-        duration: 600
-    }
-];
-
 // DOM Elements
-const gradeScreen = document.getElementById('gradeScreen');
+const startScreen = document.getElementById('startScreen');
 const gameScreen = document.getElementById('gameScreen');
 const gameOverScreen = document.getElementById('gameOverScreen');
-const starModal = document.getElementById('starModal');
-const chestModal = document.getElementById('chestModal');
-const milestoneModal = document.getElementById('milestoneModal');
+const battleModal = document.getElementById('battleModal');
 
-const starsCollectedEl = document.getElementById('starsCollected');
-const chestsOpenedEl = document.getElementById('chestsOpened');
-const streakEl = document.getElementById('streak');
-const totalScoreEl = document.getElementById('totalScore');
+const scoreEl = document.getElementById('score');
+const comboEl = document.getElementById('combo');
+const livesEl = document.getElementById('lives');
+const actionHintEl = document.getElementById('actionHint');
 
-const starProblemEl = document.getElementById('starProblem');
-const starAnswersEl = document.getElementById('starAnswers');
+const enemyIconEl = document.getElementById('enemyIcon');
+const enemyHealthEl = document.getElementById('enemyHealth');
+const battleProblemEl = document.getElementById('battleProblem');
+const battleAnswersEl = document.getElementById('battleAnswers');
+const timerFillEl = document.getElementById('timerFill');
 
-const chestProblemEl = document.getElementById('chestProblem');
-const chestAnswersEl = document.getElementById('chestAnswers');
-const chestFeedbackEl = document.getElementById('chestFeedback');
-
-const finalStarsEl = document.getElementById('finalStars');
-const finalChestsEl = document.getElementById('finalChests');
 const finalScoreEl = document.getElementById('finalScore');
-
-const milestoneScoreEl = document.getElementById('milestoneScore');
-const powerupNameEl = document.getElementById('powerupName');
-const powerupDescEl = document.getElementById('powerupDesc');
-const claimPowerupBtn = document.getElementById('claimPowerupBtn');
+const enemiesDefeatedEl = document.getElementById('enemiesDefeated');
+const gemsCollectedEl = document.getElementById('gemsCollected');
+const maxComboEl = document.getElementById('maxCombo');
 
 // Event Listeners
-document.querySelectorAll('.grade-btn').forEach(btn => {
-    btn.addEventListener('click', () => startGame(parseInt(btn.dataset.grade)));
+document.querySelectorAll('.grade-card').forEach(card => {
+    card.addEventListener('click', () => startGame(parseInt(card.dataset.grade)));
 });
 
 document.getElementById('playAgainBtn').addEventListener('click', () => {
     gameOverScreen.classList.remove('active');
-    gradeScreen.classList.add('active');
+    startScreen.classList.add('active');
 });
 
-document.getElementById('changeGradeBtn2').addEventListener('click', () => {
+document.getElementById('changeGradeBtn').addEventListener('click', () => {
     gameOverScreen.classList.remove('active');
-    gradeScreen.classList.add('active');
+    startScreen.classList.add('active');
 });
 
-claimPowerupBtn.addEventListener('click', () => {
-    closeMilestoneModal();
-});
-
-// Adventurer Class
-class Adventurer {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.width = 50;
-        this.height = 60;
-        this.speed = 5;
-        this.vx = 0;
+// Player class
+class Player {
+    constructor() {
+        this.x = 100;
+        this.y = 250;
+        this.width = 40;
+        this.height = 50;
         this.vy = 0;
+        this.jumping = false;
+        this.sliding = false;
+        this.slideTimer = 0;
         this.animFrame = 0;
     }
 
-    update() {
-        const currentSpeed = (game.activePowerup === 'speed') ? this.speed * 2 : this.speed;
-        
-        // Keyboard controls
-        if (game.keys['ArrowLeft'] || game.keys['a']) this.vx = -currentSpeed;
-        else if (game.keys['ArrowRight'] || game.keys['d']) this.vx = currentSpeed;
-        else this.vx *= 0.9;
-
-        if (game.keys['ArrowUp'] || game.keys['w']) this.vy = -currentSpeed;
-        else if (game.keys['ArrowDown'] || game.keys['s']) this.vy = currentSpeed;
-        else this.vy *= 0.9;
-
-        // Mouse/Touch controls
-        if (game.mouse.down) {
-            const dx = game.mouse.x - this.x;
-            const dy = game.mouse.y - this.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance > 20) {
-                this.vx = (dx / distance) * currentSpeed;
-                this.vy = (dy / distance) * currentSpeed;
-            }
+    jump() {
+        if (!this.jumping && !this.sliding) {
+            this.vy = -15;
+            this.jumping = true;
         }
+    }
 
-        this.x += this.vx;
+    slide() {
+        if (!this.jumping && !this.sliding) {
+            this.sliding = true;
+            this.slideTimer = 30;
+        }
+    }
+
+    update() {
+        // Gravity
+        this.vy += 0.8;
         this.y += this.vy;
 
-        // Boundaries
-        if (this.x < 0) this.x = 0;
-        if (this.x > game.canvas.width - this.width) this.x = game.canvas.width - this.width;
-        if (this.y < 0) this.y = 0;
-        if (this.y > game.canvas.height - this.height) this.y = game.canvas.height - this.height;
+        // Ground collision
+        if (this.y >= 250) {
+            this.y = 250;
+            this.vy = 0;
+            this.jumping = false;
+        }
+
+        // Slide timer
+        if (this.sliding) {
+            this.slideTimer--;
+            if (this.slideTimer <= 0) {
+                this.sliding = false;
+            }
+        }
 
         this.animFrame++;
     }
 
-    draw() {
-        const ctx = game.ctx;
+    draw(ctx) {
         const centerX = this.x + this.width / 2;
-        const centerY = this.y + this.height / 2;
-        
-        // Draw shadow
+        const centerY = this.y + (this.sliding ? this.height : this.height / 2);
+
+        // Shadow
         ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
         ctx.beginPath();
-        ctx.ellipse(centerX, this.y + this.height + 5, this.width / 2, 8, 0, 0, Math.PI * 2);
+        ctx.ellipse(centerX, 300, this.width / 2, 8, 0, 0, Math.PI * 2);
         ctx.fill();
-        
-        // Draw body (circle)
-        ctx.fillStyle = '#ff6b9d';
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw head
-        ctx.fillStyle = '#ffd4a3';
-        ctx.beginPath();
-        ctx.arc(centerX, centerY - 15, 12, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw hair
-        ctx.fillStyle = '#8B4513';
-        ctx.beginPath();
-        ctx.arc(centerX - 5, centerY - 20, 8, 0, Math.PI * 2);
-        ctx.arc(centerX + 5, centerY - 20, 8, 0, Math.PI * 2);
-        ctx.arc(centerX, centerY - 22, 8, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw eyes
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(centerX - 4, centerY - 15, 2, 0, Math.PI * 2);
-        ctx.arc(centerX + 4, centerY - 15, 2, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw smile
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY - 13, 4, 0, Math.PI);
-        ctx.stroke();
-        
-        // Draw arms (simple)
-        ctx.strokeStyle = '#ffd4a3';
-        ctx.lineWidth = 4;
-        const armBounce = Math.sin(this.animFrame * 0.1) * 3;
-        ctx.beginPath();
-        ctx.moveTo(centerX - 15, centerY - 5);
-        ctx.lineTo(centerX - 22, centerY + armBounce);
-        ctx.moveTo(centerX + 15, centerY - 5);
-        ctx.lineTo(centerX + 22, centerY + armBounce);
-        ctx.stroke();
-        
-        // Draw legs
-        ctx.strokeStyle = '#4a4a4a';
-        ctx.lineWidth = 5;
-        const legBounce = Math.sin(this.animFrame * 0.15) * 4;
-        ctx.beginPath();
-        ctx.moveTo(centerX - 8, centerY + 15);
-        ctx.lineTo(centerX - 10, centerY + 30 + legBounce);
-        ctx.moveTo(centerX + 8, centerY + 15);
-        ctx.lineTo(centerX + 10, centerY + 30 - legBounce);
-        ctx.stroke();
-        
-        // Draw power-up indicator if active
-        if (game.activePowerup) {
-            ctx.save();
-            ctx.globalAlpha = 0.7;
-            ctx.strokeStyle = '#ffd700';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 28, 0, Math.PI * 2);
-            ctx.stroke();
+
+        if (this.sliding) {
+            // Sliding pose - horizontal
+            ctx.fillStyle = '#ff6b9d';
+            ctx.fillRect(this.x, this.y + 20, this.width + 20, 25);
             
-            ctx.font = '20px Arial';
-            ctx.textAlign = 'center';
-            const powerupIcon = powerups.find(p => p.effect === game.activePowerup)?.icon || '⚡';
-            ctx.fillText(powerupIcon, centerX + 25, centerY - 25);
-            ctx.restore();
+            // Head
+            ctx.fillStyle = '#ffd4a3';
+            ctx.beginPath();
+            ctx.arc(this.x + 10, this.y + 32, 12, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            // Running/jumping pose
+            ctx.fillStyle = '#ff6b9d';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Head
+            ctx.fillStyle = '#ffd4a3';
+            ctx.beginPath();
+            ctx.arc(centerX, this.y + 15, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hair
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.arc(centerX - 5, this.y + 10, 8, 0, Math.PI * 2);
+            ctx.arc(centerX + 5, this.y + 10, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eyes
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(centerX - 4, this.y + 15, 2, 0, Math.PI * 2);
+            ctx.arc(centerX + 4, this.y + 15, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Legs
+            const legBounce = Math.sin(this.animFrame * 0.2) * 5;
+            ctx.strokeStyle = '#4a4a4a';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 8, this.y + 40);
+            ctx.lineTo(centerX - 10, this.y + 55 + legBounce);
+            ctx.moveTo(centerX + 8, this.y + 40);
+            ctx.lineTo(centerX + 10, this.y + 55 - legBounce);
+            ctx.stroke();
         }
-    }
-
-    getBounds() {
-        return {
-            x: this.x + 5,
-            y: this.y + 5,
-            width: this.width - 10,
-            height: this.height - 10
-        };
-    }
-}
-
-// Star Class
-class Star {
-    constructor() {
-        this.x = Math.random() * game.canvas.width;
-        this.y = -30;
-        this.width = 30;
-        this.height = 30;
-        this.speed = 1 + Math.random() * 2;
-        this.sway = Math.random() * 2 - 1;
-        this.collected = false;
-    }
-
-    update() {
-        this.y += this.speed;
-        this.x += this.sway;
-    }
-
-    draw() {
-        const ctx = game.ctx;
-        ctx.font = `${this.width}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.fillText('⭐', this.x, this.y);
-    }
-
-    getBounds() {
-        return {
-            x: this.x - this.width / 2,
-            y: this.y - this.height / 2,
-            width: this.width,
-            height: this.height
-        };
-    }
-}
-
-// Chest Class
-class Chest {
-    constructor() {
-        this.x = Math.random() * (game.canvas.width - 60);
-        this.y = -50;
-        this.width = 50;
-        this.height = 50;
-        this.speed = 1.5;
-        this.collected = false;
-    }
-
-    update() {
-        this.y += this.speed;
-    }
-
-    draw() {
-        const ctx = game.ctx;
-        ctx.font = `${this.width}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.fillText('💎', this.x + this.width / 2, this.y + this.height / 2);
-        
-        // Sparkle effect
-        ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
-        ctx.beginPath();
-        ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2 + 5, 0, Math.PI * 2);
-        ctx.fill();
     }
 
     getBounds() {
         return {
             x: this.x,
             y: this.y,
-            width: this.width,
-            height: this.height
+            width: this.sliding ? this.width + 20 : this.width,
+            height: this.sliding ? 25 : this.height
         };
     }
 }
 
-// Cloud Particle Class
-class Cloud {
-    constructor() {
-        this.x = Math.random() * game.canvas.width;
-        this.y = Math.random() * game.canvas.height;
-        this.size = 20 + Math.random() * 30;
-        this.speed = 0.2 + Math.random() * 0.5;
-        this.opacity = 0.3 + Math.random() * 0.3;
+// Enemy class
+class Enemy {
+    constructor(type) {
+        this.x = 850;
+        this.y = type === 'flying' ? 150 + Math.random() * 80 : 260;
+        this.width = 40;
+        this.height = 40;
+        this.type = type;
+        this.icon = type === 'flying' ? '🦇' : '👾';
+        this.health = 100;
+        this.clickable = true;
     }
 
     update() {
-        this.x += this.speed;
-        if (this.x > game.canvas.width + this.size) {
-            this.x = -this.size;
-            this.y = Math.random() * game.canvas.height;
+        this.x -= game.scrollSpeed;
+    }
+
+    draw(ctx) {
+        ctx.font = `${this.height}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText(this.icon, this.x + this.width / 2, this.y + this.height);
+        
+        // Health bar
+        if (this.health < 100) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(this.x, this.y - 10, this.width, 5);
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(this.x, this.y - 10, this.width * (this.health / 100), 5);
         }
     }
 
-    draw() {
-        const ctx = game.ctx;
-        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.arc(this.x + this.size / 2, this.y - this.size / 3, this.size * 0.7, 0, Math.PI * 2);
-        ctx.arc(this.x + this.size, this.y, this.size * 0.8, 0, Math.PI * 2);
-        ctx.fill();
+    getBounds() {
+        return { x: this.x, y: this.y, width: this.width, height: this.height };
     }
 }
 
-// Collision Detection
+// Obstacle class
+class Obstacle {
+    constructor() {
+        this.x = 850;
+        this.y = 280;
+        this.width = 30;
+        this.height = 40;
+    }
+
+    update() {
+        this.x -= game.scrollSpeed;
+    }
+
+    draw(ctx) {
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = '#654321';
+        ctx.fillRect(this.x + 5, this.y + 5, this.width - 10, this.height - 10);
+    }
+
+    getBounds() {
+        return { x: this.x, y: this.y, width: this.width, height: this.height };
+    }
+}
+
+// Gem class
+class Gem {
+    constructor() {
+        this.x = 850;
+        this.y = 150 + Math.random() * 100;
+        this.width = 25;
+        this.height = 25;
+        this.collected = false;
+    }
+
+    update() {
+        this.x -= game.scrollSpeed;
+    }
+
+    draw(ctx) {
+        ctx.font = `${this.height}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText('💎', this.x + this.width / 2, this.y + this.height);
+    }
+
+    getBounds() {
+        return { x: this.x, y: this.y, width: this.width, height: this.height };
+    }
+}
+
+// Collision detection
 function checkCollision(a, b) {
     return a.x < b.x + b.width &&
            a.x + a.width > b.x &&
@@ -372,501 +283,326 @@ function checkCollision(a, b) {
            a.y + a.height > b.y;
 }
 
-// Generate Division Problem
+// Generate problem
 function generateProblem() {
-    const gradeConfig = gradeConfigs[game.selectedGrade];
-    const levelIndex = Math.min(game.level, gradeConfig.ranges.length - 1);
-    const range = gradeConfig.ranges[levelIndex];
-    
+    const config = gradeConfigs[game.selectedGrade];
+    const range = config.ranges[Math.floor(Math.random() * config.ranges.length)];
     const divisor = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
     const maxQuotient = Math.floor(range.dividendMax / divisor);
     const quotient = Math.floor(Math.random() * maxQuotient) + 1;
     const dividend = divisor * quotient;
-    
     return { dividend, divisor, answer: quotient };
 }
 
-// Show Star Modal
-function showStarModal(star) {
+// Show battle
+function showBattle(enemy) {
     game.paused = true;
-    game.currentStar = star;
+    game.currentEnemy = enemy;
     
     const problem = generateProblem();
     game.currentAnswer = problem.answer;
     
-    starProblemEl.textContent = `${problem.dividend} ÷ ${problem.divisor} = ?`;
+    enemyIconEl.textContent = enemy.icon;
+    enemyHealthEl.style.width = enemy.health + '%';
+    battleProblemEl.textContent = `${problem.dividend} ÷ ${problem.divisor} = ?`;
     
-    // Generate wrong answers
-    const wrongAnswers = new Set();
-    const offsets = [-2, -1, 1, 2];
-    while (wrongAnswers.size < 2) {
-        const offset = offsets[Math.floor(Math.random() * offsets.length)];
-        const wrong = problem.answer + offset;
-        if (wrong > 0 && wrong !== problem.answer) {
-            wrongAnswers.add(wrong);
-        }
+    // Generate answers
+    const wrong = new Set();
+    while (wrong.size < 3) {
+        const offset = [-3, -2, -1, 1, 2, 3][Math.floor(Math.random() * 6)];
+        const ans = problem.answer + offset;
+        if (ans > 0 && ans !== problem.answer) wrong.add(ans);
     }
     
-    const allAnswers = [problem.answer, ...Array.from(wrongAnswers)];
+    const allAnswers = [problem.answer, ...Array.from(wrong)];
     allAnswers.sort(() => Math.random() - 0.5);
     
-    starAnswersEl.innerHTML = '';
+    battleAnswersEl.innerHTML = '';
     allAnswers.forEach(answer => {
         const btn = document.createElement('button');
-        btn.className = 'star-answer-btn';
+        btn.className = 'battle-btn';
         btn.textContent = answer;
-        btn.onclick = () => checkStarAnswer(answer, btn);
-        starAnswersEl.appendChild(btn);
+        btn.onclick = () => checkBattleAnswer(answer, btn);
+        battleAnswersEl.appendChild(btn);
     });
     
-    starModal.classList.add('active');
+    // Start timer
+    game.timeLeft = 100;
+    if (game.timerInterval) clearInterval(game.timerInterval);
+    game.timerInterval = setInterval(() => {
+        game.timeLeft -= 2;
+        timerFillEl.style.width = game.timeLeft + '%';
+        if (game.timeLeft <= 0) {
+            clearInterval(game.timerInterval);
+            loseLife();
+            closeBattle();
+        }
+    }, 100);
+    
+    battleModal.classList.add('active');
 }
 
-// Check Star Answer
-function checkStarAnswer(answer, btn) {
-    const buttons = starAnswersEl.querySelectorAll('.star-answer-btn');
+// Check battle answer
+function checkBattleAnswer(answer, btn) {
+    clearInterval(game.timerInterval);
+    const buttons = battleAnswersEl.querySelectorAll('.battle-btn');
     buttons.forEach(b => b.style.pointerEvents = 'none');
     
     if (answer === game.currentAnswer) {
         btn.classList.add('correct');
+        game.currentEnemy.health -= 50;
         
-        const pointValue = (game.activePowerup === 'double') ? 20 : 10;
-        game.starsCollected++;
-        game.score += pointValue;
-        game.currentStar.collected = true;
+        if (game.currentEnemy.health <= 0) {
+            game.enemiesDefeated++;
+            game.score += 50 * game.combo;
+            game.combo++;
+            if (game.combo > game.maxCombo) game.maxCombo = game.combo;
+            game.enemies = game.enemies.filter(e => e !== game.currentEnemy);
+        }
         
-        createParticleExplosion(game.currentStar.x, game.currentStar.y, '✨');
-        
-        // Check for milestone
-        checkMilestone();
-        
-        setTimeout(() => {
-            closeStarModal();
-        }, 500);
+        setTimeout(() => closeBattle(), 500);
     } else {
         btn.classList.add('incorrect');
-        
         buttons.forEach(b => {
             if (parseInt(b.textContent) === game.currentAnswer) {
                 b.classList.add('correct');
             }
         });
         
-        setTimeout(() => {
-            closeStarModal();
-        }, 1500);
+        loseLife();
+        setTimeout(() => closeBattle(), 1500);
     }
     
     updateUI();
 }
 
-// Close Star Modal
-function closeStarModal() {
-    starModal.classList.remove('active');
+// Close battle
+function closeBattle() {
+    battleModal.classList.remove('active');
     game.paused = false;
-    if (game.currentStar) {
-        game.stars = game.stars.filter(s => s !== game.currentStar);
-        game.currentStar = null;
-    }
+    game.currentEnemy = null;
 }
 
-// Check Milestone
-function checkMilestone() {
-    const milestone = Math.floor(game.score / 300) * 300;
-    if (milestone > game.lastMilestone && milestone > 0) {
-        game.lastMilestone = milestone;
-        showMilestoneModal(milestone);
+// Lose life
+function loseLife() {
+    game.lives--;
+    game.combo = 1;
+    if (game.lives <= 0) {
+        gameOver();
     }
-}
-
-// Show Milestone Modal
-function showMilestoneModal(milestone) {
-    game.paused = true;
-    
-    const powerupIndex = ((milestone / 300) - 1) % powerups.length;
-    const powerup = powerups[powerupIndex];
-    
-    milestoneScoreEl.textContent = `${milestone} Points!`;
-    powerupNameEl.textContent = powerup.name;
-    powerupDescEl.textContent = powerup.description;
-    
-    // Store the powerup to activate
-    game.pendingPowerup = powerup;
-    
-    milestoneModal.classList.add('active');
-    
-    // Create massive celebration
-    for (let i = 0; i < 50; i++) {
-        setTimeout(() => {
-            createParticleExplosion(
-                Math.random() * game.canvas.width,
-                Math.random() * game.canvas.height,
-                ['🎉', '🎊', '⭐', '💫', '✨'][Math.floor(Math.random() * 5)]
-            );
-        }, i * 50);
-    }
-}
-
-// Close Milestone Modal
-function closeMilestoneModal() {
-    milestoneModal.classList.remove('active');
-    
-    // Activate the powerup
-    if (game.pendingPowerup) {
-        game.activePowerup = game.pendingPowerup.effect;
-        game.powerupTimer = game.pendingPowerup.duration;
-        game.pendingPowerup = null;
-    }
-    
-    game.paused = false;
-}
-
-// Show Chest Modal
-function showChestModal(chest) {
-    game.paused = true;
-    game.currentChest = chest;
-    
-    const problem = generateProblem();
-    game.currentAnswer = problem.answer;
-    
-    chestProblemEl.textContent = `${problem.dividend} ÷ ${problem.divisor} = ?`;
-    
-    // Generate wrong answers
-    const wrongAnswers = new Set();
-    const offsets = [-3, -2, -1, 1, 2, 3];
-    while (wrongAnswers.size < 3) {
-        const offset = offsets[Math.floor(Math.random() * offsets.length)];
-        const wrong = problem.answer + offset;
-        if (wrong > 0 && wrong !== problem.answer) {
-            wrongAnswers.add(wrong);
-        }
-    }
-    
-    const allAnswers = [problem.answer, ...Array.from(wrongAnswers)];
-    allAnswers.sort(() => Math.random() - 0.5);
-    
-    chestAnswersEl.innerHTML = '';
-    allAnswers.forEach(answer => {
-        const btn = document.createElement('button');
-        btn.className = 'chest-answer-btn';
-        btn.textContent = answer;
-        btn.onclick = () => checkChestAnswer(answer, btn);
-        chestAnswersEl.appendChild(btn);
-    });
-    
-    chestFeedbackEl.textContent = '';
-    chestModal.classList.add('active');
-}
-
-// Check Chest Answer
-function checkChestAnswer(answer, btn) {
-    const buttons = chestAnswersEl.querySelectorAll('.chest-answer-btn');
-    buttons.forEach(b => b.style.pointerEvents = 'none');
-    
-    if (answer === game.currentAnswer) {
-        btn.classList.add('correct');
-        chestFeedbackEl.textContent = '🎉 Correct! Treasure unlocked! 🎉';
-        chestFeedbackEl.style.color = '#4caf50';
-        
-        const pointValue = (game.activePowerup === 'double') ? 100 : 50;
-        game.chestsOpened++;
-        game.score += pointValue;
-        game.streak++;
-        game.currentChest.collected = true;
-        
-        createParticleExplosion(game.currentChest.x + 25, game.currentChest.y + 25, '💎');
-        
-        // Check for milestone
-        checkMilestone();
-        
-        setTimeout(() => {
-            closeChestModal();
-        }, 1500);
-    } else {
-        btn.classList.add('incorrect');
-        chestFeedbackEl.textContent = `Oops! The answer was ${game.currentAnswer}`;
-        chestFeedbackEl.style.color = '#f44336';
-        game.streak = 0;
-        
-        buttons.forEach(b => {
-            if (parseInt(b.textContent) === game.currentAnswer) {
-                b.classList.add('correct');
-            }
-        });
-        
-        setTimeout(() => {
-            closeChestModal();
-        }, 2000);
-    }
-    
-    updateUI();
-}
-
-// Close Chest Modal
-function closeChestModal() {
-    chestModal.classList.remove('active');
-    game.paused = false;
-    if (game.currentChest) {
-        game.chests = game.chests.filter(c => c !== game.currentChest);
-        game.currentChest = null;
-    }
-}
-
-// Create Particle Explosion
-function createParticleExplosion(x, y, emoji) {
-    for (let i = 0; i < 15; i++) {
-        const angle = (Math.PI * 2 * i) / 15;
-        const velocity = 3 + Math.random() * 3;
-        game.particles.push({
-            x, y,
-            vx: Math.cos(angle) * velocity,
-            vy: Math.sin(angle) * velocity,
-            life: 30,
-            emoji: emoji
-        });
-    }
-}
-
-// Update Game
-function update() {
-    if (game.paused || game.gameOver) return;
-    
-    // Update adventurer
-    game.adventurer.update();
-    
-    // Update powerup timer
-    if (game.powerupTimer > 0) {
-        game.powerupTimer--;
-        if (game.powerupTimer === 0) {
-            game.activePowerup = null;
-        }
-    }
-    
-    // Update clouds
-    game.cloudParticles.forEach(cloud => cloud.update());
-    
-    // Spawn stars
-    if (Math.random() < 0.03) {
-        game.stars.push(new Star());
-    }
-    
-    // Spawn chests
-    if (Math.random() < 0.005 && game.chests.length < 2) {
-        game.chests.push(new Chest());
-    }
-    
-    // Update stars
-    game.stars = game.stars.filter(star => {
-        star.update();
-        
-        const adventurerBounds = game.adventurer.getBounds();
-        const starBounds = star.getBounds();
-        
-        if (!star.collected && checkCollision(adventurerBounds, starBounds)) {
-            // FORCE math problem - can't skip!
-            showStarModal(star);
-            return true; // Keep the star until problem is solved
-        }
-        
-        return star.y < game.canvas.height + 50;
-    });
-    
-    // Update chests
-    game.chests.forEach(chest => {
-        if (!chest.collected) {
-            chest.update();
-            
-            const adventurerBounds = game.adventurer.getBounds();
-            const chestBounds = chest.getBounds();
-            
-            if (checkCollision(adventurerBounds, chestBounds)) {
-                showChestModal(chest);
-            }
-        }
-    });
-    
-    game.chests = game.chests.filter(chest => !chest.collected && chest.y < game.canvas.height + 50);
-    
-    // Update particles
-    game.particles = game.particles.filter(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.2;
-        p.life--;
-        return p.life > 0;
-    });
-    
-    // Level up
-    if (game.starsCollected > 0 && game.starsCollected % 20 === 0 && game.level < 3) {
-        game.level++;
-    }
-}
-
-// Draw Game
-function draw() {
-    const ctx = game.ctx;
-    
-    // Clear canvas
-    ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
-    
-    // Draw gradient background
-    const gradient = ctx.createLinearGradient(0, 0, 0, game.canvas.height);
-    gradient.addColorStop(0, '#87CEEB');
-    gradient.addColorStop(0.5, '#E0F6FF');
-    gradient.addColorStop(1, '#FFE5E5');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-    
-    // Draw clouds
-    game.cloudParticles.forEach(cloud => cloud.draw());
-    
-    // Draw stars
-    game.stars.forEach(star => star.draw());
-    
-    // Draw chests
-    game.chests.forEach(chest => chest.draw());
-    
-    // Draw particles
-    game.particles.forEach(p => {
-        ctx.save();
-        ctx.globalAlpha = p.life / 30;
-        ctx.font = '20px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(p.emoji, p.x, p.y);
-        ctx.restore();
-    });
-    
-    // Draw adventurer
-    game.adventurer.draw();
-    
-    // Draw powerup timer
-    if (game.activePowerup && game.powerupTimer > 0) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(10, 10, 200, 30);
-        ctx.fillStyle = '#ffd700';
-        const width = (game.powerupTimer / 1200) * 190;
-        ctx.fillRect(15, 15, width, 20);
-        
-        ctx.fillStyle = '#fff';
-        ctx.font = '14px Fredoka, sans-serif';
-        ctx.textAlign = 'left';
-        const powerup = powerups.find(p => p.effect === game.activePowerup);
-        ctx.fillText(`${powerup?.icon || '⚡'} Power-up Active!`, 20, 28);
-    }
-}
-
-// Game Loop
-function gameLoop() {
-    update();
-    draw();
-    requestAnimationFrame(gameLoop);
 }
 
 // Update UI
 function updateUI() {
-    starsCollectedEl.textContent = game.starsCollected;
-    chestsOpenedEl.textContent = game.chestsOpened;
-    streakEl.textContent = game.streak;
-    totalScoreEl.textContent = game.score;
+    scoreEl.textContent = game.score;
+    comboEl.textContent = `x${game.combo}`;
+    livesEl.textContent = '❤️'.repeat(game.lives);
 }
 
-// Start Game
+// Game over
+function gameOver() {
+    game.running = false;
+    gameScreen.classList.remove('active');
+    gameOverScreen.classList.add('active');
+    
+    finalScoreEl.textContent = game.score;
+    enemiesDefeatedEl.textContent = game.enemiesDefeated;
+    gemsCollectedEl.textContent = game.gemsCollected;
+    maxComboEl.textContent = `x${game.maxCombo}`;
+}
+
+// Spawn entities
+function spawnEntities() {
+    if (Math.random() < 0.02) {
+        const type = Math.random() < 0.5 ? 'ground' : 'flying';
+        game.enemies.push(new Enemy(type));
+    }
+    
+    if (Math.random() < 0.015) {
+        game.obstacles.push(new Obstacle());
+    }
+    
+    if (Math.random() < 0.03) {
+        game.gems.push(new Gem());
+    }
+}
+
+// Update game
+function update() {
+    if (!game.running || game.paused) return;
+    
+    game.player.update();
+    
+    // Update entities
+    game.enemies.forEach(e => e.update());
+    game.obstacles.forEach(o => o.update());
+    game.gems.forEach(g => g.update());
+    
+    // Check collisions
+    const playerBounds = game.player.getBounds();
+    
+    game.enemies = game.enemies.filter(e => {
+        if (e.x < -50) return false;
+        if (checkCollision(playerBounds, e.getBounds()) && e.clickable) {
+            loseLife();
+            updateUI();
+            return false;
+        }
+        return true;
+    });
+    
+    game.obstacles = game.obstacles.filter(o => {
+        if (o.x < -50) return false;
+        if (checkCollision(playerBounds, o.getBounds())) {
+            loseLife();
+            updateUI();
+            return false;
+        }
+        return true;
+    });
+    
+    game.gems = game.gems.filter(g => {
+        if (g.x < -50) return false;
+        if (!g.collected && checkCollision(playerBounds, g.getBounds())) {
+            g.collected = true;
+            game.gemsCollected++;
+            game.score += 10 * game.combo;
+            updateUI();
+            return false;
+        }
+        return true;
+    });
+    
+    // Spawn new entities
+    spawnEntities();
+    
+    // Increase difficulty
+    if (game.score > 0 && game.score % 500 === 0 && game.scrollSpeed < 10) {
+        game.scrollSpeed += 0.5;
+    }
+}
+
+// Draw game
+function draw() {
+    const ctx = game.ctx;
+    
+    // Clear
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, '#87CEEB');
+    gradient.addColorStop(0.6, '#E8F4F8');
+    gradient.addColorStop(1, '#90EE90');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 800, 400);
+    
+    // Draw ground
+    ctx.fillStyle = '#8B7355';
+    ctx.fillRect(0, 300, 800, 100);
+    ctx.fillStyle = '#6B5345';
+    for (let i = 0; i < 800; i += 50) {
+        ctx.fillRect(i, 305, 40, 5);
+    }
+    
+    // Draw entities
+    game.gems.forEach(g => g.draw(ctx));
+    game.obstacles.forEach(o => o.draw(ctx));
+    game.enemies.forEach(e => e.draw(ctx));
+    game.player.draw(ctx);
+}
+
+// Game loop
+function gameLoop() {
+    update();
+    draw();
+    if (game.running) {
+        requestAnimationFrame(gameLoop);
+    }
+}
+
+// Start game
 function startGame(grade) {
     game.selectedGrade = grade;
     game.score = 0;
-    game.starsCollected = 0;
-    game.chestsOpened = 0;
-    game.streak = 0;
-    game.level = 0;
+    game.lives = 3;
+    game.combo = 1;
+    game.maxCombo = 1;
+    game.gemsCollected = 0;
+    game.enemiesDefeated = 0;
+    game.scrollSpeed = 5;
+    game.running = true;
     game.paused = false;
-    game.gameOver = false;
-    game.stars = [];
-    game.chests = [];
-    game.particles = [];
-    game.cloudParticles = [];
+    game.enemies = [];
+    game.obstacles = [];
+    game.gems = [];
     
-    gradeScreen.classList.remove('active');
+    startScreen.classList.remove('active');
     gameScreen.classList.add('active');
     
     game.canvas = document.getElementById('gameCanvas');
     game.ctx = game.canvas.getContext('2d');
-    
-    game.adventurer = new Adventurer(game.canvas.width / 2 - 25, game.canvas.height / 2);
-    
-    // Create clouds
-    for (let i = 0; i < 5; i++) {
-        game.cloudParticles.push(new Cloud());
-    }
+    game.player = new Player();
     
     updateUI();
+    actionHintEl.style.display = 'block';
+    setTimeout(() => actionHintEl.style.display = 'none', 3000);
+    
     gameLoop();
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Phoenix Treasure Hunt - Ready to play!');
-});
-
-// Keyboard Controls
-window.addEventListener('keydown', (e) => {
+// Keyboard controls
+window.addEventListener('keydown', e => {
     game.keys[e.key] = true;
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+    if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') {
         e.preventDefault();
+        game.player.jump();
+    }
+    if (e.key === 'ArrowDown' || e.key === 's') {
+        e.preventDefault();
+        game.player.slide();
     }
 });
 
-window.addEventListener('keyup', (e) => {
+window.addEventListener('keyup', e => {
     game.keys[e.key] = false;
 });
 
-// Mouse/Touch Controls
+// Click to battle
+game.canvas?.addEventListener('click', e => {
+    if (game.paused) return;
+    
+    const rect = game.canvas.getBoundingClientRect();
+    const scaleX = game.canvas.width / rect.width;
+    const scaleY = game.canvas.height / rect.height;
+    const clickX = (e.clientX - rect.left) * scaleX;
+    const clickY = (e.clientY - rect.top) * scaleY;
+    
+    for (let enemy of game.enemies) {
+        const bounds = enemy.getBounds();
+        if (clickX >= bounds.x && clickX <= bounds.x + bounds.width &&
+            clickY >= bounds.y && clickY <= bounds.y + bounds.height) {
+            showBattle(enemy);
+            break;
+        }
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('gameCanvas');
-    
-    canvas.addEventListener('mousedown', (e) => {
+    canvas?.addEventListener('click', e => {
+        if (game.paused) return;
+        
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        game.mouse.x = (e.clientX - rect.left) * scaleX;
-        game.mouse.y = (e.clientY - rect.top) * scaleY;
-        game.mouse.down = true;
-    });
-    
-    canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        game.mouse.x = (e.clientX - rect.left) * scaleX;
-        game.mouse.y = (e.clientY - rect.top) * scaleY;
-    });
-    
-    canvas.addEventListener('mouseup', () => {
-        game.mouse.down = false;
-    });
-    
-    canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        game.mouse.x = (touch.clientX - rect.left) * scaleX;
-        game.mouse.y = (touch.clientY - rect.top) * scaleY;
-        game.mouse.down = true;
-    });
-    
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        game.mouse.x = (touch.clientX - rect.left) * scaleX;
-        game.mouse.y = (touch.clientY - rect.top) * scaleY;
-    });
-    
-    canvas.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        game.mouse.down = false;
+        const clickX = (e.clientX - rect.left) * scaleX;
+        const clickY = (e.clientY - rect.top) * scaleY;
+        
+        for (let enemy of game.enemies) {
+            const bounds = enemy.getBounds();
+            if (clickX >= bounds.x && clickX <= bounds.x + bounds.width &&
+                clickY >= bounds.y && clickY <= bounds.y + bounds.height) {
+                showBattle(enemy);
+                break;
+            }
+        }
     });
 });

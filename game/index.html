@@ -3,180 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏃‍♀️ Adventure Quest - Division Treasure Hunt ✨</title>
+    <title>⚡ Math Runner - Division Dash! 🏃‍♀️</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="sparkles"></div>
-    
     <div class="game-container">
-        <!-- Grade Selection Screen -->
-        <div id="gradeScreen" class="screen active">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
             <div class="title-box">
-                <h1 class="game-title">🏃‍♀️ Adventure Quest ✨</h1>
-                <p class="subtitle">Guide your adventurer, solve division problems, and collect treasures!</p>
+                <h1 class="game-title">⚡ MATH RUNNER ⚡</h1>
+                <h2 class="subtitle-big">DIVISION DASH!</h2>
+                <p class="tagline">Run! Jump! Blast enemies with division power!</p>
             </div>
             
-            <div class="grade-selection">
-                <button class="grade-btn" data-grade="3">
-                    <span class="grade-number">3rd</span>
-                    <span class="grade-label">Grade</span>
-                    <span class="grade-info">Easy Flight</span>
+            <div class="grade-grid">
+                <button class="grade-card" data-grade="3">
+                    <div class="grade-num">3</div>
+                    <div class="grade-name">Grade 3</div>
                 </button>
-                <button class="grade-btn" data-grade="4">
-                    <span class="grade-number">4th</span>
-                    <span class="grade-label">Grade</span>
-                    <span class="grade-info">Medium Flight</span>
+                <button class="grade-card" data-grade="4">
+                    <div class="grade-num">4</div>
+                    <div class="grade-name">Grade 4</div>
                 </button>
-                <button class="grade-btn" data-grade="5">
-                    <span class="grade-number">5th</span>
-                    <span class="grade-label">Grade</span>
-                    <span class="grade-info">Advanced Flight</span>
+                <button class="grade-card" data-grade="5">
+                    <div class="grade-num">5</div>
+                    <div class="grade-name">Grade 5</div>
                 </button>
-                <button class="grade-btn" data-grade="6">
-                    <span class="grade-number">6th</span>
-                    <span class="grade-label">Grade</span>
-                    <span class="grade-info">Expert Flight</span>
+                <button class="grade-card" data-grade="6">
+                    <div class="grade-num">6</div>
+                    <div class="grade-name">Grade 6</div>
                 </button>
             </div>
 
-            <div class="instructions">
-                <h3>🎮 How to Play:</h3>
-                <ul>
-                    <li>🏃‍♀️ <strong>Move your adventurer</strong> with arrow keys, WASD, or mouse/touch</li>
-                    <li>⭐ <strong>Touch stars to solve quick division problems</strong> - you MUST solve to collect!</li>
-                    <li>💎 <strong>Find treasure chests</strong> for bigger challenges and bonus points</li>
-                    <li>🏆 <strong>Reach 300, 600, 900+ points</strong> to unlock power-ups!</li>
-                    <li>⚡ <strong>Power-ups</strong> give you speed boosts, double points, and more!</li>
-                </ul>
+            <div class="how-to-play">
+                <h3>🎮 Controls:</h3>
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <span class="control-key">SPACE</span>
+                        <span class="control-action">Jump!</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key">↓</span>
+                        <span class="control-action">Slide!</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key">CLICK</span>
+                        <span class="control-action">Blast Enemy!</span>
+                    </div>
+                </div>
+                <p class="game-tip">💡 Answer division problems to destroy enemies and earn points!</p>
             </div>
         </div>
 
-        <!-- Game Play Screen -->
+        <!-- Game Screen -->
         <div id="gameScreen" class="screen">
-            <div class="game-header">
-                <div class="stat-display">
-                    <span class="stat-icon">⭐</span>
-                    <span id="starsCollected">0</span>
+            <div class="game-hud">
+                <div class="hud-left">
+                    <div class="hud-item">
+                        <span class="hud-icon">💎</span>
+                        <span id="score" class="hud-value">0</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-icon">🔥</span>
+                        <span id="combo" class="hud-value">x1</span>
+                    </div>
                 </div>
-                <div class="stat-display">
-                    <span class="stat-icon">💎</span>
-                    <span id="chestsOpened">0</span>
-                </div>
-                <div class="stat-display">
-                    <span class="stat-icon">🔥</span>
-                    <span id="streak">0</span>
-                </div>
-                <div class="stat-display">
-                    <span class="stat-icon">🏆</span>
-                    <span id="totalScore">0</span>
-                </div>
-            </div>
-
-            <canvas id="gameCanvas" width="800" height="600"></canvas>
-
-            <div class="game-controls">
-                <p>Use ← → ↑ ↓ Arrow Keys or Click/Touch to Move!</p>
-            </div>
-        </div>
-
-        <!-- Quick Star Challenge Modal -->
-        <div id="starModal" class="modal">
-            <div class="modal-content star-content">
-                <div class="star-animation">
-                    <div class="big-star-icon">⭐</div>
-                </div>
-                <h2 class="modal-title">Quick Challenge!</h2>
-                <p class="modal-subtitle">Solve to collect the star:</p>
-                
-                <div class="star-question">
-                    <div id="starProblem" class="star-problem-text">15 ÷ 3 = ?</div>
-                    
-                    <div class="star-answers" id="starAnswers">
-                        <button class="star-answer-btn">5</button>
-                        <button class="star-answer-btn">3</button>
-                        <button class="star-answer-btn">4</button>
+                <div class="hud-right">
+                    <div class="hud-item">
+                        <span class="hud-icon">💗</span>
+                        <span id="lives" class="hud-value">❤️❤️❤️</span>
                     </div>
                 </div>
             </div>
+
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+            <div class="action-hint" id="actionHint">Press SPACE to JUMP!</div>
         </div>
 
-        <!-- Chest Unlock Modal -->
-        <div id="chestModal" class="modal">
-            <div class="modal-content chest-content">
-                <div class="chest-animation">
-                    <div class="big-chest">💎</div>
-                    <div class="sparkle-ring">✨✨✨</div>
-                </div>
-                <h2 class="modal-title">Treasure Chest Found!</h2>
-                <p class="modal-subtitle">Solve this division problem to unlock it:</p>
-                
-                <div class="chest-question">
-                    <div id="chestProblem" class="chest-problem-text">24 ÷ 6 = ?</div>
-                    
-                    <div class="chest-answers" id="chestAnswers">
-                        <button class="chest-answer-btn">4</button>
-                        <button class="chest-answer-btn">6</button>
-                        <button class="chest-answer-btn">8</button>
-                        <button class="chest-answer-btn">3</button>
+        <!-- Battle Modal -->
+        <div id="battleModal" class="modal">
+            <div class="modal-content battle-content">
+                <div class="enemy-display">
+                    <div class="enemy-icon" id="enemyIcon">👾</div>
+                    <div class="enemy-health-bar">
+                        <div class="health-fill" id="enemyHealth"></div>
                     </div>
                 </div>
-
-                <div id="chestFeedback" class="chest-feedback"></div>
-            </div>
-        </div>
-
-        <!-- Milestone Celebration Modal -->
-        <div id="milestoneModal" class="modal">
-            <div class="modal-content milestone-content">
-                <div class="milestone-animation">
-                    <div class="trophy-big">🏆</div>
-                    <div class="fireworks">🎆🎇✨💥</div>
+                
+                <h2 class="battle-title">MATH BATTLE!</h2>
+                <div class="battle-problem" id="battleProblem">36 ÷ 6 = ?</div>
+                
+                <div class="battle-answers" id="battleAnswers">
+                    <button class="battle-btn">6</button>
+                    <button class="battle-btn">5</button>
+                    <button class="battle-btn">7</button>
+                    <button class="battle-btn">4</button>
                 </div>
-                <h2 class="milestone-title">🎉 MILESTONE REACHED! 🎉</h2>
-                <p class="milestone-score" id="milestoneScore">300 Points!</p>
-                <p class="milestone-message">You've earned a POWER-UP!</p>
-                <div class="powerup-display">
-                    <div class="powerup-icon">⚡</div>
-                    <div class="powerup-name" id="powerupName">Speed Boost!</div>
-                    <div class="powerup-description" id="powerupDesc">Phoenix moves faster for 20 seconds!</div>
+
+                <div class="timer-bar">
+                    <div class="timer-fill" id="timerFill"></div>
                 </div>
-                <button id="claimPowerupBtn" class="btn btn-large">Claim Reward! 🎁</button>
             </div>
         </div>
 
         <!-- Game Over Screen -->
         <div id="gameOverScreen" class="screen">
-            <div class="game-over-content">
-                <h1 class="game-over-title">🌟 Great Flying! 🌟</h1>
-                <div class="final-stats">
-                    <div class="final-stat">
-                        <span class="final-stat-icon">⭐</span>
-                        <span class="final-stat-label">Stars Collected:</span>
-                        <span id="finalStars" class="final-stat-value">0</span>
+            <div class="game-over-box">
+                <h1 class="game-over-title">GAME OVER!</h1>
+                <div class="final-score-big">
+                    <div class="score-label">Final Score</div>
+                    <div id="finalScore" class="score-number">0</div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-icon">👾</div>
+                        <div class="stat-number" id="enemiesDefeated">0</div>
+                        <div class="stat-label">Enemies</div>
                     </div>
-                    <div class="final-stat">
-                        <span class="final-stat-icon">💎</span>
-                        <span class="final-stat-label">Chests Opened:</span>
-                        <span id="finalChests" class="final-stat-value">0</span>
+                    <div class="stat-box">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-number" id="gemsCollected">0</div>
+                        <div class="stat-label">Gems</div>
                     </div>
-                    <div class="final-stat">
-                        <span class="final-stat-icon">🏆</span>
-                        <span class="final-stat-label">Total Score:</span>
-                        <span id="finalScore" class="final-stat-value">0</span>
+                    <div class="stat-box">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-number" id="maxCombo">1</div>
+                        <div class="stat-label">Max Combo</div>
                     </div>
                 </div>
-                <button id="playAgainBtn" class="btn btn-large">Play Again! 🎮</button>
-                <button id="changeGradeBtn2" class="btn-secondary">Change Grade</button>
+                <button id="playAgainBtn" class="btn-play">PLAY AGAIN! 🎮</button>
+                <button id="changeGradeBtn" class="btn-secondary">Change Grade</button>
             </div>
         </div>
     </div>
 
-    <div class="floating-particles" id="particles"></div>
-    
     <script src="game.js"></script>
 </body>
 </html>
