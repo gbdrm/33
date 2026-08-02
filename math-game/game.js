@@ -14,6 +14,14 @@ class MathBlasterGame {
         this.timer = null;
         this.isGameActive = false;
         
+        // New features
+        this.comboMultiplier = 1;
+        this.activePowerups = [];
+        this.questionsSinceBonus = 0;
+        this.inBonusRound = false;
+        this.bonusTimeLeft = 10;
+        this.bonusScore = 0;
+        
         this.init();
     }
     
@@ -116,6 +124,10 @@ class MathBlasterGame {
         this.correctAnswers = 0;
         this.totalAnswers = 0;
         this.isGameActive = false;
+        this.comboMultiplier = 1;
+        this.activePowerups = [];
+        this.questionsSinceBonus = 0;
+        this.inBonusRound = false;
         
         if (this.timer) {
             clearInterval(this.timer);
@@ -124,7 +136,9 @@ class MathBlasterGame {
         
         this.updateScore();
         this.updateStreak();
+        this.updateComboMeter();
         document.getElementById('timer').textContent = '60';
+        document.getElementById('powerup-display').innerHTML = '';
     }
     
     showScreen(screen) {
@@ -138,6 +152,7 @@ class MathBlasterGame {
         this.timer = setInterval(() => {
             this.timeLeft--;
             document.getElementById('timer').textContent = this.timeLeft;
+            this.updateTimerBar();
             
             if (this.timeLeft <= 10) {
                 document.getElementById('timer').style.color = '#f44336';
@@ -147,6 +162,164 @@ class MathBlasterGame {
                 this.endGame();
             }
         }, 1000);
+    }
+    
+    spawnPowerup() {
+        const powerups = [
+            { icon: '⚡', name: 'DOUBLE POINTS', effect: 'double' },
+            { icon: '🚀', name: 'SPEED BOOST', effect: 'speed' },
+            { icon: '💎', name: 'MEGA SCORE', effect: 'mega' },
+            { icon: '🛡️', name: 'EXTRA LIFE', effect: 'life' },
+            { icon: '⏰', name: 'TIME FREEZE', effect: 'freeze' }
+        ];
+        
+        const powerup = powerups[Math.floor(Math.random() * powerups.length)];
+        
+        const powerupEl = document.createElement('div');
+        powerupEl.className = 'powerup';
+        powerupEl.textContent = `${powerup.icon} ${powerup.name}`;
+        powerupEl.dataset.effect = powerup.effect;
+        
+        powerupEl.addEventListener('click', () => {
+            this.activatePowerup(powerup);
+            powerupEl.remove();
+        });
+        
+        document.getElementById('powerup-display').appendChild(powerupEl);
+        
+        // Auto-remove after 10 seconds
+        setTimeout(() => {
+            if (powerupEl.parentElement) {
+                powerupEl.remove();
+            }
+        }, 10000);
+    }
+    
+    activatePowerup(powerup) {
+        this.createParticles(powerup.icon, '#ffd700', 15);
+        this.showFeedback(`${powerup.icon} ${powerup.name} ACTIVATED!`, 'correct');
+        
+        switch(powerup.effect) {
+            case 'double':
+                this.activePowerups.push('double');
+                this.showPowerMessage('⚡ DOUBLE POINTS FOR NEXT 5 ANSWERS! ⚡');
+                setTimeout(() => {
+                    const index = this.activePowerups.indexOf('double');
+                    if (index > -1) this.activePowerups.splice(index, 1);
+                }, 30000);
+                break;
+            case 'mega':
+                this.score += 100;
+                this.updateScore(100);
+                this.showPowerMessage('💎 +100 MEGA BONUS POINTS! 💎');
+                break;
+            case 'life':
+                if (this.selectedMode === 'survival') {
+                    this.lives = Math.min(this.lives + 1, 5);
+                    this.updateLives();
+                }
+                this.showPowerMessage('🛡️ EXTRA LIFE GAINED! 🛡️');
+                break;
+            case 'freeze':
+                if (this.selectedMode === 'speed') {
+                    this.timeLeft += 10;
+                    document.getElementById('timer').textContent = this.timeLeft;
+                }
+                this.showPowerMessage('⏰ +10 SECONDS! TIME FREEZE! ⏰');
+                break;
+            case 'speed':
+                this.activePowerups.push('speed');
+                this.showPowerMessage('🚀 SPEED MODE! ANSWER FAST! 🚀');
+                setTimeout(() => {
+                    const index = this.activePowerups.indexOf('speed');
+                    if (index > -1) this.activePowerups.splice(index, 1);
+                }, 15000);
+                break;
+        }
+        
+        this.createConfetti();
+    }
+    
+    triggerBonusRound() {
+        this.inBonusRound = true;
+        this.bonusTimeLeft = 10;
+        this.bonusScore = 0;
+        
+        const bonusRound = document.getElementById('bonus-round');
+        bonusRound.innerHTML = `
+            <div class="bonus-content">
+                <div class="bonus-title">💥 BONUS ROUND! 💥</div>
+                <div class="bonus-message">Answer as many as you can in 10 seconds!</div>
+                <div class="bonus-message">Each correct = 50 POINTS!</div>
+                <div id="bonus-timer" class="bonus-question">10</div>
+                <div id="bonus-question-text" class="bonus-question"></div>
+                <div id="bonus-answers" class="bonus-answers"></div>
+            </div>
+        `;
+        
+        bonusRound.classList.add('active');
+        this.createConfetti();
+        this.createConfetti();
+        
+        // Start bonus round timer
+        const bonusTimer = setInterval(() => {
+            this.bonusTimeLeft--;
+            document.getElementById('bonus-timer').textContent = this.bonusTimeLeft;
+            
+            if (this.bonusTimeLeft <= 0) {
+                clearInterval(bonusTimer);
+                this.endBonusRound();
+            }
+        }, 1000);
+        
+        this.generateBonusQuestion();
+    }
+    
+    generateBonusQuestion() {
+        if (this.bonusTimeLeft <= 0) return;
+        
+        const question = this.getQuestionForGrade(this.selectedGrade);
+        document.getElementById('bonus-question-text').textContent = question.text;
+        
+        const answers = this.generateAnswerChoices(question.answer);
+        const bonusAnswersEl = document.getElementById('bonus-answers');
+        bonusAnswersEl.innerHTML = '';
+        
+        answers.forEach(answer => {
+            const btn = document.createElement('button');
+            btn.className = 'bonus-answer-btn';
+            btn.textContent = this.formatAnswer(answer);
+            btn.addEventListener('click', () => {
+                if (Math.abs(answer - question.answer) < 0.1) {
+                    this.bonusScore += 50;
+                    this.createParticles('💥', '#ffd700', 10);
+                    this.generateBonusQuestion();
+                }
+            });
+            bonusAnswersEl.appendChild(btn);
+        });
+    }
+    
+    endBonusRound() {
+        this.inBonusRound = false;
+        this.score += this.bonusScore;
+        
+        const bonusRound = document.getElementById('bonus-round');
+        bonusRound.innerHTML = `
+            <div class="bonus-content">
+                <div class="bonus-title">🏆 BONUS COMPLETE! 🏆</div>
+                <div class="bonus-message">You earned ${this.bonusScore} bonus points!</div>
+            </div>
+        `;
+        
+        this.createConfetti();
+        this.createConfetti();
+        this.createConfetti();
+        
+        setTimeout(() => {
+            bonusRound.classList.remove('active');
+            this.updateScore();
+        }, 3000);
     }
     
     generateQuestion() {
@@ -368,11 +541,27 @@ class MathBlasterGame {
     handleCorrectAnswer() {
         this.correctAnswers++;
         this.streak++;
+        this.questionsSinceBonus++;
+        
         if (this.streak > this.bestStreak) {
             this.bestStreak = this.streak;
         }
         
-        const points = 10 + (this.streak >= 5 ? 5 : 0) + (this.streak >= 10 ? 10 : 0);
+        // Calculate points with combo multiplier
+        let basePoints = 10 + (this.streak >= 5 ? 5 : 0) + (this.streak >= 10 ? 10 : 0);
+        
+        // Apply combo multiplier
+        let points = basePoints * this.comboMultiplier;
+        
+        // Apply powerups
+        if (this.activePowerups.includes('double')) {
+            points *= 2;
+        }
+        
+        if (this.activePowerups.includes('speed')) {
+            points += 5;
+        }
+        
         this.score += points;
         
         // Fun feedback messages
@@ -426,12 +615,29 @@ class MathBlasterGame {
             }
         });
         
-        this.updateScore();
+        this.updateScore(points);
         this.updateStreak();
+        this.updateComboMeter();
+        
+        // Spawn power-up randomly (10% chance) or after 7 correct answers
+        if (Math.random() < 0.1 || (this.correctAnswers % 7 === 0 && this.correctAnswers > 0)) {
+            this.spawnPowerup();
+        }
+        
+        // Trigger bonus round every 15 questions
+        if (this.questionsSinceBonus >= 15 && !this.inBonusRound) {
+            this.questionsSinceBonus = 0;
+            setTimeout(() => {
+                if (this.isGameActive && !this.inBonusRound) {
+                    this.triggerBonusRound();
+                }
+            }, 1000);
+        }
     }
     
     handleWrongAnswer() {
         this.streak = 0;
+        this.comboMultiplier = 1;
         
         // Encouraging messages
         const messages = [
@@ -469,6 +675,7 @@ class MathBlasterGame {
         }
         
         this.updateStreak();
+        this.updateComboMeter();
     }
     
     showFeedback(text, type) {
@@ -534,11 +741,70 @@ class MathBlasterGame {
         }
     }
     
-    updateScore() {
+    updateScore(points = 0) {
         const scoreElement = document.getElementById('score');
         scoreElement.textContent = this.score;
         scoreElement.classList.add('pulse-score');
         setTimeout(() => scoreElement.classList.remove('pulse-score'), 400);
+        
+        if (points > 0) {
+            this.showScorePopup(`+${points}`);
+        }
+    }
+    
+    showScorePopup(text) {
+        const popup = document.getElementById('score-popup');
+        popup.textContent = text;
+        popup.classList.add('show');
+        setTimeout(() => popup.classList.remove('show'), 1000);
+    }
+    
+    updateComboMeter() {
+        const comboFill = document.getElementById('combo-fill');
+        const comboMultiplier = document.getElementById('combo-multiplier');
+        
+        // Update multiplier based on streak
+        if (this.streak >= 20) {
+            this.comboMultiplier = 5;
+        } else if (this.streak >= 15) {
+            this.comboMultiplier = 4;
+        } else if (this.streak >= 10) {
+            this.comboMultiplier = 3;
+        } else if (this.streak >= 5) {
+            this.comboMultiplier = 2;
+        } else {
+            this.comboMultiplier = 1;
+        }
+        
+        // Update visual meter
+        const percentage = Math.min((this.streak / 20) * 100, 100);
+        comboFill.style.width = percentage + '%';
+        
+        // Update multiplier display
+        comboMultiplier.textContent = `×${this.comboMultiplier}`;
+        
+        if (this.comboMultiplier >= 4) {
+            comboMultiplier.classList.add('mega');
+            setTimeout(() => comboMultiplier.classList.remove('mega'), 500);
+        }
+    }
+    
+    updateTimerBar() {
+        if (this.selectedMode !== 'speed') return;
+        
+        const timerFill = document.getElementById('timer-fill');
+        const percentage = (this.timeLeft / 60) * 100;
+        timerFill.style.width = percentage + '%';
+        
+        if (this.timeLeft <= 10) {
+            timerFill.classList.add('danger');
+            timerFill.classList.remove('warning');
+        } else if (this.timeLeft <= 20) {
+            timerFill.classList.add('warning');
+            timerFill.classList.remove('danger');
+        } else {
+            timerFill.classList.remove('warning', 'danger');
+        }
     }
     
     updateStreak() {
