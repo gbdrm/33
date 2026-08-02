@@ -242,29 +242,79 @@ class MathBlasterGame {
     
     triggerBonusRound() {
         this.inBonusRound = true;
-        this.bonusTimeLeft = 10;
+        this.bonusTimeLeft = 15;
         this.bonusScore = 0;
+        this.bonusCorrectCount = 0;
+        
+        const bonusTypes = [
+            { title: '💥 MEGA BONUS ROUND! 💥', emoji: '💥', color: '#ff0000' },
+            { title: '🚀 ROCKET ROUND! 🚀', emoji: '🚀', color: '#00ff00' },
+            { title: '⚡ LIGHTNING ROUND! ⚡', emoji: '⚡', color: '#ffff00' },
+            { title: '🔥 FIRE ROUND! 🔥', emoji: '🔥', color: '#ff6600' },
+            { title: '💎 DIAMOND ROUND! 💎', emoji: '💎', color: '#00ffff' }
+        ];
+        
+        const bonusType = bonusTypes[Math.floor(Math.random() * bonusTypes.length)];
         
         const bonusRound = document.getElementById('bonus-round');
         bonusRound.innerHTML = `
             <div class="bonus-content">
-                <div class="bonus-title">💥 BONUS ROUND! 💥</div>
-                <div class="bonus-message">Answer as many as you can in 10 seconds!</div>
-                <div class="bonus-message">Each correct = 50 POINTS!</div>
-                <div id="bonus-timer" class="bonus-question">10</div>
+                <div class="bonus-score-display" id="bonus-score-display">
+                    BONUS: 0 pts
+                </div>
+                <div class="bonus-title" data-text="${bonusType.title}">${bonusType.title}</div>
+                <div class="bonus-message">⏰ ${this.bonusTimeLeft} SECONDS!</div>
+                <div class="bonus-message">💰 50 POINTS PER CORRECT ANSWER!</div>
+                <div class="bonus-message">🔥 GO GO GO!</div>
+                <div id="bonus-timer" class="bonus-question" style="color: ${bonusType.color}">GET READY!</div>
                 <div id="bonus-question-text" class="bonus-question"></div>
                 <div id="bonus-answers" class="bonus-answers"></div>
             </div>
         `;
         
         bonusRound.classList.add('active');
-        this.createConfetti();
-        this.createConfetti();
+        
+        // Massive celebration entrance
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                this.createConfetti();
+                this.createParticles(bonusType.emoji, bonusType.color, 20);
+            }, i * 200);
+        }
+        
+        // Countdown before starting
+        let countdown = 3;
+        const countdownInterval = setInterval(() => {
+            if (countdown > 0) {
+                const countdownEl = document.createElement('div');
+                countdownEl.className = 'bonus-countdown';
+                countdownEl.textContent = countdown;
+                bonusRound.appendChild(countdownEl);
+                
+                setTimeout(() => countdownEl.remove(), 1000);
+                countdown--;
+            } else {
+                clearInterval(countdownInterval);
+                this.startBonusRound(bonusType);
+            }
+        }, 1000);
+    }
+    
+    startBonusRound(bonusType) {
+        document.getElementById('bonus-timer').textContent = `${this.bonusTimeLeft}`;
         
         // Start bonus round timer
         const bonusTimer = setInterval(() => {
             this.bonusTimeLeft--;
-            document.getElementById('bonus-timer').textContent = this.bonusTimeLeft;
+            const timerEl = document.getElementById('bonus-timer');
+            if (timerEl) {
+                timerEl.textContent = this.bonusTimeLeft;
+                
+                if (this.bonusTimeLeft <= 5) {
+                    timerEl.style.color = '#ff0000';
+                    timerEl.style.animation = 'bonusTitleMega 0.3s ease-in-out infinite';
+                }
+            }
             
             if (this.bonusTimeLeft <= 0) {
                 clearInterval(bonusTimer);
@@ -279,21 +329,62 @@ class MathBlasterGame {
         if (this.bonusTimeLeft <= 0) return;
         
         const question = this.getQuestionForGrade(this.selectedGrade);
-        document.getElementById('bonus-question-text').textContent = question.text;
+        const questionEl = document.getElementById('bonus-question-text');
+        if (questionEl) {
+            questionEl.textContent = question.text;
+            questionEl.style.animation = 'none';
+            setTimeout(() => {
+                questionEl.style.animation = 'bonusQuestionPulse 0.5s ease-out';
+            }, 10);
+        }
         
         const answers = this.generateAnswerChoices(question.answer);
         const bonusAnswersEl = document.getElementById('bonus-answers');
+        if (!bonusAnswersEl) return;
+        
         bonusAnswersEl.innerHTML = '';
         
-        answers.forEach(answer => {
+        answers.forEach((answer, index) => {
             const btn = document.createElement('button');
             btn.className = 'bonus-answer-btn';
             btn.textContent = this.formatAnswer(answer);
+            btn.style.animationDelay = `${index * 0.1}s`;
+            
             btn.addEventListener('click', () => {
                 if (Math.abs(answer - question.answer) < 0.1) {
+                    // Correct answer!
                     this.bonusScore += 50;
-                    this.createParticles('💥', '#ffd700', 10);
-                    this.generateBonusQuestion();
+                    this.bonusCorrectCount++;
+                    
+                    // Update score display
+                    const scoreDisplay = document.getElementById('bonus-score-display');
+                    if (scoreDisplay) {
+                        scoreDisplay.textContent = `BONUS: ${this.bonusScore} pts`;
+                        scoreDisplay.style.animation = 'none';
+                        setTimeout(() => {
+                            scoreDisplay.style.animation = 'bonusScorePulse 0.3s ease-out';
+                        }, 10);
+                    }
+                    
+                    // Celebration effects
+                    btn.classList.add('bonus-correct');
+                    this.createParticles('💥', '#ffd700', 15);
+                    this.createParticles('⭐', '#ff00ff', 10);
+                    this.createParticles('✨', '#00ffff', 10);
+                    
+                    // Random confetti
+                    if (Math.random() < 0.3) {
+                        this.createConfetti();
+                    }
+                    
+                    // Generate next question immediately
+                    setTimeout(() => {
+                        this.generateBonusQuestion();
+                    }, 200);
+                } else {
+                    // Wrong answer - shake button
+                    btn.classList.add('wrong-shake');
+                    setTimeout(() => btn.classList.remove('wrong-shake'), 600);
                 }
             });
             bonusAnswersEl.appendChild(btn);
@@ -304,22 +395,63 @@ class MathBlasterGame {
         this.inBonusRound = false;
         this.score += this.bonusScore;
         
+        // Determine performance level
+        let performanceTitle = '';
+        let performanceEmoji = '';
+        let performanceMessage = '';
+        
+        if (this.bonusCorrectCount >= 10) {
+            performanceTitle = '🏆 LEGENDARY PERFORMANCE! 🏆';
+            performanceEmoji = '🏆';
+            performanceMessage = `INCREDIBLE! ${this.bonusCorrectCount} CORRECT ANSWERS!`;
+        } else if (this.bonusCorrectCount >= 7) {
+            performanceTitle = '⭐ AMAZING WORK! ⭐';
+            performanceEmoji = '⭐';
+            performanceMessage = `FANTASTIC! ${this.bonusCorrectCount} CORRECT ANSWERS!`;
+        } else if (this.bonusCorrectCount >= 4) {
+            performanceTitle = '🎉 GREAT JOB! 🎉';
+            performanceEmoji = '🎉';
+            performanceMessage = `AWESOME! ${this.bonusCorrectCount} CORRECT ANSWERS!`;
+        } else {
+            performanceTitle = '💪 NICE TRY! 💪';
+            performanceEmoji = '💪';
+            performanceMessage = `YOU GOT ${this.bonusCorrectCount} CORRECT!`;
+        }
+        
         const bonusRound = document.getElementById('bonus-round');
         bonusRound.innerHTML = `
             <div class="bonus-content">
-                <div class="bonus-title">🏆 BONUS COMPLETE! 🏆</div>
-                <div class="bonus-message">You earned ${this.bonusScore} bonus points!</div>
+                <div class="bonus-title" data-text="${performanceTitle}">${performanceTitle}</div>
+                <div class="bonus-message" style="font-size: 3rem; margin: 30px 0;">
+                    +${this.bonusScore} POINTS!
+                </div>
+                <div class="bonus-message">${performanceMessage}</div>
+                <div class="bonus-message" style="font-size: 1.5rem; margin-top: 20px;">
+                    ✨ RETURNING TO GAME... ✨
+                </div>
             </div>
         `;
         
-        this.createConfetti();
-        this.createConfetti();
-        this.createConfetti();
+        // MASSIVE celebration
+        for (let i = 0; i < 10; i++) {
+            setTimeout(() => {
+                this.createConfetti();
+                this.createParticles(performanceEmoji, '#ffd700', 15);
+            }, i * 150);
+        }
+        
+        // Extra particles burst
+        setTimeout(() => {
+            for (let i = 0; i < 50; i++) {
+                this.createParticles(['🌟', '⭐', '✨', '💫'][Math.floor(Math.random() * 4)], '#ffd700', 1);
+            }
+        }, 500);
         
         setTimeout(() => {
             bonusRound.classList.remove('active');
             this.updateScore();
-        }, 3000);
+            this.showPowerMessage(`💰 ${this.bonusScore} BONUS POINTS ADDED TO YOUR SCORE! 💰`);
+        }, 4000);
     }
     
     generateQuestion() {
