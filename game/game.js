@@ -38,6 +38,12 @@
   let lastTs = 0;
   let combo = 0;
   let comboTimer = 0;
+  let flashEffect = 0;
+  let powerups = {
+    magnet: 0,
+    timeSlow: 0,
+    doublePoints: 0,
+  };
 
   const keys = new Set();
   const particles = [];
@@ -76,7 +82,7 @@
     if (kind === STATE.menu) {
       titleEl.textContent = "THR33";
       subtitleEl.textContent =
-        "Drift the ring. Collect mint cores. Avoid crimson shards.";
+        "Drift the ring. Collect cores. Grab power-ups. Avoid crimson shards.";
       startBtn.textContent = "Enter orbit";
     } else {
       titleEl.textContent = "Orbit lost";
@@ -98,6 +104,8 @@
     pulse = 0;
     combo = 0;
     comboTimer = 0;
+    flashEffect = 0;
+    powerups = { magnet: 0, timeSlow: 0, doublePoints: 0 };
     objects = [];
     particles.length = 0;
     floaters.length = 0;
@@ -141,10 +149,15 @@
   function spawnObject() {
     const roll = Math.random();
     let type = "core";
-    if (roll > 0.72) type = "hazard";
+    
+    if (roll > 0.97 && wave > 2) type = "powerup-magnet";
+    else if (roll > 0.94 && wave > 3) type = "powerup-slow";
+    else if (roll > 0.91 && wave > 4) type = "powerup-double";
+    else if (roll > 0.88 && shields < 3) type = "powerup-shield";
+    else if (roll > 0.72) type = "hazard";
     else if (roll > 0.58) type = "amber";
 
-    const r = type === "hazard" ? rand(11, 16) : rand(8, 12);
+    const r = type === "hazard" ? rand(11, 16) : type.startsWith("powerup") ? 10 : rand(8, 12);
     objects.push({
       x: rand(28, W - 28),
       y: -20,
@@ -179,10 +192,16 @@
       return;
     }
 
+    if (obj.type.startsWith("powerup")) {
+      activatePowerup(obj.type);
+      return;
+    }
+
     const base = obj.type === "amber" ? 5 : 1;
     combo += 1;
     comboTimer = 1.4;
-    const points = base + Math.floor(combo / 3);
+    const multiplier = powerups.doublePoints > 0 ? 2 : 1;
+    const points = (base + Math.floor(combo / 3)) * multiplier;
     score += points;
     collected += 1;
     pulse = 0.25;
@@ -196,16 +215,46 @@
     }
 
     if (collected > 0 && collected % TARGET === 0) {
-      score += TARGET;
+      score += TARGET * multiplier;
       shields = Math.min(3, shields + 1);
       wave += 1;
       shake = 8;
+      flashEffect = 0.4;
       spawnBurst(ship.x, ship.y, "#3dffb5", 28);
       addFloater(ship.x, ship.y - 30, "THR33 +33", "#d7e4ef");
     }
 
     wave = 1 + Math.floor(score / 40);
     updateHud();
+  }
+
+  function activatePowerup(type) {
+    const duration = 8;
+    
+    switch(type) {
+      case "powerup-magnet":
+        powerups.magnet = duration;
+        spawnBurst(ship.x, ship.y, "#a78bfa", 20);
+        addFloater(ship.x, ship.y - 30, "MAGNET", "#a78bfa");
+        break;
+      case "powerup-slow":
+        powerups.timeSlow = duration;
+        spawnBurst(ship.x, ship.y, "#60a5fa", 20);
+        addFloater(ship.x, ship.y - 30, "TIME SLOW", "#60a5fa");
+        break;
+      case "powerup-double":
+        powerups.doublePoints = duration;
+        spawnBurst(ship.x, ship.y, "#fbbf24", 20);
+        addFloater(ship.x, ship.y - 30, "2X POINTS", "#fbbf24");
+        break;
+      case "powerup-shield":
+        shields = Math.min(3, shields + 1);
+        spawnBurst(ship.x, ship.y, "#34d399", 20);
+        addFloater(ship.x, ship.y - 30, "SHIELD+", "#34d399");
+        updateHud();
+        break;
+    }
+    pulse = 0.35;
   }
 
   function update(dt) {
@@ -215,7 +264,12 @@
     invuln = Math.max(0, invuln - dt);
     shake = Math.max(0, shake - dt * 28);
     comboTimer = Math.max(0, comboTimer - dt);
+    flashEffect = Math.max(0, flashEffect - dt * 2.5);
     if (comboTimer === 0) combo = 0;
+
+    powerups.magnet = Math.max(0, powerups.magnet - dt);
+    powerups.timeSlow = Math.max(0, powerups.timeSlow - dt);
+    powerups.doublePoints = Math.max(0, powerups.doublePoints - dt);
 
     let input = 0;
     if (keys.has("ArrowLeft") || keys.has("a") || keys.has("A")) input -= 1;
@@ -244,13 +298,26 @@
       spawnTimer = Math.max(0.28, 0.85 - wave * 0.05);
     }
 
+    const timeScale = powerups.timeSlow > 0 ? 0.4 : 1;
+
     for (let i = objects.length - 1; i >= 0; i -= 1) {
       const o = objects[i];
-      o.y += o.vy * dt;
-      o.x += o.vx * dt;
+      o.y += o.vy * dt * timeScale;
+      o.x += o.vx * dt * timeScale;
       o.spin += dt;
 
       if (o.x < o.r || o.x > W - o.r) o.vx *= -1;
+
+      if (powerups.magnet > 0 && (o.type === "core" || o.type === "amber")) {
+        const dx = ship.x - o.x;
+        const dy = ship.y - o.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120 && dist > 0) {
+          const magnetForce = 400;
+          o.x += (dx / dist) * magnetForce * dt;
+          o.y += (dy / dist) * magnetForce * dt;
+        }
+      }
 
       const dx = o.x - ship.x;
       const dy = o.y - ship.y;
@@ -289,6 +356,11 @@
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
 
+    if (flashEffect > 0) {
+      ctx.fillStyle = `rgba(61, 255, 181, ${flashEffect * 0.15})`;
+      ctx.fillRect(0, 0, W, H);
+    }
+
     for (const s of stars) {
       ctx.globalAlpha = s.a;
       ctx.fillStyle = "#d7e4ef";
@@ -296,7 +368,6 @@
     }
     ctx.globalAlpha = 1;
 
-    // Soft orbital ring motif
     ctx.save();
     ctx.translate(W * 0.5, H * 0.42);
     ctx.strokeStyle = "rgba(61, 255, 181, 0.08)";
@@ -373,6 +444,46 @@
       }
       ctx.closePath();
       ctx.fill();
+    } else if (o.type.startsWith("powerup")) {
+      let color, symbol;
+      switch(o.type) {
+        case "powerup-magnet":
+          color = "#a78bfa";
+          symbol = "M";
+          break;
+        case "powerup-slow":
+          color = "#60a5fa";
+          symbol = "S";
+          break;
+        case "powerup-double":
+          color = "#fbbf24";
+          symbol = "2X";
+          break;
+        case "powerup-shield":
+          color = "#34d399";
+          symbol = "+";
+          break;
+      }
+      
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.arc(0, 0, o.r, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, o.r - 2, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 10px Figtree, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(symbol, 0, 0);
     } else {
       const color = o.type === "amber" ? "#ffb347" : "#3dffb5";
       ctx.fillStyle = color;
@@ -432,6 +543,14 @@
     drawBackground();
 
     if (state === STATE.playing || state === STATE.paused) {
+      if (powerups.magnet > 0) {
+        ctx.strokeStyle = `rgba(167, 139, 250, ${0.15 + Math.sin(Date.now() * 0.006) * 0.1})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(ship.x, ship.y, 120, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
       for (const o of objects) drawObject(o);
       drawParticles();
       drawShip();
@@ -442,6 +561,32 @@
         ctx.font = "700 14px Figtree, sans-serif";
         ctx.textAlign = "left";
         ctx.fillText(`Combo x${combo}`, 16, H - 18);
+      }
+
+      const powerupY = 24;
+      let powerupX = 16;
+      
+      if (powerups.magnet > 0) {
+        ctx.fillStyle = "#a78bfa";
+        ctx.font = "600 12px Figtree, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(`MAGNET ${Math.ceil(powerups.magnet)}s`, powerupX, powerupY);
+        powerupX += 90;
+      }
+      
+      if (powerups.timeSlow > 0) {
+        ctx.fillStyle = "#60a5fa";
+        ctx.font = "600 12px Figtree, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(`SLOW ${Math.ceil(powerups.timeSlow)}s`, powerupX, powerupY);
+        powerupX += 80;
+      }
+      
+      if (powerups.doublePoints > 0) {
+        ctx.fillStyle = "#fbbf24";
+        ctx.font = "600 12px Figtree, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(`2X ${Math.ceil(powerups.doublePoints)}s`, powerupX, powerupY);
       }
     }
 
