@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Math Blaster Academy - Super Fun Math Game!</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">🚀 Math Blaster Academy</h1>
+            <p class="subtitle">Blast off to Math Mastery!</p>
+        </header>
+
+        <!-- Main Menu -->
+        <div id="menu" class="menu-screen active">
+            <div class="menu-panel">
+                <h2>Select Your Grade Level</h2>
+                <div class="grade-selector">
+                    <button class="grade-btn" data-grade="3">
+                        <span class="grade-num">3rd</span>
+                        <span class="grade-label">Grade</span>
+                        <span class="grade-skills">Addition • Subtraction • Times Tables</span>
+                    </button>
+                    <button class="grade-btn" data-grade="4">
+                        <span class="grade-num">4th</span>
+                        <span class="grade-label">Grade</span>
+                        <span class="grade-skills">Multiplication • Division • Fractions</span>
+                    </button>
+                    <button class="grade-btn" data-grade="5">
+                        <span class="grade-num">5th</span>
+                        <span class="grade-label">Grade</span>
+                        <span class="grade-skills">Decimals • Advanced Fractions • Powers</span>
+                    </button>
+                    <button class="grade-btn" data-grade="6">
+                        <span class="grade-num">6th</span>
+                        <span class="grade-label">Grade</span>
+                        <span class="grade-skills">Ratios • Percentages • Algebra</span>
+                    </button>
+                </div>
+
+                <h2 style="margin-top: 2rem;">Choose Game Mode</h2>
+                <div class="mode-selector">
+                    <button class="mode-btn" data-mode="speed">
+                        <span class="mode-icon">⚡</span>
+                        <span class="mode-name">Speed Blast</span>
+                        <span class="mode-desc">Answer as many as you can in 60 seconds!</span>
+                    </button>
+                    <button class="mode-btn" data-mode="survival">
+                        <span class="mode-icon">🛡️</span>
+                        <span class="mode-name">Survival Mode</span>
+                        <span class="mode-desc">3 lives - how far can you go?</span>
+                    </button>
+                    <button class="mode-btn" data-mode="zen">
+                        <span class="mode-icon">🧘</span>
+                        <span class="mode-name">Zen Practice</span>
+                        <span class="mode-desc">No pressure - just practice!</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game" class="game-screen">
+            <div class="combo-meter-container">
+                <div class="combo-label">COMBO METER</div>
+                <div class="combo-bar">
+                    <div id="combo-fill" class="combo-fill"></div>
+                </div>
+                <div id="combo-multiplier" class="combo-multiplier">×1</div>
+            </div>
+            
+            <div class="game-hud">
+                <div class="hud-item hud-score">
+                    <span class="hud-label">Score</span>
+                    <span id="score" class="hud-value">0</span>
+                    <div class="score-popup" id="score-popup"></div>
+                </div>
+                <div class="hud-item" id="timer-display">
+                    <span class="hud-label">Time</span>
+                    <span id="timer" class="hud-value">60</span>
+                    <div class="timer-bar">
+                        <div id="timer-fill" class="timer-fill"></div>
+                    </div>
+                </div>
+                <div class="hud-item" id="lives-display">
+                    <span class="hud-label">Lives</span>
+                    <span id="lives" class="hud-value">❤️❤️❤️</span>
+                </div>
+                <div class="hud-item hud-streak">
+                    <span class="hud-label">Streak</span>
+                    <span id="streak" class="hud-value">0🔥</span>
+                </div>
+            </div>
+            
+            <div id="powerup-display" class="powerup-display"></div>
+            <div id="bonus-round" class="bonus-round"></div>
+
+            <div class="question-area">
+                <div id="question" class="question">2 + 2 = ?</div>
+                <div id="feedback" class="feedback"></div>
+                <div id="power-message" class="power-message"></div>
+            </div>
+
+            <div class="answer-grid">
+                <button class="answer-btn" data-answer="0">0</button>
+                <button class="answer-btn" data-answer="1">1</button>
+                <button class="answer-btn" data-answer="2">2</button>
+                <button class="answer-btn" data-answer="3">3</button>
+            </div>
+
+            <button id="quit-btn" class="quit-btn">Quit Game</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameover" class="gameover-screen">
+            <div class="gameover-panel">
+                <h2 id="gameover-title">Game Over!</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Final Score</span>
+                        <span id="final-score" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Correct Answers</span>
+                        <span id="correct-count" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Best Streak</span>
+                        <span id="best-streak" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Accuracy</span>
+                        <span id="accuracy" class="stat-value">0%</span>
+                    </div>
+                </div>
+                <div id="achievement" class="achievement"></div>
+                <button id="play-again" class="cta-btn">Play Again!</button>
+                <button id="back-menu" class="secondary-btn">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="particles"></div>
+    <script src="game.js"></script>
+</body>
+</html>
