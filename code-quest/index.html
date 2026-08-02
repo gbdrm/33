@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeQuest - Learn to Code Through Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <h1>CodeQuest</h1>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">Level</span>
+                    <span class="stat-value" id="level">1</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span class="stat-value" id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">XP</span>
+                    <span class="stat-value" id="xp">0</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="game-layout">
+            <aside class="sidebar">
+                <div class="progress-section">
+                    <h3>Your Progress</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text">0/12 Challenges</p>
+                </div>
+
+                <div class="challenges-list" id="challenges-list">
+                    <h3>Challenges</h3>
+                    <div class="challenges-scroll">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <div class="achievements">
+                    <h3>Achievements</h3>
+                    <div class="achievement-badges" id="achievement-badges">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="welcome-screen" id="welcome-screen">
+                    <div class="welcome-content">
+                        <h2>🚀 Welcome to CodeQuest!</h2>
+                        <p class="welcome-subtitle">Learn JavaScript through interactive coding challenges</p>
+                        <div class="welcome-features">
+                            <div class="feature">
+                                <span class="feature-icon">💻</span>
+                                <h4>Interactive Coding</h4>
+                                <p>Write real code in the browser</p>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-icon">🎯</span>
+                                <h4>Progressive Challenges</h4>
+                                <p>Learn step by step from basics to advanced</p>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-icon">⚡</span>
+                                <h4>Instant Feedback</h4>
+                                <p>See results immediately</p>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-icon">🏆</span>
+                                <h4>Earn Achievements</h4>
+                                <p>Track your progress and celebrate wins</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-large" id="start-game">Start Your Journey</button>
+                    </div>
+                </div>
+
+                <div class="game-screen" id="game-screen" style="display: none;">
+                    <div class="challenge-header">
+                        <div class="challenge-info">
+                            <h2 id="challenge-title">Challenge Title</h2>
+                            <span class="difficulty-badge" id="difficulty-badge">Easy</span>
+                        </div>
+                        <button class="btn btn-hint" id="hint-btn">💡 Hint</button>
+                    </div>
+
+                    <div class="challenge-description" id="challenge-description">
+                        Challenge description goes here
+                    </div>
+
+                    <div class="hint-box" id="hint-box" style="display: none;">
+                        <strong>💡 Hint:</strong> <span id="hint-text"></span>
+                    </div>
+
+                    <div class="editor-section">
+                        <div class="editor-header">
+                            <span class="editor-label">✏️ Code Editor</span>
+                            <div class="editor-actions">
+                                <button class="btn btn-small" id="reset-btn">Reset</button>
+                                <button class="btn btn-small btn-success" id="run-btn">▶ Run Code</button>
+                            </div>
+                        </div>
+                        <textarea class="code-editor" id="code-editor" spellcheck="false"></textarea>
+                    </div>
+
+                    <div class="output-section">
+                        <div class="output-header">
+                            <span class="output-label">📊 Output</span>
+                            <button class="btn btn-small" id="clear-output">Clear</button>
+                        </div>
+                        <div class="output-content" id="output"></div>
+                    </div>
+
+                    <div class="test-results" id="test-results">
+                        <!-- Test results appear here -->
+                    </div>
+
+                    <div class="challenge-actions">
+                        <button class="btn" id="prev-challenge">← Previous</button>
+                        <button class="btn btn-primary" id="next-challenge">Next Challenge →</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal" id="success-modal" style="display: none;">
+        <div class="modal-content success-modal">
+            <div class="success-icon">🎉</div>
+            <h2>Challenge Complete!</h2>
+            <p class="success-message" id="success-message"></p>
+            <div class="success-stats">
+                <div class="success-stat">
+                    <span class="success-stat-label">XP Earned</span>
+                    <span class="success-stat-value" id="xp-earned">+50</span>
+                </div>
+                <div class="success-stat">
+                    <span class="success-stat-label">Score</span>
+                    <span class="success-stat-value" id="score-earned">+100</span>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-large" id="continue-btn">Continue</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
