@@ -375,14 +375,54 @@ class MathBlasterGame {
         const points = 10 + (this.streak >= 5 ? 5 : 0) + (this.streak >= 10 ? 10 : 0);
         this.score += points;
         
-        this.showFeedback('✓ Awesome!', 'correct');
-        this.createParticles('🌟', '#4caf50');
+        // Fun feedback messages
+        const messages = [
+            '🎉 AWESOME!', '⭐ BRILLIANT!', '🔥 ON FIRE!', '💪 AMAZING!', 
+            '🚀 SUPERB!', '🌟 PERFECT!', '💥 FANTASTIC!', '✨ STELLAR!'
+        ];
+        
+        const streakMessages = {
+            5: '🔥 5 STREAK! YOU\'RE HEATING UP!',
+            10: '🌟 10 STREAK! UNSTOPPABLE!',
+            15: '💥 15 STREAK! LEGENDARY!',
+            20: '🏆 20 STREAK! MATH MASTER!'
+        };
+        
+        const message = streakMessages[this.streak] || messages[Math.floor(Math.random() * messages.length)];
+        this.showFeedback(message, 'correct');
+        
+        // More particles for streaks!
+        const particleCount = Math.min(this.streak, 20);
+        const emojis = ['🌟', '⭐', '✨', '💫', '🎉', '🎊', '💥'];
+        
+        for (let i = 0; i < particleCount; i++) {
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            this.createParticles(emoji, '#4caf50', 1);
+        }
+        
+        // Confetti for big streaks
+        if (this.streak >= 5) {
+            this.createConfetti();
+        }
+        
+        // Mega celebration animation
+        if (this.streak >= 10) {
+            document.querySelector('.question-area').classList.add('mega-correct');
+            setTimeout(() => {
+                document.querySelector('.question-area').classList.remove('mega-correct');
+            }, 800);
+        }
+        
+        // Power-up messages at milestones
+        if ([5, 10, 15, 20, 25, 30].includes(this.streak)) {
+            this.showPowerMessage(`⚡ ${this.streak} STREAK! BONUS POINTS ACTIVATED! ⚡`);
+        }
         
         const buttons = document.querySelectorAll('.answer-btn');
         buttons.forEach(btn => {
             if (Math.abs(parseFloat(btn.dataset.answer) - this.currentAnswer) < 0.1) {
                 btn.classList.add('correct-flash');
-                setTimeout(() => btn.classList.remove('correct-flash'), 500);
+                setTimeout(() => btn.classList.remove('correct-flash'), 800);
             }
         });
         
@@ -393,16 +433,29 @@ class MathBlasterGame {
     handleWrongAnswer() {
         this.streak = 0;
         
-        this.showFeedback('✗ Try again!', 'wrong');
-        this.createParticles('💥', '#f44336');
+        // Encouraging messages
+        const messages = [
+            '💪 Keep trying!', '🎯 Almost there!', '🌟 You got this!',
+            '🚀 Try again!', '💡 Think it through!', '✨ So close!'
+        ];
+        
+        const message = messages[Math.floor(Math.random() * messages.length)];
+        this.showFeedback(message, 'wrong');
+        this.createParticles('💥', '#f44336', 5);
+        
+        // Screen shake effect
+        document.querySelector('.question-area').classList.add('shake');
+        setTimeout(() => {
+            document.querySelector('.question-area').classList.remove('shake');
+        }, 500);
         
         const buttons = document.querySelectorAll('.answer-btn');
         buttons.forEach(btn => {
             if (Math.abs(parseFloat(btn.dataset.answer) - this.currentAnswer) < 0.1) {
-                // Don't highlight
+                // Don't highlight correct answer
             } else {
                 btn.classList.add('wrong-shake');
-                setTimeout(() => btn.classList.remove('wrong-shake'), 500);
+                setTimeout(() => btn.classList.remove('wrong-shake'), 600);
             }
         });
         
@@ -425,45 +478,90 @@ class MathBlasterGame {
         
         setTimeout(() => {
             feedback.classList.remove('show');
-        }, 800);
+        }, 1000);
     }
     
-    createParticles(emoji, color) {
+    showPowerMessage(text) {
+        const powerMessage = document.getElementById('power-message');
+        powerMessage.textContent = text;
+        powerMessage.classList.add('show');
+        
+        setTimeout(() => {
+            powerMessage.classList.remove('show');
+        }, 2000);
+    }
+    
+    createParticles(emoji, color, count = 8) {
         const container = document.getElementById('particles');
         
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < count; i++) {
             const particle = document.createElement('div');
             particle.className = 'particle';
             particle.textContent = emoji;
             particle.style.left = `${Math.random() * 100}%`;
-            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.top = `${20 + Math.random() * 60}%`;
             particle.style.color = color;
+            particle.style.animationDelay = `${Math.random() * 0.3}s`;
             
             container.appendChild(particle);
             
             setTimeout(() => {
                 particle.remove();
-            }, 2000);
+            }, 2300);
+        }
+    }
+    
+    createConfetti() {
+        const container = document.getElementById('particles');
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#8800ff'];
+        
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.top = '-20px';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.width = `${Math.random() * 10 + 5}px`;
+            confetti.style.height = `${Math.random() * 10 + 5}px`;
+            confetti.style.animationDuration = `${Math.random() * 2 + 2}s`;
+            confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+            
+            container.appendChild(confetti);
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, 4000);
         }
     }
     
     updateScore() {
-        document.getElementById('score').textContent = this.score;
+        const scoreElement = document.getElementById('score');
+        scoreElement.textContent = this.score;
+        scoreElement.classList.add('pulse-score');
+        setTimeout(() => scoreElement.classList.remove('pulse-score'), 400);
     }
     
     updateStreak() {
         const streakElement = document.getElementById('streak');
-        streakElement.textContent = this.streak + '🔥';
+        const fireEmojis = this.streak >= 10 ? '🔥🔥🔥' : this.streak >= 5 ? '🔥🔥' : '🔥';
+        streakElement.textContent = this.streak + fireEmojis;
         
-        if (this.streak >= 10) {
+        if (this.streak >= 20) {
+            streakElement.style.color = '#ff0000';
+            streakElement.style.transform = 'scale(1.4)';
+            streakElement.style.animation = 'rainbow 2s linear infinite';
+        } else if (this.streak >= 10) {
             streakElement.style.color = '#ff4444';
-            streakElement.style.transform = 'scale(1.2)';
+            streakElement.style.transform = 'scale(1.3)';
+            streakElement.style.animation = 'pulse 1s ease-in-out infinite';
         } else if (this.streak >= 5) {
             streakElement.style.color = '#ff9800';
-            streakElement.style.transform = 'scale(1.1)';
+            streakElement.style.transform = 'scale(1.15)';
+            streakElement.style.animation = 'none';
         } else {
             streakElement.style.color = '#667eea';
             streakElement.style.transform = 'scale(1)';
+            streakElement.style.animation = 'none';
         }
     }
     
@@ -492,7 +590,7 @@ class MathBlasterGame {
         const achievement = this.getAchievement();
         if (achievement) {
             const achievementEl = document.getElementById('achievement');
-            achievementEl.textContent = `🏆 ${achievement}`;
+            achievementEl.textContent = achievement;
             achievementEl.classList.add('show');
         } else {
             document.getElementById('achievement').classList.remove('show');
@@ -502,29 +600,62 @@ class MathBlasterGame {
         document.getElementById('gameover-title').textContent = title;
         
         this.showScreen('gameover');
-        this.createParticles('🎉', '#667eea');
+        
+        // BIG celebration!
+        const emojis = ['🎉', '🎊', '⭐', '🌟', '✨', '💫', '🏆', '👏'];
+        for (let i = 0; i < 30; i++) {
+            setTimeout(() => {
+                const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                this.createParticles(emoji, '#667eea', 3);
+            }, i * 50);
+        }
+        
+        // Confetti explosion!
+        this.createConfetti();
+        setTimeout(() => this.createConfetti(), 500);
+        setTimeout(() => this.createConfetti(), 1000);
     }
     
     getAchievement() {
-        if (this.bestStreak >= 20) return 'Math Legend! 20+ Streak!';
-        if (this.bestStreak >= 15) return 'Math Master! 15+ Streak!';
-        if (this.bestStreak >= 10) return 'On Fire! 10+ Streak!';
-        if (this.score >= 500) return 'High Scorer! 500+ Points!';
-        if (this.score >= 300) return 'Math Star! 300+ Points!';
-        if (this.correctAnswers >= 50) return 'Speed Demon! 50+ Correct!';
-        if (this.correctAnswers >= 30) return 'Quick Thinker! 30+ Correct!';
-        return null;
+        const achievements = [];
+        
+        if (this.bestStreak >= 30) achievements.push('🏆 MATH LEGEND! 30+ STREAK!');
+        else if (this.bestStreak >= 20) achievements.push('👑 MATH CHAMPION! 20+ STREAK!');
+        else if (this.bestStreak >= 15) achievements.push('⭐ MATH MASTER! 15+ STREAK!');
+        else if (this.bestStreak >= 10) achievements.push('🔥 ON FIRE! 10+ STREAK!');
+        
+        if (this.score >= 1000) achievements.push('💎 LEGENDARY SCORE! 1000+ POINTS!');
+        else if (this.score >= 500) achievements.push('💰 HIGH SCORER! 500+ POINTS!');
+        else if (this.score >= 300) achievements.push('🌟 MATH STAR! 300+ POINTS!');
+        
+        if (this.correctAnswers >= 100) achievements.push('⚡ LIGHTNING FAST! 100+ CORRECT!');
+        else if (this.correctAnswers >= 50) achievements.push('🚀 SPEED DEMON! 50+ CORRECT!');
+        else if (this.correctAnswers >= 30) achievements.push('💪 QUICK THINKER! 30+ CORRECT!');
+        
+        const accuracy = this.totalAnswers > 0 
+            ? Math.round((this.correctAnswers / this.totalAnswers) * 100) 
+            : 0;
+            
+        if (accuracy === 100 && this.correctAnswers >= 10) achievements.push('✨ PERFECT SCORE! 100% ACCURACY!');
+        else if (accuracy >= 95 && this.correctAnswers >= 20) achievements.push('🎯 SHARPSHOOTER! 95%+ ACCURACY!');
+        
+        return achievements.length > 0 ? achievements.join(' • ') : null;
     }
     
     getGameOverTitle() {
         const accuracy = this.totalAnswers > 0 
             ? Math.round((this.correctAnswers / this.totalAnswers) * 100) 
             : 0;
-            
-        if (accuracy >= 90) return '🌟 Outstanding Work!';
-        if (accuracy >= 75) return '🎉 Great Job!';
-        if (accuracy >= 60) return '👍 Nice Try!';
-        return '💪 Keep Practicing!';
+        
+        if (this.score >= 1000) return '🏆 LEGENDARY PERFORMANCE!';
+        if (this.bestStreak >= 30) return '👑 YOU\'RE A MATH GENIUS!';
+        if (accuracy === 100 && this.correctAnswers >= 10) return '✨ ABSOLUTELY PERFECT!';
+        if (accuracy >= 95) return '🌟 OUTSTANDING WORK!';
+        if (accuracy >= 85) return '🎉 AMAZING JOB!';
+        if (accuracy >= 75) return '⭐ GREAT EFFORT!';
+        if (accuracy >= 60) return '👍 NICE TRY!';
+        if (this.correctAnswers >= 5) return '💪 GOOD START!';
+        return '🚀 KEEP PRACTICING!';
     }
 }
 
