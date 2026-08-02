@@ -29,6 +29,28 @@ Then visit `http://localhost:8080` in your browser.
 npx serve code-quest
 ```
 
+### Option 4: Play on iPad 📱
+
+**Optimized for iPad!** Open this link in **Safari**:
+
+```
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/gbdrm/33/cursor/code-learning-game-fc8e/code-quest/play.html
+```
+
+**Features on iPad:**
+- ✨ Touch-optimized interface
+- 📱 Responsive layout for portrait & landscape
+- ⌨️ iPad keyboard support
+- 💾 Progress saves locally
+- 🚀 Works offline after first load
+
+**iPad Tips:**
+1. Use Safari for best experience
+2. Tap "▶ Run" to execute your code
+3. Use on-screen keyboard or external keyboard
+4. Rotate to landscape for more space
+5. Add to Home Screen for app-like experience
+
 ## 🧪 Testing
 
 Want to verify all challenges work correctly? Open `test.html` in your browser or visit `http://localhost:8080/test.html` when running a local server. This page automatically tests all 12 challenges with sample solutions and shows detailed results.
