@@ -230,6 +230,80 @@ body {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
+/* Star Modal */
+.star-content {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.star-animation {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.big-star-icon {
+    font-size: 4rem;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.star-question {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin: 15px 0;
+}
+
+.star-problem-text {
+    font-family: 'Bubblegum Sans', cursive;
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.star-answers {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.star-answer-btn {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 15px 25px;
+    border: 3px solid #f5576c;
+    border-radius: 12px;
+    background: white;
+    color: #f5576c;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 70px;
+}
+
+.star-answer-btn:hover {
+    background: #f5576c;
+    color: white;
+    transform: scale(1.1);
+}
+
+.star-answer-btn.correct {
+    background: #4caf50;
+    color: white;
+    border-color: #4caf50;
+}
+
+.star-answer-btn.incorrect {
+    background: #f44336;
+    color: white;
+    border-color: #f44336;
+    animation: shake 0.5s ease;
+}
+
 .chest-animation {
     position: relative;
     margin-bottom: 20px;
@@ -333,6 +407,90 @@ body {
     font-weight: 600;
     margin-top: 15px;
     min-height: 30px;
+}
+
+/* Milestone Modal */
+.milestone-content {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+    border: 5px solid #ff6b6b;
+    animation: rainbowBorder 2s linear infinite;
+}
+
+@keyframes rainbowBorder {
+    0% { border-color: #ff6b6b; }
+    25% { border-color: #4ecdc4; }
+    50% { border-color: #45b7d1; }
+    75% { border-color: #f093fb; }
+    100% { border-color: #ff6b6b; }
+}
+
+.milestone-animation {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.trophy-big {
+    font-size: 6rem;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+.fireworks {
+    font-size: 3rem;
+    animation: explode 1.5s ease-in-out infinite;
+}
+
+@keyframes explode {
+    0%, 100% { transform: scale(0.8); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 1; }
+}
+
+.milestone-title {
+    font-family: 'Bubblegum Sans', cursive;
+    font-size: 2.5rem;
+    color: #d32f2f;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 0 white;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.milestone-score {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1976d2;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0 white;
+}
+
+.milestone-message {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.powerup-display {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    margin: 20px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.powerup-icon {
+    font-size: 4rem;
+    animation: pulse 0.8s ease-in-out infinite;
+}
+
+.powerup-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #764ba2;
+    margin: 15px 0 10px;
+}
+
+.powerup-description {
+    font-size: 1.1rem;
+    color: #666;
 }
 
 .game-over-content {

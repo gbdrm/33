@@ -18,27 +18,75 @@ let game = {
     gameOver: false,
     canvas: null,
     ctx: null,
-    phoenix: null,
+    adventurer: null,
     stars: [],
+    currentStar: null,
     chests: [],
     obstacles: [],
     currentChest: null,
     keys: {},
     mouse: { x: 0, y: 0, down: false },
     particles: [],
-    cloudParticles: []
+    cloudParticles: [],
+    lastMilestone: 0,
+    activePowerup: null,
+    powerupTimer: 0
 };
+
+// Power-ups
+const powerups = [
+    {
+        name: '⚡ Speed Boost',
+        icon: '⚡',
+        description: 'Phoenix flies 2x faster for 20 seconds!',
+        effect: 'speed',
+        duration: 1200 // 20 seconds at 60fps
+    },
+    {
+        name: '🌟 Star Magnet',
+        icon: '🧲',
+        description: 'Automatically attract nearby stars for 15 seconds!',
+        effect: 'magnet',
+        duration: 900
+    },
+    {
+        name: '💎 Double Points',
+        icon: '💰',
+        description: 'Earn 2x points for everything for 15 seconds!',
+        effect: 'double',
+        duration: 900
+    },
+    {
+        name: '🛡️ Shield',
+        icon: '🛡️',
+        description: 'Invincibility for 20 seconds!',
+        effect: 'shield',
+        duration: 1200
+    },
+    {
+        name: '🎯 Lucky Streak',
+        icon: '🍀',
+        description: 'All answers show hints for 10 seconds!',
+        effect: 'lucky',
+        duration: 600
+    }
+];
 
 // DOM Elements
 const gradeScreen = document.getElementById('gradeScreen');
 const gameScreen = document.getElementById('gameScreen');
 const gameOverScreen = document.getElementById('gameOverScreen');
+const starModal = document.getElementById('starModal');
 const chestModal = document.getElementById('chestModal');
+const milestoneModal = document.getElementById('milestoneModal');
 
 const starsCollectedEl = document.getElementById('starsCollected');
 const chestsOpenedEl = document.getElementById('chestsOpened');
 const streakEl = document.getElementById('streak');
 const totalScoreEl = document.getElementById('totalScore');
+
+const starProblemEl = document.getElementById('starProblem');
+const starAnswersEl = document.getElementById('starAnswers');
 
 const chestProblemEl = document.getElementById('chestProblem');
 const chestAnswersEl = document.getElementById('chestAnswers');
@@ -47,6 +95,11 @@ const chestFeedbackEl = document.getElementById('chestFeedback');
 const finalStarsEl = document.getElementById('finalStars');
 const finalChestsEl = document.getElementById('finalChests');
 const finalScoreEl = document.getElementById('finalScore');
+
+const milestoneScoreEl = document.getElementById('milestoneScore');
+const powerupNameEl = document.getElementById('powerupName');
+const powerupDescEl = document.getElementById('powerupDesc');
+const claimPowerupBtn = document.getElementById('claimPowerupBtn');
 
 // Event Listeners
 document.querySelectorAll('.grade-btn').forEach(btn => {
@@ -63,27 +116,33 @@ document.getElementById('changeGradeBtn2').addEventListener('click', () => {
     gradeScreen.classList.add('active');
 });
 
-// Phoenix Class
-class Phoenix {
+claimPowerupBtn.addEventListener('click', () => {
+    closeMilestoneModal();
+});
+
+// Adventurer Class
+class Adventurer {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.width = 60;
+        this.width = 50;
         this.height = 60;
         this.speed = 5;
         this.vx = 0;
         this.vy = 0;
-        this.trail = [];
+        this.animFrame = 0;
     }
 
     update() {
+        const currentSpeed = (game.activePowerup === 'speed') ? this.speed * 2 : this.speed;
+        
         // Keyboard controls
-        if (game.keys['ArrowLeft'] || game.keys['a']) this.vx = -this.speed;
-        else if (game.keys['ArrowRight'] || game.keys['d']) this.vx = this.speed;
+        if (game.keys['ArrowLeft'] || game.keys['a']) this.vx = -currentSpeed;
+        else if (game.keys['ArrowRight'] || game.keys['d']) this.vx = currentSpeed;
         else this.vx *= 0.9;
 
-        if (game.keys['ArrowUp'] || game.keys['w']) this.vy = -this.speed;
-        else if (game.keys['ArrowDown'] || game.keys['s']) this.vy = this.speed;
+        if (game.keys['ArrowUp'] || game.keys['w']) this.vy = -currentSpeed;
+        else if (game.keys['ArrowDown'] || game.keys['s']) this.vy = currentSpeed;
         else this.vy *= 0.9;
 
         // Mouse/Touch controls
@@ -92,8 +151,8 @@ class Phoenix {
             const dy = game.mouse.y - this.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             if (distance > 20) {
-                this.vx = (dx / distance) * this.speed;
-                this.vy = (dy / distance) * this.speed;
+                this.vx = (dx / distance) * currentSpeed;
+                this.vy = (dy / distance) * currentSpeed;
             }
         }
 
@@ -106,36 +165,100 @@ class Phoenix {
         if (this.y < 0) this.y = 0;
         if (this.y > game.canvas.height - this.height) this.y = game.canvas.height - this.height;
 
-        // Trail effect
-        this.trail.push({ x: this.x + this.width / 2, y: this.y + this.height / 2, life: 20 });
-        this.trail = this.trail.filter(t => t.life-- > 0);
+        this.animFrame++;
     }
 
     draw() {
         const ctx = game.ctx;
+        const centerX = this.x + this.width / 2;
+        const centerY = this.y + this.height / 2;
         
-        // Draw trail
-        this.trail.forEach((t, i) => {
-            const alpha = t.life / 20;
-            ctx.fillStyle = `rgba(255, ${150 + i * 5}, 0, ${alpha * 0.5})`;
+        // Draw shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.beginPath();
+        ctx.ellipse(centerX, this.y + this.height + 5, this.width / 2, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw body (circle)
+        ctx.fillStyle = '#ff6b9d';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw head
+        ctx.fillStyle = '#ffd4a3';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY - 15, 12, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw hair
+        ctx.fillStyle = '#8B4513';
+        ctx.beginPath();
+        ctx.arc(centerX - 5, centerY - 20, 8, 0, Math.PI * 2);
+        ctx.arc(centerX + 5, centerY - 20, 8, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY - 22, 8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw eyes
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(centerX - 4, centerY - 15, 2, 0, Math.PI * 2);
+        ctx.arc(centerX + 4, centerY - 15, 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw smile
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY - 13, 4, 0, Math.PI);
+        ctx.stroke();
+        
+        // Draw arms (simple)
+        ctx.strokeStyle = '#ffd4a3';
+        ctx.lineWidth = 4;
+        const armBounce = Math.sin(this.animFrame * 0.1) * 3;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 15, centerY - 5);
+        ctx.lineTo(centerX - 22, centerY + armBounce);
+        ctx.moveTo(centerX + 15, centerY - 5);
+        ctx.lineTo(centerX + 22, centerY + armBounce);
+        ctx.stroke();
+        
+        // Draw legs
+        ctx.strokeStyle = '#4a4a4a';
+        ctx.lineWidth = 5;
+        const legBounce = Math.sin(this.animFrame * 0.15) * 4;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 8, centerY + 15);
+        ctx.lineTo(centerX - 10, centerY + 30 + legBounce);
+        ctx.moveTo(centerX + 8, centerY + 15);
+        ctx.lineTo(centerX + 10, centerY + 30 - legBounce);
+        ctx.stroke();
+        
+        // Draw power-up indicator if active
+        if (game.activePowerup) {
+            ctx.save();
+            ctx.globalAlpha = 0.7;
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(t.x, t.y, 3, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
-        // Draw phoenix
-        ctx.font = `${this.width}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🔥', this.x + this.width / 2, this.y + this.height / 2);
+            ctx.arc(centerX, centerY, 28, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            const powerupIcon = powerups.find(p => p.effect === game.activePowerup)?.icon || '⚡';
+            ctx.fillText(powerupIcon, centerX + 25, centerY - 25);
+            ctx.restore();
+        }
     }
 
     getBounds() {
         return {
-            x: this.x + 10,
-            y: this.y + 10,
-            width: this.width - 20,
-            height: this.height - 20
+            x: this.x + 5,
+            y: this.y + 5,
+            width: this.width - 10,
+            height: this.height - 10
         };
     }
 }
@@ -263,6 +386,141 @@ function generateProblem() {
     return { dividend, divisor, answer: quotient };
 }
 
+// Show Star Modal
+function showStarModal(star) {
+    game.paused = true;
+    game.currentStar = star;
+    
+    const problem = generateProblem();
+    game.currentAnswer = problem.answer;
+    
+    starProblemEl.textContent = `${problem.dividend} ÷ ${problem.divisor} = ?`;
+    
+    // Generate wrong answers
+    const wrongAnswers = new Set();
+    const offsets = [-2, -1, 1, 2];
+    while (wrongAnswers.size < 2) {
+        const offset = offsets[Math.floor(Math.random() * offsets.length)];
+        const wrong = problem.answer + offset;
+        if (wrong > 0 && wrong !== problem.answer) {
+            wrongAnswers.add(wrong);
+        }
+    }
+    
+    const allAnswers = [problem.answer, ...Array.from(wrongAnswers)];
+    allAnswers.sort(() => Math.random() - 0.5);
+    
+    starAnswersEl.innerHTML = '';
+    allAnswers.forEach(answer => {
+        const btn = document.createElement('button');
+        btn.className = 'star-answer-btn';
+        btn.textContent = answer;
+        btn.onclick = () => checkStarAnswer(answer, btn);
+        starAnswersEl.appendChild(btn);
+    });
+    
+    starModal.classList.add('active');
+}
+
+// Check Star Answer
+function checkStarAnswer(answer, btn) {
+    const buttons = starAnswersEl.querySelectorAll('.star-answer-btn');
+    buttons.forEach(b => b.style.pointerEvents = 'none');
+    
+    if (answer === game.currentAnswer) {
+        btn.classList.add('correct');
+        
+        const pointValue = (game.activePowerup === 'double') ? 20 : 10;
+        game.starsCollected++;
+        game.score += pointValue;
+        game.currentStar.collected = true;
+        
+        createParticleExplosion(game.currentStar.x, game.currentStar.y, '✨');
+        
+        // Check for milestone
+        checkMilestone();
+        
+        setTimeout(() => {
+            closeStarModal();
+        }, 500);
+    } else {
+        btn.classList.add('incorrect');
+        
+        buttons.forEach(b => {
+            if (parseInt(b.textContent) === game.currentAnswer) {
+                b.classList.add('correct');
+            }
+        });
+        
+        setTimeout(() => {
+            closeStarModal();
+        }, 1500);
+    }
+    
+    updateUI();
+}
+
+// Close Star Modal
+function closeStarModal() {
+    starModal.classList.remove('active');
+    game.paused = false;
+    if (game.currentStar) {
+        game.stars = game.stars.filter(s => s !== game.currentStar);
+        game.currentStar = null;
+    }
+}
+
+// Check Milestone
+function checkMilestone() {
+    const milestone = Math.floor(game.score / 300) * 300;
+    if (milestone > game.lastMilestone && milestone > 0) {
+        game.lastMilestone = milestone;
+        showMilestoneModal(milestone);
+    }
+}
+
+// Show Milestone Modal
+function showMilestoneModal(milestone) {
+    game.paused = true;
+    
+    const powerupIndex = ((milestone / 300) - 1) % powerups.length;
+    const powerup = powerups[powerupIndex];
+    
+    milestoneScoreEl.textContent = `${milestone} Points!`;
+    powerupNameEl.textContent = powerup.name;
+    powerupDescEl.textContent = powerup.description;
+    
+    // Store the powerup to activate
+    game.pendingPowerup = powerup;
+    
+    milestoneModal.classList.add('active');
+    
+    // Create massive celebration
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            createParticleExplosion(
+                Math.random() * game.canvas.width,
+                Math.random() * game.canvas.height,
+                ['🎉', '🎊', '⭐', '💫', '✨'][Math.floor(Math.random() * 5)]
+            );
+        }, i * 50);
+    }
+}
+
+// Close Milestone Modal
+function closeMilestoneModal() {
+    milestoneModal.classList.remove('active');
+    
+    // Activate the powerup
+    if (game.pendingPowerup) {
+        game.activePowerup = game.pendingPowerup.effect;
+        game.powerupTimer = game.pendingPowerup.duration;
+        game.pendingPowerup = null;
+    }
+    
+    game.paused = false;
+}
+
 // Show Chest Modal
 function showChestModal(chest) {
     game.paused = true;
@@ -310,12 +568,16 @@ function checkChestAnswer(answer, btn) {
         chestFeedbackEl.textContent = '🎉 Correct! Treasure unlocked! 🎉';
         chestFeedbackEl.style.color = '#4caf50';
         
+        const pointValue = (game.activePowerup === 'double') ? 100 : 50;
         game.chestsOpened++;
-        game.score += 50;
+        game.score += pointValue;
         game.streak++;
         game.currentChest.collected = true;
         
         createParticleExplosion(game.currentChest.x + 25, game.currentChest.y + 25, '💎');
+        
+        // Check for milestone
+        checkMilestone();
         
         setTimeout(() => {
             closeChestModal();
@@ -369,8 +631,16 @@ function createParticleExplosion(x, y, emoji) {
 function update() {
     if (game.paused || game.gameOver) return;
     
-    // Update phoenix
-    game.phoenix.update();
+    // Update adventurer
+    game.adventurer.update();
+    
+    // Update powerup timer
+    if (game.powerupTimer > 0) {
+        game.powerupTimer--;
+        if (game.powerupTimer === 0) {
+            game.activePowerup = null;
+        }
+    }
     
     // Update clouds
     game.cloudParticles.forEach(cloud => cloud.update());
@@ -389,16 +659,13 @@ function update() {
     game.stars = game.stars.filter(star => {
         star.update();
         
-        const phoenixBounds = game.phoenix.getBounds();
+        const adventurerBounds = game.adventurer.getBounds();
         const starBounds = star.getBounds();
         
-        if (!star.collected && checkCollision(phoenixBounds, starBounds)) {
-            star.collected = true;
-            game.starsCollected++;
-            game.score += 10;
-            createParticleExplosion(star.x, star.y, '✨');
-            updateUI();
-            return false;
+        if (!star.collected && checkCollision(adventurerBounds, starBounds)) {
+            // FORCE math problem - can't skip!
+            showStarModal(star);
+            return true; // Keep the star until problem is solved
         }
         
         return star.y < game.canvas.height + 50;
@@ -409,10 +676,10 @@ function update() {
         if (!chest.collected) {
             chest.update();
             
-            const phoenixBounds = game.phoenix.getBounds();
+            const adventurerBounds = game.adventurer.getBounds();
             const chestBounds = chest.getBounds();
             
-            if (checkCollision(phoenixBounds, chestBounds)) {
+            if (checkCollision(adventurerBounds, chestBounds)) {
                 showChestModal(chest);
             }
         }
@@ -469,8 +736,23 @@ function draw() {
         ctx.restore();
     });
     
-    // Draw phoenix
-    game.phoenix.draw();
+    // Draw adventurer
+    game.adventurer.draw();
+    
+    // Draw powerup timer
+    if (game.activePowerup && game.powerupTimer > 0) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(10, 10, 200, 30);
+        ctx.fillStyle = '#ffd700';
+        const width = (game.powerupTimer / 1200) * 190;
+        ctx.fillRect(15, 15, width, 20);
+        
+        ctx.fillStyle = '#fff';
+        ctx.font = '14px Fredoka, sans-serif';
+        ctx.textAlign = 'left';
+        const powerup = powerups.find(p => p.effect === game.activePowerup);
+        ctx.fillText(`${powerup?.icon || '⚡'} Power-up Active!`, 20, 28);
+    }
 }
 
 // Game Loop
@@ -509,7 +791,7 @@ function startGame(grade) {
     game.canvas = document.getElementById('gameCanvas');
     game.ctx = game.canvas.getContext('2d');
     
-    game.phoenix = new Phoenix(game.canvas.width / 2 - 30, game.canvas.height / 2);
+    game.adventurer = new Adventurer(game.canvas.width / 2 - 25, game.canvas.height / 2);
     
     // Create clouds
     for (let i = 0; i < 5; i++) {
@@ -519,6 +801,11 @@ function startGame(grade) {
     updateUI();
     gameLoop();
 }
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Phoenix Treasure Hunt - Ready to play!');
+});
 
 // Keyboard Controls
 window.addEventListener('keydown', (e) => {

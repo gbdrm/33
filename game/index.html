@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔥 Phoenix Treasure Hunt ✨</title>
+    <title>🏃‍♀️ Adventure Quest - Division Treasure Hunt ✨</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,8 +16,8 @@
         <!-- Grade Selection Screen -->
         <div id="gradeScreen" class="screen active">
             <div class="title-box">
-                <h1 class="game-title">🔥 Phoenix Treasure Hunt ✨</h1>
-                <p class="subtitle">Fly your phoenix, collect treasures, and unlock magical chests!</p>
+                <h1 class="game-title">🏃‍♀️ Adventure Quest ✨</h1>
+                <p class="subtitle">Guide your adventurer, solve division problems, and collect treasures!</p>
             </div>
             
             <div class="grade-selection">
@@ -46,11 +46,11 @@
             <div class="instructions">
                 <h3>🎮 How to Play:</h3>
                 <ul>
-                    <li>🔥 <strong>Move your phoenix</strong> with arrow keys or mouse/touch</li>
-                    <li>⭐ <strong>Collect stars</strong> as you fly through the magical sky</li>
-                    <li>💎 <strong>Find treasure chests</strong> that appear on screen</li>
-                    <li>🔢 <strong>Solve division problems</strong> to unlock the chests</li>
-                    <li>🏆 <strong>Keep your combo alive</strong> and collect treasures!</li>
+                    <li>🏃‍♀️ <strong>Move your adventurer</strong> with arrow keys, WASD, or mouse/touch</li>
+                    <li>⭐ <strong>Touch stars to solve quick division problems</strong> - you MUST solve to collect!</li>
+                    <li>💎 <strong>Find treasure chests</strong> for bigger challenges and bonus points</li>
+                    <li>🏆 <strong>Reach 300, 600, 900+ points</strong> to unlock power-ups!</li>
+                    <li>⚡ <strong>Power-ups</strong> give you speed boosts, double points, and more!</li>
                 </ul>
             </div>
         </div>
@@ -83,6 +83,27 @@
             </div>
         </div>
 
+        <!-- Quick Star Challenge Modal -->
+        <div id="starModal" class="modal">
+            <div class="modal-content star-content">
+                <div class="star-animation">
+                    <div class="big-star-icon">⭐</div>
+                </div>
+                <h2 class="modal-title">Quick Challenge!</h2>
+                <p class="modal-subtitle">Solve to collect the star:</p>
+                
+                <div class="star-question">
+                    <div id="starProblem" class="star-problem-text">15 ÷ 3 = ?</div>
+                    
+                    <div class="star-answers" id="starAnswers">
+                        <button class="star-answer-btn">5</button>
+                        <button class="star-answer-btn">3</button>
+                        <button class="star-answer-btn">4</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Chest Unlock Modal -->
         <div id="chestModal" class="modal">
             <div class="modal-content chest-content">
@@ -105,6 +126,25 @@
                 </div>
 
                 <div id="chestFeedback" class="chest-feedback"></div>
+            </div>
+        </div>
+
+        <!-- Milestone Celebration Modal -->
+        <div id="milestoneModal" class="modal">
+            <div class="modal-content milestone-content">
+                <div class="milestone-animation">
+                    <div class="trophy-big">🏆</div>
+                    <div class="fireworks">🎆🎇✨💥</div>
+                </div>
+                <h2 class="milestone-title">🎉 MILESTONE REACHED! 🎉</h2>
+                <p class="milestone-score" id="milestoneScore">300 Points!</p>
+                <p class="milestone-message">You've earned a POWER-UP!</p>
+                <div class="powerup-display">
+                    <div class="powerup-icon">⚡</div>
+                    <div class="powerup-name" id="powerupName">Speed Boost!</div>
+                    <div class="powerup-description" id="powerupDesc">Phoenix moves faster for 20 seconds!</div>
+                </div>
+                <button id="claimPowerupBtn" class="btn btn-large">Claim Reward! 🎁</button>
             </div>
         </div>
 
