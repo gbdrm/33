@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>THR33 — Orbit Arcade</title>
+    <meta name="description" content="THR33 is a fast orbit arcade game. Weave, collect, and survive." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Syne:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="brand">
+        <p class="brand__mark">THR33</p>
+        <p class="brand__tag">orbit arcade</p>
+      </header>
+
+      <section class="stage" aria-label="THR33 game stage">
+        <canvas id="game" width="420" height="720" role="img" aria-label="Game canvas"></canvas>
+
+        <div id="hud" class="hud" hidden>
+          <div class="hud__block">
+            <span class="hud__label">Score</span>
+            <span id="score">0</span>
+          </div>
+          <div class="hud__block hud__block--center">
+            <span class="hud__label">Wave</span>
+            <span id="wave">1</span>
+          </div>
+          <div class="hud__block hud__block--right">
+            <span class="hud__label">Shields</span>
+            <span id="shields" class="shields" aria-live="polite">●●●</span>
+          </div>
+        </div>
+
+        <div id="overlay" class="overlay">
+          <div class="overlay__panel">
+            <h1 id="title">THR33</h1>
+            <p id="subtitle" class="overlay__copy">
+              Drift the ring. Collect mint cores. Avoid crimson shards.
+            </p>
+            <p id="best" class="overlay__best"></p>
+            <button id="start" type="button" class="cta">Enter orbit</button>
+            <p class="overlay__hint">
+              Drag to steer on iPad · ← → / A D on keyboard · Space to pause
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="game.js"></script>
+  </body>
+</html>
